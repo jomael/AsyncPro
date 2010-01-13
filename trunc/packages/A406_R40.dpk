@@ -1,0 +1,115 @@
+package A406_R40;
+
+{$R *.RES}
+{$ALIGN ON}
+{$ASSERTIONS OFF}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $01200000}
+{$DESCRIPTION 'TurboPower Async Professional 4.06 Runtime Package - VCL40'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  vcl40,
+  Vclx40;
+
+contains
+  AdMeter in '..\source\AdMeter.pas',
+  AdPStat in '..\source\AdPStat.pas',
+  AdStatLt in '..\source\AdStatLt.pas',
+  AdWnPort in '..\source\AdWnPort.pas',
+  ADXDial in '..\source\ADXDial.pas',
+  AdXProt in '..\source\AdXProt.pas',
+  AdXUp in '..\source\AdXUp.pas',
+  AwTPcl in '..\source\AwTPcl.pas',
+  AdExcept in '..\source\AdExcept.pas',
+  AdPackEd in '..\source\AdPackEd.pas',
+  AdPacket in '..\source\AdPacket.pas',
+  AdPort in '..\source\AdPort.pas',
+  AdProtcl in '..\source\AdProtcl.pas',
+  AdSelCom in '..\source\AdSelCom.pas',
+  AdSocket in '..\source\AdSocket.pas',
+  AdWUtil in '..\source\AdWUtil.pas',
+  AwAbsPcl in '..\source\AwAbsPcl.pas',
+  AwAscii in '..\source\AwAscii.pas',
+  AwKermit in '..\source\AwKermit.pas',
+  AwUser in '..\source\AwUser.pas',
+  AwWin32 in '..\source\AwWin32.pas',
+  AwWnsock in '..\source\AwWnsock.pas',
+  AwXmodem in '..\source\AwXmodem.pas',
+  AwYmodem in '..\source\AwYmodem.pas',
+  AwZmodem in '..\source\AwZmodem.pas',
+  OoMisc in '..\source\OoMisc.pas',
+  AdTUtil in '..\source\AdTUtil.pas',
+  AdTSel in '..\source\AdTSel.pas',
+  AdTStat in '..\source\AdTStat.pas',
+  AdTapi in '..\source\AdTapi.pas',
+  AwFaxCvt in '..\source\AwFaxCvt.pas',
+  AdFaxCtl in '..\source\AdFaxCtl.pas',
+  AdFaxCvt in '..\source\AdFaxCvt.pas',
+  AdFaxPrn in '..\source\AdFaxPrn.pas',
+  AdFPStat in '..\source\AdFPStat.pas',
+  AdFStat in '..\source\AdFStat.pas',
+  AdFView in '..\source\AdFView.pas',
+  AwAbsFax in '..\source\AwAbsFax.pas',
+  AwFax in '..\source\AwFax.pas',
+  AdFax in '..\source\AdFax.pas',
+  AwFView in '..\source\AwFView.pas',
+  AdSrMgr in '..\source\AdSrMgr.pas',
+  AdPager in '..\source\AdPager.pas',
+  AdFtp in '..\source\Adftp.pas',
+  AdScript in '..\source\AdScript.pas',
+  ADTrmEmu in '..\source\ADTrmEmu.pas',
+  ADTrmPsr in '..\source\ADTrmPsr.pas',
+  ADTrmMap in '..\source\ADTrmMap.pas',
+  ADTrmBuf in '..\source\ADTrmBuf.pas',
+  AdRStat in '..\source\AdRStat.pas' {RasStatusDisplay},
+  AdRas in '..\source\Adras.pas',
+  AdRasUtl in '..\source\Adrasutl.pas',
+  AdFaxSrv in '..\source\Adfaxsrv.pas',
+  AdFIDlg in '..\source\Adfidlg.pas' {ApdFaxJobInfoDialog},
+  AdGSM in '..\source\AdGsm.pas',
+  AdMdm in '..\source\AdMdm.pas',
+  AdMdmCfg in '..\source\AdMdmCfg.pas' {ApdModemConfigDialog},
+  AdMdmDlg in '..\source\AdMdmDlg.pas' {ApdModemStatusDialog},
+  AdLibMdm in '..\source\AdLibMdm.pas' {ApdModemSelectionDialog},
+  AdXLbMdm in '..\source\AdXLbMdm.pas',
+  AdXParsr in '..\source\AdXParsr.pas',
+  AdXChrFlt in '..\source\AdXChrFlt.pas',
+  AdXBase in '..\source\AdXBase.pas',
+  AdStMach in '..\source\AdStMach.pas',
+  AdSapiEn in '..\source\AdSapiEn.pas',
+  AdSapiPh in '..\source\AdSapiPh.pas',
+  AdSapiGr in '..\source\AdSapiGr.pas',
+  AdISapi in '..\source\AdISapi.pas',
+  AdVoIP in '..\source\AdVoip.pas',
+  AdVoipEd in '..\source\AdVoipEd.pas' {VoipAudioVideoEditor},
+  AdITapi3 in '..\source\AdITapi3.pas',
+  AdStrMap in '..\source\AdStrMap.pas',
+  AdPgr in '..\source\AdPgr.pas',
+  AdStDS in '..\source\AdStDS.pas',
+  AdStFax in '..\source\AdStFax.pas',
+  AdStProt in '..\source\AdStProt.pas',
+  AdStSapi in '..\source\AdStSapi.pas',
+  AdStSt in '..\source\adstst.pas',
+  LNSWin32 in '..\source\LNSWin32.pas',
+  LNSQueue in '..\source\LNSQueue.pas';
+
+end.

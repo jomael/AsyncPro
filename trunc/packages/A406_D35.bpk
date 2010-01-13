@@ -1,0 +1,187 @@
+# ---------------------------------------------------------------------------
+!if !$d(BCB)
+BCB = $(MAKEDIR)\..
+!endif
+
+# ---------------------------------------------------------------------------
+# IDE SECTION
+# ---------------------------------------------------------------------------
+# The following section of the project makefile is managed by the BCB IDE.
+# It is recommended to use the IDE to change any of the values in this
+# section.
+# ---------------------------------------------------------------------------
+
+VERSION = BCB.03
+# ---------------------------------------------------------------------------
+PROJECT = A406_D35.bpl
+OBJFILES = ..\source\AproReg.obj ..\source\Adpedit0.obj ..\source\Adpeditt.obj \
+  ..\source\AdPropEd.obj ..\source\Adabout.obj ..\source\AdStatEd.obj \
+  ..\source\AdStatE0.obj A406_D35.obj
+RESFILES = A406_D35.res
+DEFFILE =
+RESDEPEN = $(RESFILES) ..\source\AdStatEd.dfm ..\source\AdStatE0.dfm
+LIBFILES =
+LIBRARIES =
+SPARELIBS = VCL35.lib
+PACKAGES = vcl35.bpi vclx35.bpi A406_R35.bpi
+# ---------------------------------------------------------------------------
+PATHCPP = .;
+PATHASM = .;..\source
+PATHPAS = .;
+PATHRC = .;
+DEBUGLIBPATH = $(BCB)\lib\debug
+RELEASELIBPATH = $(BCB)\lib\release
+# ---------------------------------------------------------------------------
+CFLAG1 = -Od -w -Ve -r- -k -y -v -vi- -c -b- -w-par -w-inl -Vx
+CFLAG2 = -I..\source;source;$(BCB)\include;$(BCB)\include\vcl -D_RTLDLL;USEPACKAGES
+CFLAG3 = -Tkh30000
+PFLAGS = -U..\source;..\packages;source;$(BCB)\lib\obj;$(BCB)\lib;$(RELEASELIBPATH) \
+  -I..\source;source;$(BCB)\include;$(BCB)\include\vcl -D_RTLDLL;USEPACKAGES -H \
+  -W -$Y -$W -$O- -v -JPHN -M
+RFLAGS = -i..\source;source;$(BCB)\include;$(BCB)\include\vcl -D_RTLDLL;USEPACKAGES
+AFLAGS = /i$(BCB)\include /i$(BCB)\include\vcl /d_RTLDLL /dUSEPACKAGES /mx /w2 /zi
+LFLAGS = -L..\source;..\packages;source;$(BCB)\lib\obj;$(BCB)\lib;$(RELEASELIBPATH) \
+  -D"TurboPower Async Professional 4.06 Designtime Package - VCL35" -aa -Tpp -Gpd \
+  -x -Gn -Gl -Gi -v
+IFLAGS =
+# ---------------------------------------------------------------------------
+ALLOBJ = c0pkg32.obj $(PACKAGES) sysinit.obj $(OBJFILES)
+ALLRES = $(RESFILES)
+ALLLIB = $(LIBFILES) $(LIBRARIES) import32.lib cp32mti.lib
+# ---------------------------------------------------------------------------
+!ifdef IDEOPTIONS
+
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=0
+MajorVer=4
+MinorVer=6
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=TurboPower Software Company
+FileDescription=Async Professional Designtime Package - VCL35
+FileVersion=4.06
+InternalName=A406_D35
+LegalCopyright=Copyright (c) 1996-2002 TurboPower Software Co.
+LegalTrademarks=
+OriginalFilename=A406_D35
+ProductName=Async Professional
+ProductVersion=4.06
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=3
+Item0=$(BCB)\include;$(BCB)\include\vcl
+Item1=d;pd;$(BCB)\include;$(BCB)\include\vcl
+Item2=d;pd;apd;..\;..\apd;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=7
+Item0=..\ap4;$(BCB)\lib\obj;$(BCB)\lib
+Item1=$(BCB)\lib\obj;$(BCB)\lib
+Item2=e:\ap3;$(BCB)\lib\obj;$(BCB)\lib
+Item3=..\ap3;$(BCB)\lib\obj;$(BCB)\lib
+Item4=d;pd;$(BCB)\lib\obj;$(BCB)\lib
+Item5=..\ap3;d;pd;apd;..\;..\apd;$(BCB)\lib\obj;$(BCB)\lib
+Item6=..\apd;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=1
+Item0=_RTLDLL;USEPACKAGES
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+
+!endif
+
+# ---------------------------------------------------------------------------
+# MAKE SECTION
+# ---------------------------------------------------------------------------
+# This section of the project file is not used by the BCB IDE.  It is for
+# the benefit of building from the command-line using the MAKE utility.
+# ---------------------------------------------------------------------------
+
+.autodepend
+# ---------------------------------------------------------------------------
+!if !$d(BCC32)
+BCC32 = bcc32
+!endif
+
+!if !$d(DCC32)
+DCC32 = dcc32
+!endif
+
+!if !$d(TASM32)
+TASM32 = tasm32
+!endif
+
+!if !$d(LINKER)
+LINKER = ilink32
+!endif
+
+!if !$d(BRCC32)
+BRCC32 = brcc32
+!endif
+# ---------------------------------------------------------------------------
+!if $d(PATHCPP)
+.PATH.CPP = $(PATHCPP)
+.PATH.C   = $(PATHCPP)
+!endif
+
+!if $d(PATHPAS)
+.PATH.PAS = $(PATHPAS)
+!endif
+
+!if $d(PATHASM)
+.PATH.ASM = $(PATHASM)
+!endif
+
+!if $d(PATHRC)
+.PATH.RC  = $(PATHRC)
+!endif
+# ---------------------------------------------------------------------------
+$(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
+    $(BCB)\BIN\$(LINKER) @&&!
+    $(LFLAGS) +
+    $(ALLOBJ), +
+    $(PROJECT),, +
+    $(ALLLIB), +
+    $(DEFFILE), +
+    $(ALLRES)
+!
+# ---------------------------------------------------------------------------
+.pas.hpp:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.pas.obj:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.cpp.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.c.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.asm.obj:
+    $(BCB)\BIN\$(TASM32) $(AFLAGS) $<, $@
+
+.rc.res:
+    $(BCB)\BIN\$(BRCC32) $(RFLAGS) -fo$@ $<
+# ---------------------------------------------------------------------------

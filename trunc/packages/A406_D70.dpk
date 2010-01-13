@@ -1,0 +1,45 @@
+package A406_D70;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS OFF}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'TurboPower Async Professional 4.06 Designtime Package - VCL70'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  designide,
+  rtl,
+  vclx,
+  A406_R70;
+
+contains
+  APROReg in '..\source\APROREG.PAS',
+  AdAbout in '..\source\adabout.pas' {ApdAboutForm},
+  AdPackEd in '..\source\adpacked.pas' {PacketEditor},
+  AdPEdit0 in '..\source\Adpedit0.pas' {AdPEdit},
+  AdPEditT in '..\source\Adpeditt.pas',
+  Adproped in '..\source\AdPropEd.pas',
+  AdStatEd in '..\source\AdStatEd.pas' {frmStateEdit},
+  AdStatE0 in '..\source\AdStatE0.pas' {frmConditionEdit};
+
+end.

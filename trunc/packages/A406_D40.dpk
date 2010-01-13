@@ -1,0 +1,43 @@
+package A406_D40;
+
+{$R *.RES}
+{$ALIGN ON}
+{$ASSERTIONS OFF}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $00400000}
+{$DESCRIPTION 'TurboPower Async Professional 4.06 Designtime Package - VCL40'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  vcl40,
+  vclx40,
+  A406_R40;
+
+contains
+  Adpedit0 in '..\source\Adpedit0.pas',
+  Adpeditt in '..\source\Adpeditt.pas',
+  AdPropEd in '..\source\AdPropEd.pas',
+  Adabout in '..\source\Adabout.pas',
+  Aproreg in '..\source\Aproreg.pas',
+  AdStatEd in '..\source\AdStatEd.pas' {frmStateEdit},
+  AdStatE0 in '..\source\AdStatE0.pas' {frmConditionEdit};
+
+end.
