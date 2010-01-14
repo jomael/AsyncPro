@@ -20,11 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *    Sulaiman Mah
+ *    Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                    OOMISC.PAS 4.06                    *}
+{*                    OOMISC.PAS 5.00                    *}
 {*********************************************************}
 {* Miscellaneous supporting methods and types            *}
 {*********************************************************}
@@ -78,7 +80,7 @@ uses
 {$ENDIF}
 
 const
-  ApVersionStr = 'v4.07';                                                   // SWB
+  ApVersionStr = 'v5.00';
   {$IFDEF Apax}
   ApaxVersionStr = 'v1.14';                                                 // SWB
   {$ENDIF}
@@ -87,26 +89,18 @@ const
   ApdProductName = 'Async Professional';
   ApdShortProductName = 'APRO';
 
-  ApdVendor = 'TurboPower Software Company';
-  ApdVendorURL = 'http://www.TurboPower.com';
+  ApdVendor = 'Async Professional';
+  ApdVendorURL = 'http://tpapro.sourceforge.net/';
 
   { Version numbers }
   ApdXSLImplementation = 0.0;
   ApdXMLSpecification = '1.0';
 
-  {$IFDEF Win32}
   fsPathName  = 255;
   fsDirectory = 255;
   fsFileName  = 255;
   fsExtension = 255;
   fsName      = 255;
-  {$ELSE}
-  fsPathName  = 79;
-  fsDirectory = 67;
-  fsFileName  = 8;
-  fsExtension = 4;
-  fsName      = 12;
-  {$ENDIF}
 
   {shareable reading file mode}
   ApdShareFileRead = $40;
@@ -137,43 +131,20 @@ const
   {Event codes: (outbound)}
   eSetFileName = 3;
 
-{$IFDEF Win32}
 type
   TPipeEvent = record
     Event : Byte;
     Data : ShortString;
   end;
-  {$IFNDEF Delphi5}
   TOleEnum = type DWORD;
-  {$ENDIF}
   { XML definitions }
   DOMString = WideString;
-{$ENDIF}
-{$IFNDEF Win32}
-type
-  { define some types used by the 16-bit fax printer driver }
-  AnsiChar = Char;
-  PAnsiChar = PChar;
-  AnsiString  = string;
-  ShortString = string;
-  POverlapped = pointer;
-  DWORD = LongInt;
-{$ENDIF}
 
 type
   CharSet = set of char;
 
-  {$IFDEF AProBCB}
-    {$IFDEF Ver140}
-    TPassString = string;
-    {$ELSE}
-    TPassString = string[255];
-    {$ENDIF}
-  TApdHwnd = Integer;
-  {$ELSE}
-  TPassString = string[255];
+  TPassString = string[255];  // !!! There is a good case to remove this type.
   TApdHwnd = HWND;
-  {$ENDIF}
 
 
   {Standard event timer record structure used by all timing routines}
@@ -233,8 +204,8 @@ type { moved from AdRasUtl.pas }                                         {!!.06}
     dwfOptions         : DWord;                                          {!!.06}
     dwCountryID        : DWord;                                          {!!.06}
     dwCountryCode      : DWord;                                          {!!.06}
-    szAreaCode         : array[0..RasMaxAreaCode] of char;               {!!.06}
-    szLocalPhoneNumber : array[0..RasMaxPhoneNumber] of char;            {!!.06}
+    szAreaCode         : array[0..RasMaxAreaCode] of ansichar;
+    szLocalPhoneNumber : array[0..RasMaxPhoneNumber] of ansichar;
     dwAlternateOffset  : DWord;                                          {!!.06}
     IPAddr             : TRasIPAddr;                                     {!!.06}
     IPAddrDns          : TRasIPAddr;                                     {!!.06}
@@ -335,7 +306,7 @@ type
     dwBps                     : DWORD;                                   {!!.06}
     dwConnectDuration         : DWORD;                                   {!!.06}
   end;                                                                   {!!.06}
-{$ENDIF}                                                                 {!!.06}
+
 const
   {Compile-time configurations}
   MaxComHandles = 50;               {Max comm ports open at once}
@@ -422,10 +393,6 @@ type
   TDirCharArray  = array[0..fsDirectory] of Char;                   
   TChar20Array   = array[0..20] of Char;
   TCharArray = array[0..255] of Char;
-
-  {For generic buffer typecasts}
-  PByteBuffer = ^TByteBuffer;
-  TByteBuffer = array[1..65535] of Byte;
 
   {Port characteristic constants}
   TDatabits = 5..DontChangeDatabits;
@@ -2007,12 +1974,9 @@ type
     PageHeader  : TPageHeaderRec;     {header for current output page}
     OutFile     : PBufferedOutputFile;{Output file}
     PadPage     : Bool;               {True to pad text conversion to full page}{!!.04}
-    {$IFNDEF PrnDrv}
     InBitmap    : Graphics.TBitmap;
-    {$ENDIF}
   end;
 
-{$IFNDEF PrnDrv}
 
 type
   { moved from AdWUtil }                                                 {!!.06}
@@ -2167,9 +2131,9 @@ const
 type
   TLineReader = class
     protected
-      Buffer : array[0..LineBufferSize] of char;
+      Buffer : array[0..LineBufferSize] of ansichar;
       fEOLF : Boolean;
-      ReadPtr : PChar;
+      ReadPtr : PAnsiChar;
       fStream : TStream;
       fBytesRead : LongInt;
       fFileSize : LongInt;
@@ -2180,394 +2144,13 @@ type
       destructor Destroy; override;
       property EOLF : Boolean read fEOLF;
       property FileSize : LongInt read fFileSize;
-      function NextLine : string;
+      function NextLine : ansistring;
   end;
 
-  {String handling class, only used by the TApdPager}
-type
-  TAdStr = class
-  private
-    FMaxLen: Integer;
-    FLen: Integer;
-    FString: PChar;
-    FCur: PChar;
-
-  protected
-    procedure SetLen(NewLen: Integer);
-    function GetLen: Integer;
-
-    procedure SetMaxLen(NewMaxLen: Integer);
-    function GetMaxLen: Integer;
-
-    function GetBuffLen: Integer;
-
-    procedure SetChar(Index: Cardinal; Value: Char);
-    function GetChar(Index: Cardinal): Char;
-
-    function GetCurChar: Char;
-
-  public
-    constructor Create(AMaxLen: Cardinal);
-    destructor Destroy; override;
-    procedure Assign(Source: TAdStr);
-
-    property Len: Integer
-      read GetLen write SetLen;
-    property MaxLen: Integer
-      read GetMaxLen write SetMaxLen;
-    property BuffLen: Integer
-      read GetBuffLen;
-    property Chars[Index: Cardinal]: Char
-      read GetChar write SetChar; default;
-    property CurChar: Char
-      read GetCurChar;
-    property Str: PChar
-      read FString;
-    property Cur: PChar
-      read FCur;
-
-    procedure First;
-    procedure GotoPos(Index: Cardinal);
-    procedure Last;
-    procedure MoveBy(IndexBy: LongInt);
-    procedure Next;
-    procedure Prev;
-
-    procedure Append(const Text: string);
-    procedure AppendTAdStr(TS: TAdStr);
-    procedure AppendBuff(Buff: PChar);
-    procedure Clear;
-    function Copy(Index, SegLen: Integer): string;
-    procedure Delete(Index, SegLen: Integer);
-    procedure Insert(const Text: string; Index: Integer);
-    function Pos(const SubStr: string): Cardinal;
-    function PosIdx(const SubStr: string; Index: Integer): Cardinal;
-    procedure Prepend(const Text: string);
-    procedure Resize(NewLen: Integer);
-  end;
 
   TAdStrCur = class
   private
   public
-  end;
-
-  {text converter data}
-  PTextFaxData = ^TTextFaxData;
-  TTextFaxData = record
-    IsExtended : Boolean;                      {Using extended text option?}
-    ReadBuffer : PByteArray;                   {Input buffer}
-    TabStop    : Cardinal;                     {Number of spaces per tab character}
-    LineCount  : Cardinal;                     {Number of text lines between page}
-    InFile     : TLineReader;                  {Input file}
-    OnLine     : DWORD;                        {Number of current input line} 
-    CurRow     : Cardinal;                     {Current raster row of CurStr}
-    CurStr     : array[0..255] of char;
-    Pending    : string;                                           
-    FFPending  : Boolean;                      {TRUE if formfeed pending}
-    FontRec    : TFontRecord;                  {Holds current font info}
-    case Integer of
-      0: (FontLoaded : Bool;                   {False until font loaded}
-          FontPtr    : PByteArray);            {Pointer to the loaded font table}
-      1: (Bitmap     : Graphics.TBitmap;       {Memory bitmap for rendering text}
-          LineBytes  : Cardinal;               {Bytes per raster line}
-          Offset     : Cardinal;               {Current offset in the bitmap}
-          ImageSize  : LongInt;                {Size of image structure}
-          ImageData  : Pointer);               {Image data}
-  end;
-
-
-  {TIFF strip information}
-  PStripRecord = ^TStripRecord;
-  TStripRecord = packed record
-    Offset : LongInt;
-    Length : LongInt;
-  end;
-
-  PStripInfo = ^TStripInfo;
-  TStripInfo = array[1..(65521 div SizeOf(TStripRecord))] of TStripRecord;
-
-  {TIFF converter data}
-  PTiffFaxData = ^TTiffFaxData;
-  TTiffFaxData = record
-    Intel       : Bool;                {TRUE if file is in Intel byte order}
-    LastBitMask : Word;                {Last decode bit mask}
-    CurrRBSize  : Cardinal;            {Amount of data in read buffer}
-    CurrRBOfs   : Cardinal;            {Current offset in ReadBuffer}
-    OnStrip     : Cardinal;            {Current strip being processed}
-    OnRaster    : Cardinal;            {Current raster line being processed}
-    Version     : Word;                {Version number from file preable}
-    SubFile     : Word;                {TIFF tag field values for image:}
-    ImgWidth    : Word;                {image width}
-    ImgLen      : Word;                {length of image}
-    ImgBytes    : Word;                {bytes per raster line}
-    NumLines    : Word;                {image length (height)}
-    CompMethod  : Word;                {compression type}
-    PhotoMet    : Word;                {photometric conversion type}
-    RowStrip    : DWORD;               {raster lines per image strip}
-    StripOfs    : LongInt;             {offset in file to first strip}
-    StripCnt    : DWORD;               {number of strips}
-    StripInfo   : PStripInfo;          {strip offsets/lengths}
-    ByteCntOfs  : LongInt;             {offset to byte count list}
-    ImgStart    : LongInt;             {start of image data in file}
-    ReadBuffer  : PByteArray;          {buffer for reads}
-    InFile      : File;                {input file}
-  end;
-
-  PDcxFaxData = ^TDcxFaxData;
-  TDcxFaxData = record
-    DcxHeader : TDcxHeaderRec;         {Offsets to DCX pages}
-    DcxPgSz   : TDcxOfsArray;          {Number of bytes per PCX image}
-    DcxNumPag : Cardinal;              {Number of pages (PCX images) in file}
-    OnPage    : Cardinal;              {Current page being converted}
-  end;
-
-  PPcxFaxData = ^TPcxFaxData;
-  TPcxFaxData = record
-    CurrRBSize   : Cardinal;           {Read buffer size}
-    CurrRBOfs    : Cardinal;           {Offset into read buffer}
-    ActBytesLine : Cardinal;           {Actual number of bytes per line}
-    ReadBuffer   : PByteArray;         {Read buffer}
-    PcxHeader    : TPcxHeaderRec;      {Header from PCX image}
-    PcxBytes     : DWORD;              {Number of bytes in PCX image}
-    InFile       : File;               {Input file}
-    PcxWidth     : Word;               {Width of raster line in pixels}
-    DcxData      : PDcxFaxData;        {Optional DCX conversion data}
-  end;
-
-const
-  DMSize = 32;
-
-type
-  PBitmapFaxData = ^TBitmapFaxData;
-  TBitmapFaxData = record
-    BmpHandle       : HBitmap;
-    DataBitmap      : Graphics.TBitmap;
-    BytesPerLine    : Cardinal;
-    Width           : Cardinal;
-    NumLines        : Cardinal;
-    OnLine          : Cardinal;
-    Offset          : LongInt;
-    BitmapBufHandle : THandle;
-    BitmapBuf       : Pointer;
-    NeedsDithering  : Boolean;
-    DM              : array[0..Pred(DMSize),0..Pred(DMSize)] of Integer;
-  end;
-{$ENDIF}
-{$ENDIF} {DrvInst}
-
-{Fax unpacking}
-
-{options passed to unpacker callback}
-const
-  upStarting = $0001;
-  upEnding   = $0002;
-
-{flags passed to unpacker status}
-const
-  usStarting = $0001;
-  usEnding   = $0002;
-
-const
-  {unpacker options}
-  ufYield            = $0001;
-  ufAutoDoubleHeight = $0002;
-  ufAutoHalfWidth    = $0004;
-  ufAbort            = $0008;
-
-  DefUnpackOptions = ufYield or ufAutoDoubleHeight;
-  BadUnpackOptions = Cardinal(0);
-
-  {const number of raster lines per allocated page}
-  RasterBufferPageSize = Cardinal(1024);
-
-type
-  {settings for horizontal and vertical scaling}
-  PScaleSettings = ^TScaleSettings;
-  TScaleSettings = record
-    HMult : Cardinal;
-    HDiv  : Cardinal;
-    VMult : Cardinal;
-    VDiv  : Cardinal;
-  end;
-
-  PUnpackFax = ^TUnpackFax;
-
-  {callback for outputting unpacked data}
-  TUnpackLineCallback = function(Unpack : PUnpackFax; plFlags : Word;
-    var Data; Len, PageNum : Cardinal) : Integer;
-
-  {callback for outputting status information}
-  TUnpackStatusCallback = procedure(Unpack : PUnpackFax; FaxFile : PChar;
-    PageNum : Cardinal; BytesUnpacked, BytesToUnpack : LongInt);
-
-  {memory bitmap descriptor}
-  PMemoryBitmapDesc = ^TMemoryBitmapDesc;
-  TMemoryBitmapDesc = record
-    Width  : Cardinal;
-    Height : Cardinal;
-    Bitmap : HBitmap;
-  end;
-
-  TUnpackFax = record
-    {basic unpacker data}
-    CurCode    : Cardinal;
-    CurSig     : Cardinal;
-    LineOfs    : Cardinal;            {Current offset in line}
-    LineBit    : Cardinal;            {Current offset in byte}
-    CurrPage   : Cardinal;            {Current page}
-    CurrLine   : Cardinal;            {Current line}
-    Flags      : Cardinal;            {Option flags}
-    BadCodes   : Cardinal;            {Number of bad codes unpacked}
-    WSFrom     : Cardinal;            {Whitespace comp - size of run to comp}
-    WSTo       : Cardinal;            {Number of lines to compress to}
-    WhiteCount : Cardinal;            {Count of white lines unpacked}
-    TreeLast   : Integer;
-    TreeNext   : Integer;
-    Match      : Integer;
-    ImgBytes   : LongInt;
-    ImgRead    : LongInt;
-    WhiteTree  : PTreeArray;          {Tree of white runlength codes}
-    BlackTree  : PTreeArray;          {Tree of black runlength codes}
-    LineBuffer : PByteArray;          {Buffer for decompression}
-    TmpBuffer  : PByteArray;
-    FileBuffer : PByteArray;          {File I/O buffer}
-    FaxHeader  : TFaxHeaderRec;
-    PageHeader : TPageHeaderRec;
-    OutputLine : TUnpackLineCallback; {Output a decompressed raster line}
-    Status     : TUnpackStatusCallback;
-    UserData   : Pointer;             {Data needed by higher level unpackers}
-
-    {scaling data}
-    Height     : Cardinal;            {height of bitmap}
-    Width      : Cardinal;            {width of bitmap}
-    Handle     : THandle;             {handle to memory block}
-    Pages      : Cardinal;            {pages allocate in handle}
-    MaxWid     : Cardinal;            {maximum width of line}
-    Lines      : Pointer;             {raster lines}
-    Scale      : TScaleSettings;      {scale settings}
-    MemBmp     : TMemoryBitmapDesc;   {memory bitmap}
-    SaveHook   : TUnpackLineCallback; {saved output line hook}
-    ToBuffer   : Bool;                {unpack to memory buffer?}
-    Inverted   : Bool;                {TRUE if bitmap data should be inverted}
-  end;
-
-  {data for unpacking to PCX file}
-  PUnpackToPcxData = ^TUnpackToPcxData;
-  TUnpackToPcxData = record
-    PBOfs       : Cardinal;
-    Lines       : Cardinal;
-    LastPage    : Cardinal;
-    PCXOfs      : LongInt;
-    FileOpen    : Bool;
-    DcxUnpack   : Bool;
-    OutFile     : File;
-    OutName     : array[0..255] of Char;
-    PackBuffer  : array[0..511] of Byte;
-    DcxHead     : TDcxHeaderRec;
-  end;
-
-{image converters}
-const
-  DCXHeaderID = 987654321;
-
-{Fax viewer}
-
-const
-  {fax viewer window Cardinal}
-  gwl_Viewer = 0;
-
-const
-  {special styles}
-  vws_DragDrop  = $0001;
-
-  {default colors}
-  DefViewerBG = $FFFFFF;
-  DefViewerFG = $000000;
-
-  {default scrolling parameters}
-  DefVScrollInc = 8;
-  DefHScrollInc = 8;
-
-{Abstract fax send/receive}
-const
-  {Constants used to initialize object fields}
-  DefConnectAttempts : Cardinal = 1;   {Default one connect attempt}
-  DefMaxRetries : Integer       = 2;   {Max times to retry sending a page}
-  DefStatusTimeout : Integer    = 1;   {Seconds between status updates}
-
-  {Constants used directly}
-  DefNormalInit        : string = 'ATE0Q0V1X4S0=0S2=43';                 {!!.04}
-  DefBlindInit         : string = 'ATE0Q0V1X3S0=0S2=43';                 {!!.04}
-  DefNoDetectBusyInit  : string = 'ATE0Q0V1X2S0=0S2=43';                 {!!.04}
-  DefX1Init            : string = 'ATE0Q0V1X1S0=0S2=43';                 {!!.04}
-  DefTapiInit          : string = 'ATE0Q0V1S0=0S2=43';                   {!!.04}
-  {DefInit                      = DefNormalInit;}                        {!!.04}
-  DefStatusBytes : Cardinal        = 10000;   {Force periodic exit}
-  MaxBadPercent : Cardinal         = 10;      {Error if this % bad training}
-  FlushWait : Cardinal             = 500;     {Msec before/after DTR drop}
-  FrameWait : Cardinal             = 20;      {Msec delay before HDLC frame}
-
-  {Fax send/receive options}
-  afAbortNoConnect      = $0001;   {Abort if no connect}
-  afExitOnError         = $0002;   {Exit FaxTransmit/Receive on error}
-  afCASSubmitUseControl = $0004;   {SubmitSingleFile uses control file}
-  afSoftwareFlow        = $0008;   {Use software flow control in C1/2}
-
-  DefFaxOptions : Cardinal = 0;
-  BadFaxOptions = Cardinal(0);
-
-  {Fax types (for specifying different send/receive state machines}
-  ftNone              = 0;   {None specified}
-  ftClass12           = 1;   {Class 1/2/2.0}
-
-type
-  ClassType = (ctUnknown, ctDetect, ctClass1, ctClass2, ctClass2_0);  
-
-  {Logging codes}
-  TFaxLogCode = (
-    lfaxNone,
-    lfaxTransmitStart,
-    lfaxTransmitOk,
-    lfaxTransmitFail,
-    lfaxReceiveStart,
-    lfaxReceiveOk,
-    lfaxReceiveSkip,
-    lfaxReceiveFail);
-  { APRO components now use the TFaxLogCode exclusively, TLogFaxCode defined }
-  { here for backwards compatibility }
-  TLogFaxCode = TFaxLogCode;                                             {!!.04}
-  {Logging codes for TApdFaxServer}
-  TFaxServerLogCode = (
-    fslNone,
-    fslPollingEnabled,
-    fslPollingDisabled,
-    fslMonitoringEnabled,
-    fslMonitoringDisabled);
-
-  {General fax states}
-  FaxStateType = (
-    faxReady,           {State machine ready immediately}
-    faxWaiting,         {State machine waiting}
-    faxCritical,        {State machine in critical state}
-    faxFinished);       {State machine is finished}
-
-type
-  {A list of files/numbers to fax}
-  TFaxNumber = String[40];
-  PFaxEntry = ^TFaxEntry;
-  TFaxEntry = record
-    fNumber : TFaxNumber;
-    fFName  : ShortString;
-    fCover  : ShortString;
-    fNext   : PFaxEntry;
-  end;
-
-  {A general (Pascal and C++) structure for returning the next fax to send}
-  PSendFax = ^TSendFax;
-  TSendFax = record
-    sfNumber : array[0..40] of Char;
-    sfFName  : array[0..255] of Char;
-    sfCover  : array[0..255] of Char;
   end;
 
 const
@@ -2679,17 +2262,6 @@ type
   TTraceQueue = array[0..HighestTrace] of TTraceRecord;
 
   {DispatchBuffer type}
-  PDBuffer = ^TDBuffer;
-  TDBuffer = array[0..65527] of Char;
-
-  {$IFDEF Win32}
-  {Output buffer type}
-  POBuffer = ^TOBuffer;
-  TOBuffer = array[0..pred(High(Integer))] of Char;
-  {$ENDIF}                                                            
-
-  {$IFNDEF PrnDrv}
-
   {For storing com name}
   TComName = array[0..5] of Char;
 
@@ -2717,7 +2289,7 @@ type
     tChkIndex   : TCheckIndex;
     tMatched    : Bool;
     tIgnoreCase : Bool;
-    tData       : array[0..MaxTrigData] of Char;
+    tData       : array[0..MaxTrigData] of byte;
   end;
 
   {Status trigger record}
@@ -2764,115 +2336,20 @@ type
     }
   {$ENDIF}
 
-{$IFDEF Win32}
 procedure SetFlag(var Flags : Cardinal; FlagMask : Cardinal);
-{$ELSE}
-procedure SetFlag(var Flags : Cardinal; FlagMask : Cardinal);
-  {-Set bit(s) in the parameter Flags. The bits to set are specified in
-  FlagMask.}
-  inline(
-    $58/                     {pop ax        ;FlagMask into AX}
-    $5F/                     {pop di}
-    $07/                     {pop es        ;ES:DI => Flags}
-    $26/$09/$05);            {or es:[di],ax ;Flags := Flags or FlagMask}
-{$ENDIF}
 
-{$IFDEF Win32}
 procedure ClearFlag(var Flags : Cardinal; FlagMask : Cardinal);
-{$ELSE}
-procedure ClearFlag(var Flags : Cardinal; FlagMask : Cardinal);
-  {-Clear bit(s) in the parameter Flags. The bits to clear are specified in
-  Flagmask.}
-  inline(
-    $58/                     {pop ax         ;FlagMask into AX}
-    $5F/                     {pop di}
-    $07/                     {pop es         ;ES:DI => Flags}
-    $F7/$D0/                 {not ax         ;FlagMask := not FlagMask}
-    $26/$21/$05);            {and es:[di],ax ;Flags := Flags and not FlagMask}
-{$ENDIF}
 
-{$IFDEF Win32}
 function FlagIsSet(Flags : Cardinal; FlagMask : Cardinal) : Bool;
-{$ELSE}
-function FlagIsSet(Flags, FlagMask : Cardinal) : Bool;
-  {-Return True if the bit specified by FlagMask is set in Flags.}
-  inline(
-    $5A/                     {pop dx    ;FlagMask into DX}
-    $58/                     {pop ax    ;Flags into AX}
-    $21/$D0/                 {and ax,dx ;Mask out everything not in FlagMask}
-    $74/$03/                 {jz  Exit}
-    $B8/$01/$00);            {mov ax,1  ;AX = Ord(True)}
-                             {Exit:}
-{$ENDIF}
 
-{$IFDEF Win32}
 procedure SetByteFlag(var Flags : Byte; FlagMask : Byte);
-{$ELSE}
-procedure SetByteFlag(var Flags : Byte; FlagMask : Byte);
-  {-Set bit(s) in the parameter Flags. The bits to set are specified in
-  FlagMask.}
-  inline(
-    $58/                     {pop ax        ;FlagMask into AL}
-    $5F/                     {pop di}
-    $07/                     {pop es        ;ES:DI => Flags}
-    $26/$08/$05);            {or es:[di],al ;Flags := Flags or FlagMask}
-{$ENDIF}
 
-{$IFDEF Win32}
 procedure ClearByteFlag(var Flags : Byte; FlagMask : Byte);
-{$ELSE}
-procedure ClearByteFlag(var Flags : Byte; FlagMask : Byte);
-  {-Clear bit(s) in the parameter Flags. The bits to clear are specified in
-  FlagMask.}
-  inline(
-    $58/                     {pop ax         ;FlagMask into AL}
-    $5F/                     {pop di}
-    $07/                     {pop es         ;ES:DI => Flags}
-    $F6/$D0/                 {not al         ;AL := not AL}
-    $26/$20/$05);            {and es:[di],al ;Flags := Flags and not FlagMask}
-{$ENDIF}
 
-{$IFDEF Win32}
 function ByteFlagIsSet(Flags : Byte; FlagMask : Byte) : Bool;
-{$ELSE}
-function ByteFlagIsSet(Flags, FlagMask : Byte) : Bool;
-  {-Return True if the bit specified by FlagMask is set in the Flags
-  parameter.}
-  Inline(
-    $5A/                   {pop dx    ;FlagMask into DL}
-    $58/                   {pop ax    ;Flags into AL}
-    $30/$E4/               {xor ah,ah ;Zero out AH}
-    $20/$D0/               {and al,dl ;Mask out everything not in FlagMask}
-    $74/$02/               {jz  Exit}
-    $B0/$01);              {mov al,1  ;AX = Ord(True)}
-                            {Exit:}
-{$ENDIF}
 
-{$IFDEF Win32}
-function MinWord(A, B : Cardinal) : Cardinal;
-{$ELSE}
-function MinWord(A, B : Cardinal) : Cardinal;
-  {-Return the smaller of A and B.}
-  inline(
-    $58/                     {pop ax}
-    $5B/                     {pop bx}
-    $39/$C3/                 {cmp bx,ax}
-    $73/$02/                 {jae done}
-    $89/$D8);                {mov ax,bx}
-                             {done:}
-{$ENDIF}
 
-{$IFDEF Win32}
 function AddWordToPtr(P : Pointer; W : Cardinal) : Pointer;
-{$ELSE}
-function AddWordToPtr(P : Pointer; W : Cardinal) : Pointer;
-  {-Add a Cardinal to a pointer.}
-  inline(
-    $5B/                     {pop bx     ;bx = W}
-    $58/                     {pop ax     ;ax = Ofs(P^)}
-    $5A/                     {pop dx     ;dx = Seg(P^)}
-    $01/$D8);                {add ax,bx  ;ax = Ofs(P^)+W}
-{$ENDIF}
 
 function AdTimeGetTime : DWord;
 
@@ -2887,46 +2364,32 @@ function ElapsedTimeInSecs(ET : EventTimer) : LongInt;
 function RemainingTime(ET : EventTimer) : LongInt;
 function RemainingTimeInSecs(ET : EventTimer) : LongInt;
 function DelayTicks(Ticks: LongInt; Yield : Bool) : Longint;
-{$IFNDEF PrnDrv}
 function Long2StrZ(Dest : PChar; L : LongInt) : PChar;
 function Str2LongZ(S : PChar; var I : LongInt) : Bool;
-{$ENDIF}
 function JustPathnameZ(Dest : PChar; PathName : PChar) : PChar;
 function JustFilenameZ(Dest : PChar; PathName : PChar) : PChar;
-{$IFNDEF PrnDrv}
 function JustExtensionZ(Dest : PChar; Name : PChar) : PChar;
-{$ENDIF}
 function StrStCopy(Dest : PChar; S : PChar; Pos, Count : Cardinal) : PChar;
 function AddBackSlashZ(Dest : PChar; DirName : PChar) : PChar;
-{$IFNDEF PrnDrv}
 function ExistFileZ(FName : PChar) : Bool;
-{$ENDIF}
 function ForceExtensionZ(Dest : PChar; Name, Ext : PChar) : PChar;
 function DefaultExtensionZ(Dest : PChar; Name, Ext : PChar) : PChar;
 function GetPtr(P : Pointer; O : LongInt) : Pointer;
 procedure NotBuffer(var Buf; Len : Cardinal);
 
-{$IFNDEF Win32}
-function Trim(const S : string) : string;
-{$ENDIF}
 
 function DelayMS(MS : Cardinal) : Cardinal;
 
 function SafeYield : LongInt;
 
-{$IFNDEF Win32}
-function TrimRight(const S : String) : String;
-  {-Return a String with trailing white space removed}
-{$ENDIF}
 
-{$IFNDEF PrnDrv}
 function JustName(PathName : String) : String;
   {-Return just the name (no extension, no path) of a pathname}
 
 function AddBackSlash(const DirName : String) : String;
   {-Add a default backslash to a directory name}
 
-function IsWin2000 : Boolean;                                          
+function IsWin2000 : Boolean;
   {- Returns True if running on Windows 2000 }
 
 function IsWinNT : Boolean;
@@ -2993,22 +2456,13 @@ type
 {$ENDIF}
 
 
-{$IFDEF Win32}
 function ApWinExecAndWait32(FileName : PChar; CommandLine : PChar;
                             Visibility : Integer) : Integer;
-{$ENDIF}
 
 {$IFDEF Apax}
 procedure WriteDebug(const S : string);
 {$ENDIF}
 
-{$IFDEF Delphi6}
-{ These methods were overloaded to work around a Delphi 6 bug. }
-procedure AssignFile(var F: File; const FileName: string); overload;
-procedure AssignFile(var F: TextFile; const FileName : string); overload;
-procedure Assign(var F: File; const FileName: string); overload;
-procedure Assign(var F: TextFile; const FileName: string); overload;
-{$ENDIF}
 
 implementation
 
@@ -3016,7 +2470,7 @@ implementation
 procedure WriteDebug(const S : string);
 var
   LogStream : TFileStream;
-  TimeStamp : string;
+  TimeStamp : ansistring;
 begin
   LogStream := nil;
   try
@@ -3026,35 +2480,13 @@ begin
       LogStream := TFileStream.Create('APAXDBG.TXT', fmCreate or fmShareDenyNone);
     LogStream.Seek(0, soFromEnd);
     TimeStamp := FormatDateTime('dd/mm/yy : hh:mm:ss - ', Now) + S + #13#10;
-    LogStream.WriteBuffer(TimeStamp[1], Length(TimeStamp));
-    WriteLn(S);
+    LogStream.WriteBuffer(TimeStamp[1], Length(TimeStamp) * SizeOf( ansichar))
   finally
     LogStream.Free;
   end;
 end;
 {$ENDIF}
 
-{$IFDEF Delphi6}
-procedure AssignFile(var F: File; const FileName: string);
-begin
-  System.AssignFile(F, FileName);
-end;
-
-procedure AssignFile(var F: TextFile; const FileName : string);
-begin
-  System.AssignFile(F, FileName);
-end;
-
-procedure Assign(var F: File; const FileName: string);
-begin
-  System.Assign(F, FileName);
-end;
-
-procedure Assign(var F: TextFile; const FileName: string);
-begin
-  System.Assign(F, FileName);
-end;
-{$ENDIF}
 
 
 const
@@ -3066,8 +2498,6 @@ const
   SecsFreq  = 92;
   MSecsFreq = 92000;
 
-{$IFNDEF PrnDrv}
-{$IFNDEF DrvInst}
 constructor TLineReader.Create(Stream : TStream);
 begin
   fStream := Stream;
@@ -3082,9 +2512,9 @@ begin
   inherited Destroy;
 end;
 
-function TLineReader.NextLine : string;
+function TLineReader.NextLine : ansistring;
 var
-  EOL : PChar;
+  EOL : PAnsiChar;
   Done : Boolean;
 begin
   Result := '';
@@ -3130,304 +2560,6 @@ begin
   end;
 end;                                                                        // SWB
 
-{ TAdStr }
-
-constructor TAdStr.Create(AMaxLen: Cardinal);
-begin
-  inherited Create;
-  FMaxLen := 0;
-  FLen := 0;
-  FString := nil;
-  SetMaxLen(AMaxLen);
-end;
-
-destructor TAdStr.Destroy;
-begin
-  if Assigned(FString) then
-    FreeMem(FString, FMaxLen + 1);
-  inherited Destroy;
-end;
-
-procedure TAdStr.Append(const Text: string);
-var
-  NewLen: Integer;
-  Buff: PChar;
-begin
-  if Text = '' then Exit;         { nothing to append }
-
-  NewLen := Length(Text) + FLen;
-  if NewLen > FMaxLen then         { if new text will be longer than allocated }
-    Resize(NewLen);              { reallocate }
-
-  Buff := StrAlloc(Length(Text) + 1);
-  StrPCopy(Buff,Text);
-  StrCat(FString, Buff);
-  StrDispose(Buff);
-  FLen := StrLen(FString);
-end;
-
-procedure TAdStr.AppendBuff(Buff: PChar);
-var
-  BuffLen: Integer;
-begin
-  BuffLen := StrLen(Buff);
-  if BuffLen = 0 then Exit;
-
-  if BuffLen + FLen > FMaxLen then
-    Resize(BuffLen + FLen);
-
-  StrCat(FString, Buff);
-  FLen := StrLen(FString);
-end;
-
-procedure TAdStr.AppendTAdStr(TS: TAdStr);
-begin
-  AppendBuff(TS.Str);
-end;
-
-procedure TAdStr.Assign(Source: TAdStr);
-begin
-  if not Assigned(Source) then Exit;
-
-  if Source.MaxLen <> MaxLen then
-    Resize(Source.MaxLen);
-
-  FMaxLen := Source.MaxLen;
-
-  StrCopy(FString, Source.Str);
-  FLen    := StrLen(FString);
-
-  GotoPos(Source.Cur - Source.Str);
-end;
-
-procedure TAdStr.Clear;
-begin
-  FString[0] := #0;
-  FLen := 0;
-  FCur := FString;
-end;
-
-function TAdStr.Copy(Index, SegLen: Integer): string;
-var
-  P:PChar;
-  NewLen: Integer;
-begin
-  if (Index = 0) or (SegLen = 0) or (Index > FLen) then begin
-    Result := '';
-    Exit;
-  end;
-
-  NewLen := SegLen;
-  if Index + (SegLen - 1) > FLen then  { requested segment runs past end of string }
-    NewLen := FLen - Index;  { just return up to end of string }
-
-{$ifndef WIN32 }
-  if NewLen > 255 then  { old Pascal strings can contain no more than 255 chars }
-    NewLen := 255;
-{$endif }
-  GotoPos(Index);
-
-  P := StrAlloc(NewLen + 1);
-  StrLCopy(P, FCur, NewLen);
-  Result := StrPas(P);
-  StrDispose(P);
-end;
-
-procedure TAdStr.Delete(Index, SegLen: Integer);
-var
-  Src: PChar;
-  SrcLen: Cardinal;
-begin
-  if (Index = 0) or (SegLen = 0) or (Index > FLen) then Exit;
-
-  GotoPos(Index);             { locate starting point }
-  if Index + (SegLen - 1) > FLen then  { delete rest of string }
-    FCur[0] := #0
-  else begin                  { remove chunk }
-    Src := FCur + SegLen;     { find start of remain post chunk string }
-    SrcLen := StrLen(Src);
-    StrLCopy(FCur, Src, SrcLen);
-  end;
-  FLen := StrLen(FString);
-end;
-
-procedure TAdStr.First;
-begin
-  FCur := FString;
-end;
-
-function TAdStr.GetBuffLen: Integer;
-begin
-  Result := FMaxLen + 1;
-end;
-
-function TAdStr.GetChar(Index: Cardinal): Char;
-begin
-  Result := FString[Index];
-end;
-
-function TAdStr.GetCurChar: Char;
-begin
-  Result := FCur[0];
-end;
-
-function TAdStr.GetLen: Integer;
-begin
-  Result := FLen;
-end;
-
-function TAdStr.GetMaxLen: Integer;
-begin
-  Result := FMaxLen;
-end;
-
-procedure TAdStr.GotoPos(Index: Cardinal);
-begin
-  FCur := FString;
-  Inc(FCur, Index-1);
-end;
-
-procedure TAdStr.Insert(const Text: string; Index: Integer);
-var
-  Buff: PChar;
-  NewLen: Integer;
-begin
-  if (Index = 0) or (Index > FLen) or (Text = '') then Exit;
-
-  NewLen := Length(Text) + FLen;
-  if NewLen > FMaxLen then         { if new text will be longer than allocated }
-    Resize(NewLen);              { reallocate }
-
-  GotoPos(Index);                  { find insertion point }
-  Buff := StrNew(FCur);            { make copy of rest of string }
-  StrPCopy(FCur, Text);            { append Text at insertion point }
-  StrCat(FString, Buff);           { add rest of string back on }
-  StrDispose(Buff);
-  FLen := StrLen(FString);
-end;
-
-procedure TAdStr.Last;
-begin
-  FCur := StrEnd(FString) - 1;
-end;
-
-procedure TAdStr.Resize(NewLen: Integer);
-var
-  Temp: PChar;
-  TempLen: Cardinal;
-begin
-  Temp := StrNew(FString);
-  if (NewLen - 1) < FLen then
-    TempLen := NewLen - 1
-  else
-    TempLen := FLen;
-  SetMaxLen(NewLen);
-  StrLCopy(FString, Temp, TempLen);
-  StrDispose(Temp);
-  FLen := StrLen(FString)
-end;
-
-procedure TAdStr.MoveBy(IndexBy: LongInt);
-begin
-  if IndexBy < 0 then
-    Dec(FCur, IndexBy)
-  else
-  if IndexBy > 0 then
-    Inc(FCur, IndexBy)
-  else
-    {no change};
-end;
-
-procedure TAdStr.Next;
-begin
-  Inc(FCur, 1);
-end;
-
-function TAdStr.Pos(const SubStr: string): Cardinal;
-var
-  Buff: PChar;
-begin
-  Buff := StrAlloc(Length(SubStr) + 1);
-  StrPCopy(Buff,SubStr);
-  FCur := StrPos(FString, Buff);
-  StrDispose(Buff);
-
-  if FCur = nil then
-    Result := 0
-  else
-    Result := FCur - FString + 1;
-end;
-
-function TAdStr.PosIdx(const SubStr: string; Index: Integer): Cardinal;
-var
-  Buff: PChar;
-begin
-  if (Index = 0) or (Index > FLen) then begin
-    Result := 0 ;
-    Exit ;
-  end;
-
-  GetMem(Buff, Length(SubStr) + 5);
-  GotoPos(Index);
-  FCur := StrPos(FCur, StrPCopy(Buff,SubStr));
-  StrDispose(Buff);
-
-  if FCur = nil then
-    Result := 0
-  else
-    Result := FCur - FString + 1;
-end;
-
-procedure TAdStr.Prepend(const Text: string);
-begin
-  Insert(Text,1);
-end;
-
-procedure TAdStr.Prev;
-begin
-  Dec(FCur,1);
-end;
-
-procedure TAdStr.SetChar(Index: Cardinal; Value: Char);
-begin
-  if FString[Index] <> Value then
-    FString[Index] := Value;
-end;
-
-procedure TAdStr.SetLen(NewLen: Integer);
-begin
-  if NewLen <= FLen then
-    FString[NewLen] := #0;
-end;
-
-procedure TAdStr.SetMaxLen(NewMaxLen: Integer);
-begin
-  if FMaxLen <> NewMaxLen then begin
-    if Assigned(FString) then
-      FreeMem(FString, FMaxLen + 5);
-    FMaxLen := NewMaxLen;
-    if FMaxLen = 0 then
-      FString := nil
-    else
-      GetMem(FString, FMaxLen + 5);
-  end;
-
-  if Assigned(FString) then
-    FString[0] := #0;
-  FLen := 0;
-end;
-
-{$ENDIF}
-{$ENDIF}
-
-{$IFDEF Win32}
-function MinWord(A, B : Cardinal) : Cardinal;
-begin
-  if A < B then
-    Result := A
-  else
-    Result := B;
-end;
 
 function FlagIsSet(Flags : Cardinal; FlagMask : Cardinal) : Bool;
 begin
@@ -3463,16 +2595,11 @@ function AddWordToPtr(P : Pointer; W : Cardinal) : Pointer; assembler;
 asm
   add   eax,edx
 end;
-{$ENDIF}
 
 const
-  DosDelimSet : set of Char = ['\', ':', #0];
+  DosDelimSet : set of ansichar = ['\', ':', #0];
 
-  {$IFDEF Win32}
   MaxPCharLen = $7FFFFFFF;
-  {$ELSE}
-  MaxPCharLen = $FFFF;
-  {$ENDIF}
 
   function SafeYield : LongInt;
     {-Allow other processes a chance to run}
@@ -3628,7 +2755,6 @@ const
     DelayTicks := Res;
   end;
 
-  {$IFNDEF PrnDrv}
   function Long2StrZ(Dest : PChar; L : LongInt) : PChar;
     {-Convert a long/Cardinal/integer/byte/shortint to a string}
   var
@@ -3637,7 +2763,6 @@ const
     Str(L, S);
     Result := StrPCopy(Dest, S);
   end;
-  {$ENDIF}
 
 const
   MaxLen  = 255;
@@ -3646,7 +2771,6 @@ const
 type
   TSmallArray = Array[0..MaxLen-1] of Char;
 
-  {$IFNDEF PrnDrv}
   function Str2LongZ(S : PChar; var I : LongInt) : Bool;
     {-Convert a string to a longint, returning true if successful}
   var
@@ -3655,12 +2779,11 @@ type
     Val(StrPas(S),I,Err);
     Result := Err = 0;
   end;
-  {$ENDIF}
 
   function JustPathnameZ(Dest : PChar; PathName : PChar) : PChar;
     {-Return just the drive:directory portion of a pathname}
   var
-    I : Integer;                                                      
+    I : Integer;
 
   begin
     I := StrLen(PathName);
@@ -3668,7 +2791,7 @@ type
       Dec(I);
     until (I = -1) or (PathName[I] in DosDelimSet);
 
-    if I = -1 then                                                    
+    if I = -1 then
       {Had no drive or directory name}
       Dest[0] := #0
     else if I = 0 then begin
@@ -3723,7 +2846,7 @@ type
     if Pos < Len then begin
       if (Len-Pos) < Count then
         Count := Len-Pos;
-      Move(S[Pos], Dest^, Count);
+      Move(S[Pos], Dest^, Count * SizeOf( Char));
       Dest[Count] := #0;
     end else
       Dest[0] := #0;
@@ -3766,45 +2889,11 @@ type
     Result := StrPCopy(Dest,S);
   end;
 
-  {$IFNDEF Win32}
-  function GetPtr(P : Pointer; O : LongInt) : Pointer; assembler;
-    {-Return a pointer to an offset in a huge memory block}
-  asm
-    mov   dx,Cardinal ptr [O+2]
-    shl   dx,3
-    add   dx,Cardinal ptr [P+2]
-    mov   ax,Cardinal ptr [O]
-    add   ax,Cardinal ptr [P]
-  end;
-  {$ELSE}
   function GetPtr(P : Pointer; O : LongInt) : Pointer; assembler; register;
   asm
     add   eax,edx   {eax = P; edx = Offset}
   end;
-  {$ENDIF}
 
-  {$IFNDEF Win32}
-  procedure NotBuffer(var Buf; Len : Cardinal); assembler;
-  asm
-    push  ds
-    lds   si,Buf                {DS:SI->Buf}
-    xor   ax,ax                 {AX=0}
-    mov   cx,Len                {CX = Length of buffer}
-    shr   cx,1                  {CX = CX / 2}
-    adc   ax,ax                 {AX = remainder from division}
-    jcxz  @2                    {Jump if there are no words to NOT}
-@1: not   Cardinal ptr [si]     {NOT next Cardinal of buffer}
-    inc   si                    {SI += 2}
-    inc   si
-    loop  @1
-
-@2: or    ax,ax                 {jump if no more data}
-    jz    @3
-    not   byte ptr [si]         {NOT last byte of buffer}
-
-@3: pop   ds
-  end;
-  {$ELSE}
   procedure NotBuffer(var Buf; Len : Cardinal); assembler; register;
   asm
     {eax is the pointer to the buffer}
@@ -3833,19 +2922,6 @@ type
 
 @4:
   end;
-  {$ENDIF}
-
-  {$IFNDEF Win32}
-  function Trim(const S : string) : string;
-    {-Remove leading and trailing whitespace from a string}
-  begin
-    Result := S;
-    while (Length(Result) > 0) and (Result[Length(Result)] <= ' ') do
-      Dec(Result[0]);
-    while (Length(Result) > 0) and (Result[1] <= ' ') do
-      Delete(Result, 1, 1);
-  end;
-  {$ENDIF}
 
   function DelayMS(MS : Cardinal) : Cardinal;
   var
@@ -3868,20 +2944,6 @@ type
     end;
   end;
 
-  {$IFNDEF Win32}
-  function TrimRight(const S : String) : String;
-    {-Return a String with trailing white space removed}
-  var
-    SLen : Byte absolute Result;
-
-  begin
-    Result := S;
-    while (SLen > 0) and (Result[SLen] <= ' ') do
-      Dec(SLen);
-  end;
-  {$ENDIF}
-
-{$IFNDEF PrnDrv}
   function JustName(PathName : string) : string;
     {-Return just the name (no extension, no path) of a pathname}
   var
@@ -3896,21 +2958,21 @@ type
 
   function AddBackSlash(const DirName : String) : String;
     {-Add a default backslash to a directory name}
-  var                                                                  
-    IsQuoted : Boolean;                                                
+  var
+    IsQuoted : Boolean;
   begin
     Result := DirName;
     if DirName = '' then Exit;
-    IsQuoted := DirName[Length(DirName)] = '"';                        
-    if IsQuoted then                                                   
-      Result := Copy(DirName, 1, Length(DirName) - 1);                 
+    IsQuoted := DirName[Length(DirName)] = '"';
+    if IsQuoted then
+      Result := Copy(DirName, 1, Length(DirName) - 1);
     if not(Result[Length(Result)] in DosDelimSet) then
-      Result := Result+'\';                                            
-    if IsQuoted then                                                   
-      Result := Result + '"';                                          
+      Result := Result+'\';
+    if IsQuoted then
+      Result := Result + '"';
   end;
 
-function IsWin2000 : Boolean;                                          
+function IsWin2000 : Boolean;
 var
  Osi : TOSVersionInfo;
 begin
@@ -3980,9 +3042,7 @@ end;
 procedure TApdBaseScrollingWinControl.SetVersion(const Value: string);
 begin                    
 end;
-{$ENDIF}
 
-{$IFDEF Win32}
 function ApWinExecAndWait32(FileName : PChar; CommandLine : PChar;
                             Visibility : Integer) : Integer;
  { returns -1 if the Exec failed, otherwise returns the process' exit }
@@ -4039,7 +3099,6 @@ begin                                                                       // S
     timeEndPeriod(tc.wPeriodMin);                                           // SWB
 end;                                                                        // SWB
 
-{$ENDIF}
 
 end.
 

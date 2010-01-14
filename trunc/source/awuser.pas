@@ -215,13 +215,13 @@ type
       FQueue         : TIOQueue;               {Input queue}                // SWB
 
       { Output buffer -- protected by OutputSection }
-      OBuffer       : POBuffer;          {Output buffer}
+      OBuffer       : pointer;          {Output buffer}
       OBufHead      : Cardinal;          {Head offset in OBuffer}
       OBufTail      : Cardinal;          {Tail offset in OBuffer}
       OBufFull      : Boolean;           {True when output buffer full}
 
       { Dispatcher stuff -- protected by DispSection }
-      DBuffer       : PDBuffer;          {Dispatcher buffer}
+      DBuffer       : pointer;          {Dispatcher buffer}
       DBufHead      : Cardinal;          {Head offset in DBuffer}
       DBufTail      : Cardinal;          {Tail offset in DBuffer}
       fEventBusy    : Boolean;           {True if we're processing a COM event}
@@ -278,7 +278,7 @@ type
       function ExtractData : Boolean;
       function FindTriggerFromHandle(TriggerHandle : Cardinal; Delete : Boolean;
                                      var T : TTriggerType; var Trigger : Pointer) : Integer;
-      function GetDispatchTime : DWORD;                               
+      function GetDispatchTime : DWORD;
       function GetModemStatusPrim(ClearMask : Byte) : Byte;
       function GetTriggerHandle : Cardinal;
 
@@ -288,7 +288,7 @@ type
                             Offset : Cardinal;
                             Len : Cardinal;
                             var NewTail : Cardinal) : Integer;
-      function PeekCharPrim(var C : Char; Count : Cardinal) : Integer;
+      function PeekCharPrim(var C : ansiChar; Count : Cardinal) : Integer;
       procedure RefreshStatus;
       procedure ResetStatusHits;
       procedure ResetDataTriggers;
@@ -1522,7 +1522,7 @@ end;
     end;
   end;
 
-  function TApdBaseDispatcher.PeekCharPrim(var C : Char; Count : Cardinal) : Integer;
+  function TApdBaseDispatcher.PeekCharPrim(var C : ansiChar; Count : Cardinal) : Integer;
     {-Return the Count'th character but don't remove it from the buffer}
   var
     NewTail : Cardinal;
@@ -1545,7 +1545,8 @@ end;
         NewTail := DBufTail + (Count - 1);
         if NewTail >= DispatchBufferSize then
           NewTail := (NewTail - DispatchBufferSize);
-        C := DBuffer^[NewTail];
+//        C := DBuffer^[NewTail];
+        C := PAnsiChar( AddWordToPtr( DBuffer, NewTail))^;
       end else
         Result := ecBufferIsEmpty;
     finally

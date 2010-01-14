@@ -20,11 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *    Sulaiman Mah
+ *    Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADXDIAL.PAS 4.06                    *}
+{*                   ADXDIAL.PAS 5.00                    *}
 {*********************************************************}
 {* Generic dial dialog, prompts for phone number         *}
 {*********************************************************}

@@ -20,11 +20,12 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *
+ *    Sulaiman Mah
+ *    Sean B. Durkin
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADPEDIT0.PAS 4.06                   *}
+{*                   ADPEDIT0.PAS 5.00                   *}
 {*********************************************************}
 {* Baud rate property editor                             *}
 {*********************************************************}
@@ -49,12 +50,7 @@ uses
   Controls,
   Forms,
   Dialogs,
-{$IFDEF Delphi6}
-  DesignIntf,
-  DesignEditors,
-{$ELSE}
   DsgnIntf,
-{$ENDIF}
   StdCtrls;
 
 type
