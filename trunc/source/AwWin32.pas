@@ -20,11 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   AWWIN32.PAS 4.06                    *}
+{*                   AWWIN32.PAS 5.00                    *}
 {*********************************************************}
 {* Win32 serial device layer and dispatcher              *}
 {*********************************************************}
@@ -422,9 +424,6 @@ implementation
         while (DispThread <> nil) and not(TimerExpired(ET)) do
           SafeYield;
         if DispThread <> nil then begin
-          {$IFDEF DebugThreadConsole}
-          WriteLn('DispThread<>nil');
-          {$ENDIF}
           { thread didn't die, reset the event }
           SetEvent(ComEvent);
           {Wait for it to die yet again}
@@ -436,9 +435,6 @@ implementation
             DispThread.Free;
         end;
 
-        {$IFDEF DebugThreadConsole}
-        Writeln(ThreadStatus(DispKill));
-        {$ENDIF}
       end;
 
       if ComEvent <> INVALID_HANDLE_VALUE then begin

@@ -44,9 +44,7 @@
 {$I AWDEFINE.INC}
 
 {Options required for this unit}
-{$IFNDEF Win32}
 {$L-}
-{$ENDIF}
 
 unit OoMisc;
   {-Unit for miscellaneous routines}
@@ -72,11 +70,7 @@ uses
 
 { need this for the 16-bit printer drivers }
 {$IFNDEF UseResourceStrings}
-  {$IFDEF Win32}
   {$R APRO.R32}
-  {$ELSE}
-  {$R APRO.R16}
-  {$ENDIF}
 {$ENDIF}
 
 const
@@ -1804,10 +1798,8 @@ type
   TMakeUpCodeArray = array[0..MaxMUCodeTable] of TCodeRec;
 
   {generic byte array}
-  {$IFNDEF Win32}
   PByteArray = ^TByteArray;
   TByteArray = array[0..$FFF0] of Byte;
-  {$ENDIF}
 
   PBufferedOutputFile = ^TBufferedOutputFile;
   TBufferedOutputFile = record
@@ -2255,13 +2247,19 @@ type
 
   {For holding trace entries}
   TTraceRecord = record
-    EventType : Char;
-    C : Char;
+    EventType : AnsiChar;
+    C : AnsiChar;
   end;
   PTraceQueue = ^TTraceQueue;
   TTraceQueue = array[0..HighestTrace] of TTraceRecord;
 
   {DispatchBuffer type}
+  PDBuffer = ^TDBuffer;
+  TDBuffer = array[0..65527] of Char;
+
+  POBuffer = ^TOBuffer;
+  TOBuffer = array[0..pred(High(Integer))] of AnsiChar;
+
   {For storing com name}
   TComName = array[0..5] of Char;
 

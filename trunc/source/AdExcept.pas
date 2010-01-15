@@ -794,10 +794,8 @@ end;
 initialization
   InitializeUnit;
 
-  {$IFDEF Win32}
   finalization
     FinalizeUnit;
-  {$ENDIF}
 
 {$ENDIF}
 

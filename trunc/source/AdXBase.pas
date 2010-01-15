@@ -20,11 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADXBASE.PAS 4.06                    *}
+{*                   ADXBASE.PAS 5.00                    *}
 {*********************************************************}
 {*     XML parser Base types and conversion routines     *}
 {*********************************************************}

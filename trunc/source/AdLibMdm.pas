@@ -24,7 +24,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADLIBMDM.PAS 4.06                   *}
+{*                   ADLIBMDM.PAS 5.00                   *}
 {*********************************************************}
 {* TApdLibModem component, types used by LibModem, and   *}
 {* the modem selection dialog                            *}

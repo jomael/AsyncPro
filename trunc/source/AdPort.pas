@@ -34,7 +34,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                    ADPORT.PAS 4.06                    *}
+{*                    ADPORT.PAS 5.00                    *}
 {*********************************************************}
 {* TApdComPort component                                 *}
 {*********************************************************}
@@ -72,11 +72,7 @@ uses
   Forms,
   OoMisc,
   AwUser,
-{$IFNDEF UseAwWin32}
   LnsWin32,
-{$ELSE}
-  AwWin32,
-{$ENDIF}
   AdExcept,
   AdSelCom;
 

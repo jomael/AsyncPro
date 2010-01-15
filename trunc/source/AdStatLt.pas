@@ -20,11 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADSTATLT.PAS 4.06                   *}
+{*                   ADSTATLT.PAS 5.00                   *}
 {*********************************************************}
 {* TApdSLController, TApdStatusLight component           *}
 {*********************************************************}
@@ -556,7 +558,7 @@ implementation
     if not ComPort.Open then begin
       MonitoringPending := NewMon;
       if MonitoringPending then
-        Exit;                                                         
+        Exit;
     end;
 
     FMonitoring := NewMon;

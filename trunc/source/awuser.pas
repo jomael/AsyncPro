@@ -41,7 +41,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                    AWUSER.PAS 4.06                    *}
+{*                    AWUSER.PAS 5.00                    *}
 {*********************************************************}
 {* Low-level dispatcher                                  *}
 {*********************************************************}
@@ -259,7 +259,7 @@ type
       function GetComError(var Stat : TComStat) : Integer; virtual; abstract;
       function GetComEventMask(EvtMask : Integer) : Cardinal; virtual; abstract;
       function GetComState(var DCB: TDCB): Integer; virtual; abstract;
-      function ReadCom(Buf : PChar; Size: Integer) : Integer; virtual; abstract;
+      function ReadCom(Buf : PansiChar; Size: Integer) : Integer; virtual; abstract;
       function SetComState(var DCB : TDCB) : Integer; virtual; abstract;
       function WriteCom(Buf : PChar; Size: Integer) : Integer; virtual; abstract;
       function WaitComEvent(var EvtMask : DWORD;
@@ -3624,7 +3624,7 @@ end;
     Start, Len : Cardinal;
     TraceFile : Text;
     TraceFileBuffer : array[1..512] of Char;
-    LastEventType : Char;
+    LastEventType : AnsiChar;
     First : Boolean;
     Col : Cardinal;
     I : Cardinal;
@@ -4304,7 +4304,7 @@ end;
       NumToWrite : Integer;
       NumWritten : DWORD;
       Ok         : Boolean;
-      TempBuff   : OPBuffer;
+      TempBuff   : POBuffer;
     begin
       while DataInBuffer do begin
         with H do begin

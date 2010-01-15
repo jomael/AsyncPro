@@ -20,11 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADWUTIL.PAS 4.06                    *}
+{*                   ADWUTIL.PAS 5.00                    *}
 {*********************************************************}
 {* Winsock DLL interface and utility methods             *}
 {*********************************************************}
@@ -50,10 +52,8 @@ uses
 
 type
   TSocket = Integer;
-  {$IFNDEF Win32}
   AnsiChar = Char;
   PAnsiChar = ^Char;
-  {$ENDIF}
 
 const
   { Version of Winsock that we support }
@@ -455,7 +455,6 @@ type
     lpVendorInfo   : PAnsiChar;
   end;
 
-  {$IFDEF Win32}
   PTransmitFileBuffers = ^TTransmitFileBuffers;
   TTransmitFileBuffers = packed record
       Head       : Pointer;
@@ -463,7 +462,6 @@ type
       Tail       : Pointer;
       TailLength : DWORD;
   end;
-  {$ENDIF}
 
   { Structure used by kernel to store most addresses. }
 
@@ -498,175 +496,175 @@ type
   TfnAccept                   = function(S : TSocket;
                                          var Addr : TSockAddr;
                                          var Addrlen : Integer) : TSocket;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnBind                     = function(S : TSocket;
                                          var Addr : TSockAddr;
                                          NameLen : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnCloseSocket              = function(S : TSocket) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnConnect                  = function(S : TSocket;
                                          var Name : TSockAddr;
                                          NameLen : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnIOCtlSocket              = function(S : TSocket;
                                          Cmd : LongInt;
                                          var Arg : LongInt) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnGetPeerName              = function(S : TSocket;
                                          var Name : TSockAddr;
                                          var NameLen : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnGetSockName              = function(S : TSocket;
                                          var Name : TSockAddr;
                                          var NameLen : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnGetSockOpt               = function(S : TSocket;
                                          Level, OptName : Integer;
                                          var OptVal; var OptLen : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   Tfnhtonl                    = function(HostLong : LongInt) : LongInt;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   Tfnhtons                    = function(HostShort : Word) : Word;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnINet_Addr                = function(Cp : PAnsiChar) : LongInt;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnINet_NtoA                = function(InAddr : TInAddr) : PAnsiChar;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnListen                   = function(S : TSocket; Backlog : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   Tfnntohl                    = function(NetLong : LongInt) : LongInt;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   Tfnntohs                    = function(NetShort : Word) : Word;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnRecv                     = function(S : TSocket; var Buf;
                                          Len, Flags : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnRecvFrom                 = function(S : TSocket; var Buf;
                                          Len, Flags : Integer;
                                          var From : TSockAddr;
                                          var FromLen : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnSelect                   = function(Nfds : Integer;
                                          Readfds, Writefds,
                                          Exceptfds : PFDSet;
                                          Timeout : PTimeVal) : LongInt;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnSend                     = function(S : TSocket; var Buf;
                                          Len, Flags : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnSendTo                   = function(S : TSocket; var Buf;
                                          Len, Flags : Integer;
                                          var AddrTo : TSockAddr;
                                          ToLen : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnSetSockOpt               = function(S : TSocket;
                                          Level, OptName : Integer;
                                          var OptVal; OptLen : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnShutdown                 = function(S : TSocket; How : Integer) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnSocket                   = function(Af, Struct, Protocol : Integer) : TSocket;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnGetHostByAddr            = function(var Addr; Len, Struct : Integer): PHostEnt;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnGetHostByName            = function(Name : PAnsiChar) : PHostEnt;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnGetHostName              = function(Name : PAnsiChar;
                                          Len : Integer): Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnGetServByPort            = function(Port : Word; Proto : PAnsiChar) : PServEnt;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnGetServByName            = function(Name, Proto : PAnsiChar) : PServEnt;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnGetProtoByNumber         = function(Proto : Integer) : PProtoEnt;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnGetProtoByName           = function(Name : PAnsiChar) : PProtoEnt;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaStartup               = function(wVersionRequired : Word;
                                          var WSData : TwsaData) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaCleanup               = function : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaSetLastError          = procedure(iError : Integer);
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaGetLastError          = function : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaIsBlocking            = function : BOOL;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaUnhookBlockingHook    = function : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaSetBlockingHook       = function(lpBlockFunc : TFarProc) : TFarProc;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaCancelBlockingCall    = function : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaAsyncGetServByName    = function(HWindow : HWnd; wMsg : Integer;
                                          Name, Proto, Buf : PAnsiChar;
                                          BufLen : Integer) : THandle;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaAsyncGetServByPort    = function(HWindow : HWnd;
                                          wMsg, Port : Integer;
                                          Proto, Buf : PAnsiChar;
                                          BufLen : Integer) : THandle;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaAsyncGetProtoByName   = function(HWindow : HWnd;
                                          wMsg : Integer;
                                          Name, Buf : PAnsiChar;
                                          BufLen : Integer) : THandle;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaAsyncGetProtoByNumber = function(HWindow : HWnd;
                                          wMsg : Integer;
                                          Number : Integer;
                                          Buf : PAnsiChar;
                                          BufLen : Integer) : THandle;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaAsyncGetHostByName    = function(HWindow : HWnd;
                                          wMsg : Integer;
                                          Name, Buf : PAnsiChar;
                                          BufLen : Integer) : THandle;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaAsyncGetHostByAddr    = function(HWindow : HWnd;
                                          wMsg : Integer;
@@ -674,18 +672,17 @@ type
                                          Len, Struct : Integer;
                                          Buf : PAnsiChar;
                                          BufLen : Integer) : THandle;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaCancelAsyncRequest    = function(hAsyncTaskHandle : THandle) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
   TfnwsaAsyncSelect           = function(S : TSocket;
                                          HWindow : HWnd;
                                          wMsg : Integer;
                                          lEvent : LongInt) : Integer;
-                                         {$IFDEF Win32} stdcall; {$ENDIF}
+                                         stdcall;
 
-  {$IFDEF Win32}
   TfnwsaRecvEx                = function(S : TSocket;
                                          var Buf;
                                          Len : Integer;
@@ -698,7 +695,6 @@ type
                                          lpOverlapped : POverlapped;
                                          lpTransmitBuffers: PTransmitFileBuffers;
                                          dwReserved: DWORD) : BOOL; stdcall;
-  {$ENDIF}
 
   { Record for our function pointers. }
   PSocketFuncs = ^TSocketFuncs;
@@ -749,10 +745,8 @@ type
     wsaAsyncGetHostByAddr    : TfnwsaAsyncGetHostByAddr;
     wsaCancelAsyncRequest    : TfnwsaCancelAsyncRequest;
     wsaAsyncSelect           : TfnwsaAsyncSelect;
-    {$IFDEF Win32}
     wsaRecvEx                : TfnwsaRecvEx;
     TransmitFile             : TfnTransmitFile;
-    {$ENDIF}
   end;
 
 function LoadWinsock : Boolean;
@@ -769,11 +763,7 @@ var
 implementation
 
 const
-  {$IFDEF Win32}
   SockDLL = 'WSOCK32';
-  {$ELSE}
-  SockDLL = 'WINsOCK.DLL';
-  {$ENDIF}
 
 var
   SocketModule : THandle;
@@ -789,11 +779,8 @@ begin
     SocketModule := LoadLibrary(SockDLL);
 
   { Validate loading of the module }
-  {$IFDEF Win32}
+
   if SocketModule = 0 then begin
-  {$ELSE}
-  if SocketModule <= HINsTANCE_ERROR then begin
-  {$ENDIF}
     SocketModule := 0;
     Exit;
   end;
@@ -939,15 +926,12 @@ begin
     @wsaAsyncSelect := GetProcAddress(SocketModule, 'WSAAsyncSelect');
     if not Assigned(wsaAsyncSelect) then Exit;
 
-    {$IFDEF Win32}
-
     {At least one implementation of 32-bit Winsock does not have these calls}
     {@wsaRecvEx := GetProcAddress(SocketModule, 'WSARecvEx');
     if not Assigned(wsaRecvEx) then Exit;}
 
     {@TransmitFile := GetProcAddress(SocketModule, 'TransmitFile');
     if not Assigned(TransmitFile) then Exit;}
-    {$ENDIF}
 
   end;
 
@@ -994,17 +978,14 @@ begin
 end;
 
 initialization
-{$IFNDEF Win32}
   AddExitProc(WinsockExit);
-{$ENDIF}
   FillChar(SockFuncs, Sizeof(SockFuncs), #0);
   SocketModule := 0;
 
-{$IFDEF Win32}
+
 finalization
   {Free Winsock if we loaded it}
   WinsockExit;
-{$ENDIF}
 
 end.
 

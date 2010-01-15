@@ -23,6 +23,8 @@
  *  Stephen W. Boyd     - Created this module to provide input queueing for
  *                        serial port dispatcher.
  *                        August 2005
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 {Global defines potentially affecting this unit}

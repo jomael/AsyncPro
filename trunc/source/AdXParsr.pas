@@ -20,11 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADXPARSR.PAS 4.06                   *}
+{*                   ADXPARSR.PAS 5.00                   *}
 {*********************************************************}
 {*                    XML parser code                    *}
 {*********************************************************}
@@ -37,15 +39,9 @@ unit AdXParsr;
 interface
 
 uses
-{$IFDEF WIN32}
   Windows,
   Graphics,
   Controls,
-{$ENDIF}
-{$IFDEF LINUX}
-  Libc,
-  Types,
-{$ENDIF}
   SysUtils,
   Classes,
   OOMisc,

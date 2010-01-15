@@ -24,7 +24,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADSELCOM.PAS 4.06                   *}
+{*                   ADSELCOM.PAS 5.00                   *}
 {*********************************************************}
 {* Port selection dialog, IsPortAvailable method         *}
 {*********************************************************}
@@ -93,11 +93,7 @@ function IsPortAvailable(ComNum : Cardinal) : Boolean;
   function MakeComName(const Dest : PChar; const ComNum : Cardinal) : PChar;
     {-Return a string like 'COMXX'}
   begin
-    {$IFDEF WIN32}
     StrFmt(Dest,'\\.\COM%d',[ComNum]);
-    {$ELSE}
-    StrFmt(Dest,'COM%d',[ComNum]);
-    {$ENDIF}
     MakeComName := Dest;
   end;
 
@@ -112,19 +108,11 @@ begin
       Result := False
     else begin
       if UseDispatcherForAvail then begin
-        {$IFDEF Win32}
         DeviceLayer  := TApdWin32Dispatcher.Create(nil);
-        {$ELSE}
-        DeviceLayer := TApdCommDispatcher.Create(nil);
-        {$ENDIF}
         Res := DeviceLayer.OpenCom(MakeComName(ComName,ComNum), 64, 64);
         if (Res < 0) then
           if ShowPortsInUse then
-            {$IFDEF Win32}
             Result := GetLastError = DWORD(Abs(ecAccessDenied))
-            {$ELSE}
-            Result := Res = ie_Open
-            {$ENDIF}
           else
             Result := False
         else begin
@@ -132,7 +120,6 @@ begin
           DeviceLayer.CloseCom;
         end;
       end else begin
-        {$IFDEF Win32}
         Res := CreateFile(MakeComName(ComName, ComNum),
                  GENERIC_READ or GENERIC_WRITE,
                  0,
@@ -141,31 +128,19 @@ begin
                  FILE_ATTRIBUTE_NORMAL or
                  FILE_FLAG_OVERLAPPED,
                  0);
-        {$ELSE}
-        Res := OpenComm(MakeComName(ComName, ComNum), 64, 64);
-        {$ENDIF}
-
         if Res > 0 then begin
-          {$IFDEF Win32}
           CloseHandle(Res);
-          {$ELSE}
-          CloseComm(Res);
-          {$ENDIF}
           Result := True;
         end else begin
           if ShowPortsInUse then
-            {$IFDEF Win32}
             Result := GetLastError = DWORD(Abs(ecAccessDenied))
-            {$ELSE}
-            Result := Res = ie_Open
-            {$ENDIF}
           else
             Result := False;
         end;
       end;
     end;
   finally
-    if UseDispatcherForAvail then                                  
+    if UseDispatcherForAvail then
       DeviceLayer.Free;
   end;
 end;

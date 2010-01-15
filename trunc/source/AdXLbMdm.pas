@@ -20,11 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADXLBMDM.PAS 4.06                   *}
+{*                   ADXLBMDM.PAS 5.00                   *}
 {*********************************************************}
 {*  Contains TApdModemCapDetails, which manipulates the  *}
 {*                modemcap detail files.                 *}

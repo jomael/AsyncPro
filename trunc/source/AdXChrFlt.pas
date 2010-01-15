@@ -20,11 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                  ADXCHRFLT.PAS 4.06                   *}
+{*                  ADXCHRFLT.PAS 5.00                   *}
 {*********************************************************}
 {*        XML Character streams, input and output        *}
 {*********************************************************}
