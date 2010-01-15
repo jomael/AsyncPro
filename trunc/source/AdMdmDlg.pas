@@ -38,7 +38,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  OOMisc, AdMdm, StdCtrls, Buttons, ExtCtrls
+  OOMisc, AdMdm, StdCtrls, Buttons, ExtCtrls, ImgList
   {$IFDEF Delphi4}, ImgList{$ENDIF};
 
 type
