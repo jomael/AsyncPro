@@ -2289,7 +2289,7 @@ type
     tChkIndex   : TCheckIndex;
     tMatched    : Bool;
     tIgnoreCase : Bool;
-    tData       : array[0..MaxTrigData] of byte;
+    tData       : array[0..MaxTrigData] of AnsiChar;
   end;
 
   {Status trigger record}

@@ -36,6 +36,8 @@
  *                        were being popped off the queue but not freed; Added
  *                        D2006 / D2007 compiler strings
  *
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
@@ -284,7 +286,7 @@ type
 
       procedure MapEventsToMS(Events : Integer);
       function PeekBlockPrim(
-                            Block : PChar;
+                            Block : PAnsiChar;
                             Offset : Cardinal;
                             Len : Cardinal;
                             var NewTail : Cardinal) : Integer;
@@ -339,8 +341,8 @@ type
                               Len : Cardinal) : Integer;
       function AddStatusTrigger(SType : Cardinal) : Integer;
       function AddTimerTrigger : Integer;
-      procedure AddTraceEntry(CurEntry : Char; CurCh : Char);
-      function AppendDispatchLog(FName : PChar;
+      procedure AddTraceEntry(CurEntry : ansiChar; CurCh : ansiChar);
+      function AppendDispatchLog(FName : PWideChar;
                                   InHex, AllHex : Boolean) : Integer;
       function AppendTrace(FName : PChar;
                             InHex, AllHEx : Boolean) : Integer;
@@ -372,11 +374,11 @@ type
       function FlushOutBuffer : Integer;
       function CharReady : Boolean;
       function GetBaseAddress : Word;
-      function GetBlock(Block : PChar; Len : Cardinal) : Integer;
-      function GetChar(var C : Char) : Integer;
+      function GetBlock(Block : PAnsiChar; Len : Cardinal) : Integer;
+      function GetChar(var C : ansiChar) : Integer;
       function GetDataPointer(var P : Pointer; Index : Cardinal) : Integer;
       function GetFlowOptions(var HWOpts, SWOpts, BufferFull,
-        BufferResume : Cardinal; var OnChar, OffChar : Char): Integer;
+        BufferResume : Cardinal; var OnChar, OffChar : ansiChar): Integer;
       procedure GetLine(var Baud : LongInt; var Parity : Word;
         var DataBits : TDatabits; var StopBits : TStopbits);
       function GetLineError : Integer;
@@ -397,8 +399,8 @@ type
       procedure OptionsOff(Options : Cardinal);
       function OutBuffUsed : Cardinal;
       function OutBuffFree : Cardinal;
-      function PeekBlock(Block : PChar; Len : Cardinal) : Integer;
-      function PeekChar(var C : Char; Count : Cardinal) : Integer;
+      function PeekBlock(Block : PAnsiChar; Len : Cardinal) : Integer;
+      function PeekChar(var C : ansiChar; Count : Cardinal) : Integer;
       function ProcessCommunications : Integer; virtual; abstract;
       function PutBlock(const Block; Len : Cardinal) : Integer;
       function PutChar(C : Char) : Integer;
@@ -432,7 +434,7 @@ type
       procedure StartTracing;
       procedure StopDispatchLogging;
       procedure StopTracing;
-      function SWFlowChars( OnChar, OffChar : Char) : Integer;
+      function SWFlowChars( OnChar, OffChar : AnsiChar) : Integer;
       function SWFlowDisable : Integer;
       function SWFlowEnable(BufferFull, BufferResume : Cardinal;
         Options : Cardinal) : Integer;
@@ -1554,7 +1556,7 @@ end;
     end;
   end;
 
-  function TApdBaseDispatcher.PeekChar(var C : Char; Count : Cardinal) : Integer;
+  function TApdBaseDispatcher.PeekChar(var C : AnsiChar; Count : Cardinal) : Integer;
     {-Return the Count'th character but don't remove it from the buffer}
     {-Account for GetCount}
   begin
@@ -1568,7 +1570,7 @@ end;
     end;
   end;
 
-  function TApdBaseDispatcher.GetChar(var C : Char) : Integer;
+  function TApdBaseDispatcher.GetChar(var C : ansiChar) : Integer;
     {-Return next char and remove it from buffer}
   begin
     EnterCriticalSection(DispSection);
@@ -1604,7 +1606,7 @@ end;
     end;
   end;
 
-  function TApdBaseDispatcher.PeekBlockPrim(Block : PChar;
+  function TApdBaseDispatcher.PeekBlockPrim(Block : PAnsiChar;
     Offset : Cardinal; Len : Cardinal; var NewTail : Cardinal) : Integer;
     {-Return Block from ComPort, return new tail value}
   var
@@ -1634,14 +1636,14 @@ end;
 
         if EndCount <> 0 then begin
           {Move data from end of dispatch buffer}
-          Move(DBuffer^[NewTail], Pointer(Block)^, EndCount);
+          Move( GetPtr(DBuffer, NewTail)^, Pointer(Block)^, EndCount);
           Inc(NewTail, EndCount);
         end;
 
         if BeginCount <> 0 then begin
           {Move data from beginning of dispatch buffer}
-          Move(DBuffer^[0],
-               PByteBuffer(Block)^[EndCount+1],
+          Move(DBuffer^,
+               GetPtr(Block, EndCount+1)^,
                BeginCount);
           NewTail := BeginCount;
         end;
@@ -1658,7 +1660,7 @@ end;
     end;
   end;
 
-  function TApdBaseDispatcher.PeekBlock(Block : PChar; Len : Cardinal) : Integer;
+  function TApdBaseDispatcher.PeekBlock(Block : PAnsiChar; Len : Cardinal) : Integer;
     {-Return Block from ComPort but don't set new tail value}
   var
     Tail : Cardinal;
@@ -1677,7 +1679,7 @@ end;
     end;
   end;
 
-  function TApdBaseDispatcher.GetBlock(Block : PChar; Len : Cardinal) : Integer;
+  function TApdBaseDispatcher.GetBlock(Block : PansiChar; Len : Cardinal) : Integer;
     {-Get Block from ComPort and set new tail}
   var
     Tail : Cardinal;
@@ -1798,7 +1800,7 @@ end;
 
       if TracingOn and (CharsOut <> 0) then
         for I := 0 to CharsOut-1 do
-          AddTraceEntry('T', PChar(@Block)[I]);
+          AddTraceEntry('T', PAnsiChar(@Block)[I]);
     finally
       LeaveCriticalSection(DataSection);
     end;
@@ -2100,7 +2102,7 @@ end;
     end;
   end;
 
-  function TApdBaseDispatcher.SWFlowChars(OnChar, OffChar : Char) : Integer;
+  function TApdBaseDispatcher.SWFlowChars(OnChar, OffChar : AnsiChar) : Integer;
     {-Set on/off chars for software flow control}
   begin
     with DCB do begin
@@ -2260,8 +2262,8 @@ end;
     GetCount := 0;
   end;
 
-  function MatchString(var Indexes : TCheckIndex; const C : Char; Len : Cardinal;
-                        P : PChar; IgnoreCase : Boolean) : Boolean;
+  function MatchString(var Indexes : TCheckIndex; const C : AnsiChar; Len : Cardinal;
+                        P : PAnsiChar; IgnoreCase : Boolean) : Boolean;
     {-Checks for string P on consecutive calls, returns True when found}
   var
     I        : Cardinal;
@@ -2408,7 +2410,7 @@ end;
     MatchSize : Cardinal;
     CC : Cardinal;
     AnyMatch : Boolean;
-    C : Char;
+    C : AnsiChar;
 
     function CharCount(CurTail, Adjust : Cardinal) : Cardinal;
       {-Return the number of characters available between CurTail }
@@ -2609,7 +2611,7 @@ end;
 
         {Move data to end of dispatch buffer}
         if EndFree <> 0 then begin
-          Len := ReadCom(PChar(@DBuffer^[DBufHead]), EndFree);
+          Len := ReadCom(PAnsiChar(@DBuffer^[DBufHead]), EndFree);
 
           {Restore data count on errors}
           if Len < 0 then begin
@@ -2643,7 +2645,7 @@ end;
 
         {Move data to beginning of dispatch buffer}
         if BeginFree <> 0 then begin
-          Len := ReadCom(PChar(@DBuffer^[DBufHead]), BeginFree);
+          Len := ReadCom(PAnsiChar(@DBuffer^[DBufHead]), BeginFree);
 
           {Restore data count on errors}
           if Len < 0 then begin
@@ -3470,7 +3472,7 @@ end;
   end;
 
   function TApdBaseDispatcher.GetFlowOptions(var HWOpts, SWOpts, BufferFull,
-        BufferResume : Cardinal; var OnChar, OffChar : Char) : Integer;
+        BufferResume : Cardinal; var OnChar, OffChar : AnsiChar) : Integer;
   begin
     HWOpts := 0;
     SWOpts := 0;
@@ -3593,7 +3595,7 @@ end;
     end;
   end;
 
-  procedure TApdBaseDispatcher.AddTraceEntry(CurEntry : Char; CurCh : Char);
+  procedure TApdBaseDispatcher.AddTraceEntry(CurEntry : ansiChar; CurCh : ansiChar);
     {-Add a trace event to the global TraceQueue}
   begin
     EnterCriticalSection(DataSection);
@@ -3701,7 +3703,6 @@ end;
           with TraceQueue^[Start] do begin
             if EventType <> LastEventType then begin
               if not First then begin
-                WriteLn(TraceFile,^M^J);
                 Col := 0;
               end;
               {First := False;}
@@ -3856,7 +3857,7 @@ end;
     Insert('.', Result, Length(Result) - 2);                             {!!.04}
   end;
 
-  function TApdBaseDispatcher.DumpDispatchLogPrim(FName : PChar;
+  function TApdBaseDispatcher.DumpDispatchLogPrim(FName : PWideChar;
                                                   AppendFile, InHex, AllHex : Boolean) : Integer;
 
     {-Dump the dispatch log}
@@ -4126,11 +4127,11 @@ end;
   end;
 
   function TApdBaseDispatcher.AppendDispatchLog(
-                              FName : PChar;
+                              FName : PWideChar;
                               InHex, AllHex : Boolean) : Integer;
     {-Append the dispatch log}
   begin
-    Result := DumpDispatchLogPrim(FName, True, InHex, AllHex);        
+    Result := DumpDispatchLogPrim(FName, True, InHex, AllHex);
   end;
 
   function TApdBaseDispatcher.GetDispatchTime : DWORD;
@@ -4303,7 +4304,7 @@ end;
       NumToWrite : Integer;
       NumWritten : DWORD;
       Ok         : Boolean;
-      TempBuff   : POBuffer;
+      TempBuff   : OPBuffer;
     begin
       while DataInBuffer do begin
         with H do begin

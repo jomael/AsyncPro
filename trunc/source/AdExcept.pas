@@ -20,11 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *    Sulaiman Mah
+ *    Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADEXCEPT.PAS 4.06                   *}
+{*                   ADEXCEPT.PAS 5.00                   *}
 {*********************************************************}
 
 {Global defines potentially affecting this unit}
@@ -63,19 +65,6 @@ uses
 
 {*** English ***}
   {$I AdExcept.inc}
-{*** French ***}
-  {.$I AdExcept.fra}
-{*** German ***}
-  {.$I AdExcept.deu}
-{*** Spanish ***}
-  {.$I AdExcept.esp}
-{*** Swedish ***}
-  {.$I AdExcept.sw}
-{*** Norwegian ***}
-  {.$I AdExcept.nor}
-{*** Danish ***}
-  {.$I AdExcept.dk}
-
 
 type
   {General Apro exception class}
