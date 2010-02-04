@@ -229,7 +229,7 @@ begin
       S := ReadLine;
       { save the beginning of the entity }
       if (Pos('<Modem', S) > 0) and (Pos('<ModemList', S) = 0) then
-        ModemStart := MemStream.Position - Length(S);
+        ModemStart := MemStream.Position - PayloadLengthInBytes(S);
       Found := (Pos('FriendlyName =', S) > 0) and
                (Pos(ModemName, UnXMLize(S)) > 0);
     until Found or (MemStream.Position >= MemStream.Size);
@@ -724,8 +724,8 @@ begin
     FileList.Sorted := True;
     FileList.Duplicates := dupIgnore;
     while (Pos('<ModemRecord ModemName = "', List[X]) > 0) do begin
-      S := Copy(List[X], ApxRPos(ModemFileStr, List[X]) + Length(ModemFileStr),
-        Length(List[x]));
+      S := Copy(List[X], ApxRPos(ModemFileStr, List[X]) + PayloadLengthInBytes(ModemFileStr),
+        PayloadLengthInBytes(List[x]));
       S := Copy(S, 1, Pos('"', S) - 1);
       FileList.Add(S);
       dec(X);
@@ -785,7 +785,7 @@ begin
   if Str = '>' then
     { it's a terminating '>', remove the preceding #13#10 }
     DetailStream.Position := DetailStream.Position - 2;
-  DetailStream.WriteBuffer(Str[1], Length(Str));
+  DetailStream.WriteBuffer(Str[1], PayloadLengthInBytes(Str));
   DetailStream.WriteBuffer(#13#10, 2);
 end;
 

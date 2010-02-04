@@ -448,7 +448,7 @@ begin
                     // Read either all the data in the buffer or as much as the caller
                     // can accept.
                     bytesToRead := Min(len, BytesUsed - BytesRead);
-                    Move((Data + BytesRead)^, Buf^, bytesToRead);
+                    Move((Data + BytesRead)^, Buf^, SizeOf( bytesToRead));// --check
                     BytesRead := BytesRead + bytesToRead;
                     Dec(len, bytesToRead);
                     Inc(Buf, bytesToRead);
@@ -575,7 +575,7 @@ begin
         begin
             {can move data to output queue in one block}
 //            Move(Buf^, OBuffer^[OBufHead], Size);
-            Move(Buf^, GetPtr(OBuffer, OBufHead)^, Size);
+            Move(Buf^, GetPtr(OBuffer, OBufHead)^, SizeOf( Size));// --check
 
             if SizeAtEnd = Size then
                 OBufHead := 0
@@ -585,9 +585,9 @@ begin
         begin
             { need to use two moves }
 //            Move(Buf^, OBuffer^[OBufHead], SizeAtEnd);
-            Move(Buf^, GetPtr(OBuffer, OBufHead)^, SizeAtEnd);
+            Move(Buf^, GetPtr(OBuffer, OBufHead)^, SizeOf( SizeAtEnd));// --check
             LeftOver := Size - SizeAtEnd;
-            Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, LeftOver);
+            Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --check
             OBufHead := LeftOver;
         end;
     finally
@@ -863,7 +863,7 @@ begin
                 AddDispatchEntry(dtThread, dstThreadSleep, 3, nil, 0);
 {$ENDIF}
             // Wait for output to appear in the queue or for a flush request
-            stat := WaitForMultipleObjects(Length(outEvents),
+            stat := WaitForMultipleObjects(length(outEvents), // --check
                                            @outEvents[0],
                                            False,
                                            100);
@@ -956,16 +956,16 @@ begin
                         numToWrite := OBufHead - OBufTail;
                         GetMem(tempBuff, numToWrite);
 //                        Move(OBuffer^[OBufTail], tempBuff^, numToWrite);
-                        Move(GetPtr(OBuffer,OBufTail)^, tempBuff^, numToWrite);
+                        Move(GetPtr(OBuffer,OBufTail)^, tempBuff^, SizeOf( numToWrite));// --check
 //PAnsiChar(AddWordToPtr( tempBuff, (OutQue - OBufTail)));GetPtr(DBuffer, NewTail)^
                     end else
                     begin
                         numToWrite := (OutQue - OBufTail) + OBufHead;
                         GetMem(tempBuff, numToWrite);
 //                        Move(OBuffer^[OBufTail], tempBuff^, OutQue - OBufTail);
-                        Move(GetPtr( OBuffer, OBufTail)^, tempBuff^, OutQue - OBufTail);
+                        Move(GetPtr( OBuffer, OBufTail)^, tempBuff^, SizeOf((OutQue - OBufTail)));// --check
 //                        Move(OBuffer^[0], tempBuff^[OutQue - OBufTail], OBufHead);
-                        Move( GetPtr( OBuffer,0)^, tempBuff^[OutQue - OBufTail], OBufHead);
+                        Move( GetPtr( OBuffer,0)^, tempBuff^[OutQue - OBufTail], SizeOf( OBufHead));// --check
 
                     end;
                     // Reset the queue head and tail
@@ -1064,7 +1064,7 @@ begin
     waitEvents[0] := ovl.hEvent;
     waitEvents[1] := OutFlushEvent;
     repeat
-        stat := WaitForMultipleObjects(Length(waitEvents),
+        stat := WaitForMultipleObjects(length(waitEvents),  // --check
                                        @waitEvents[0],
                                        False,
                                        100);

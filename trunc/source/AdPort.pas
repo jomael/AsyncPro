@@ -387,8 +387,8 @@ type
 
     {Tracing}
     procedure InitTracing(const NumEntries : Cardinal);
-    procedure DumpTrace(const FName : ShortString; const InHex : Boolean);
-    procedure AppendTrace(const FName : ShortString;                        // SWB
+    procedure DumpTrace(const FName : string; const InHex : Boolean);        // --check shortstring to sting
+    procedure AppendTrace(const FName : String;                        // SWB// --check shortstring to sting
                           const InHex : Boolean;                            // SWB
                           const NewState : TTraceLogState);                 // SWB
     procedure ClearTracing;
@@ -398,8 +398,8 @@ type
 
     {DispatchLogging}
     procedure InitLogging(const Size : Cardinal);
-    procedure DumpLog(const FName : ShortString; const InHex : Boolean);
-    procedure AppendLog(const FName : ShortString;                          // SWB
+    procedure DumpLog(const FName : String; const InHex : Boolean);// --check shortstring to sting
+    procedure AppendLog(const FName : String;  // --check shortstring to sting                        // SWB
                         const InHex : Boolean;                              // SWB
                         const NewState : TTraceLogState);                   // SWB
     procedure ClearLogging;
@@ -453,7 +453,7 @@ type
       {-Discard the contents of the output buffer}
 
     {Trigger managment}
-    function AddDataTrigger(const Data : ShortString;
+    function AddDataTrigger(const Data : String;// --check shortstring to sting
                             const IgnoreCase : Boolean) : Word;
       {-Add a data trigger}
     function AddTimerTrigger : Word;
@@ -745,7 +745,7 @@ type
     property Tag;
   end;
 
-  function ComName(const ComNumber : Word) : ShortString;
+  function ComName(const ComNumber : Word) : string;// --check shortstring to sting
   function SearchComPort(const C : TComponent) : TApdCustomComPort;
 
 implementation
@@ -2159,7 +2159,7 @@ const
         for I := 0 to SourcePort.UserList.Count-1 do begin
           New(UL);
           Move(SourcePort.UserList.Items[I]^, UL^,
-               SizeOf(TUserListEntry));
+               SizeOf(TUserListEntry));   // --check
           UserList.Add(UL);
         end;
 
@@ -2368,7 +2368,7 @@ const
     FTracing := tlOn;
   end;
 
-  procedure TApdCustomComPort.DumpTrace(const FName : ShortString;
+  procedure TApdCustomComPort.DumpTrace(const FName : string;// --check shortstring to sting
                                         const InHex : Boolean);
     {-Dump the trace file}
   var
@@ -2380,7 +2380,7 @@ const
     FTracing := tlOff;
   end;
 
-  procedure TApdCustomComPort.AppendTrace(const FName : ShortString;
+  procedure TApdCustomComPort.AppendTrace(const FName : string;// --check shortstring to sting
                                           const InHex : Boolean;
                                           const NewState : TTraceLogState); // SWB
     {-Append the trace file}
@@ -2468,7 +2468,7 @@ const
     FLogging := tlOn;
   end;
 
-  procedure TApdCustomComPort.DumpLog(const FName : ShortString;
+  procedure TApdCustomComPort.DumpLog(const FName : String;// --check shortstring to sting
                                       const InHex : Boolean);
     {-Dump the dispatch log}
   var
@@ -2480,7 +2480,7 @@ const
     FLogging := tlOff;
   end;
 
-  procedure TApdCustomComPort.AppendLog(const FName : ShortString;
+  procedure TApdCustomComPort.AppendLog(const FName : String;// --check shortstring to sting
                                         const InHex : Boolean;
                                         const NewState : TTraceLogState);   // SWB
     {-Dump the dispatch log}
@@ -2524,7 +2524,7 @@ const
     FLogging := tlPause;
   end;
 
-  function TApdCustomComPort.AddDataTrigger(const Data : ShortString;
+  function TApdCustomComPort.AddDataTrigger(const Data : String;// --check shortstring to sting
                                             const IgnoreCase : Boolean) : Word;
     {-Add a ShortString data trigger}
   var
@@ -2535,8 +2535,8 @@ const
       Result := 0;
       Exit;
     end;
-    Len := Length(Data);
-    Move(Data[1], P, Len);
+    Len := PayloadLengthInBytes(Data);
+    Move(Data[1], P, SizeOf( Len));   // --check
     Result := Word(CheckException(Self,
         ValidDispatcher.AddDataTriggerLen(P, IgnoreCase, Len)));
   end;
@@ -2670,7 +2670,7 @@ const
   begin
     if (PortState = psShuttingDown) then Exit;
    {$IFOPT H+}
-    CheckException(Self, ValidDispatcher.PutBlock(Pointer(S)^, Length(S)));
+    CheckException(Self, ValidDispatcher.PutBlock(Pointer(S)^, PayloadLengthInBytes(S)));
    {$ELSE}
     CheckException(Self, ValidDispatcher.PutString(S));
    {$ENDIF}
@@ -2707,7 +2707,7 @@ const
     {Compare...}
     if C = CurChar then
       {Got match, was it complete?}
-      if Index = Length(S) then begin
+      if Index = PayloadLengthInBytes(S) then begin
         Index := 0;
         CheckForString := True;
       end else
@@ -2745,7 +2745,7 @@ const
     ValidDispatcher.SetEventBusy(WasBusy, True);
 
     {Note the length of the string}
-    Len := Length(S);
+    Len := PayloadLengthInBytes(S);
 
     {Prepare...}
     NewTimer(ET, Timeout);
@@ -2846,7 +2846,7 @@ const
       Exit;
 
     {Note the length of the string}
-    Len := Length(S);
+    Len := PayloadLengthInBytes(S);
 
     {Set busy flag}
     ValidDispatcher.SetEventBusy(WasBusy, True);
@@ -2989,7 +2989,7 @@ const
     Result := FindComPort(C);
   end;
 
-  function ComName(const ComNumber : Word) : ShortString;
+  function ComName(const ComNumber : Word) : String;// --check shortstring to sting
     {-Return a comname ShortString for ComNumber}
   begin
     Result := 'COM' + IntToStr(ComNumber);

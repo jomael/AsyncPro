@@ -636,15 +636,15 @@ var
   j           : Integer;
   CharDeleted : Boolean;
 begin
-  while (Length(FDataBuffer) > 0) and
+  while (PayloadLengthInBytes(FDataBuffer) > 0) and
         IsWhiteSpace(FDataBuffer[1]) do
     Delete(FDataBuffer, 1, 1);
-  while (Length(FDataBuffer) > 0) and
-        IsWhiteSpace(FDataBuffer[Length(FDataBuffer)]) do
-    Delete(FDataBuffer, Length(FDataBuffer), 1);
+  while (PayloadLengthInBytes(FDataBuffer) > 0) and
+        IsWhiteSpace(FDataBuffer[PayloadLengthInBytes(FDataBuffer)]) do
+    Delete(FDataBuffer, PayloadLengthInBytes(FDataBuffer), 1);
 
   j := 1;
-  BuffLen := Length(FDataBuffer);
+  BuffLen := PayloadLengthInBytes(FDataBuffer);
   CharDeleted := False;
   while j < BuffLen do begin
     if IsWhiteSpace(FDataBuffer[j]) then begin
@@ -653,13 +653,13 @@ begin
 
       { Remove additional whitespace }
       j := j + 1;
-      while (j <= Length(FDataBuffer)) and
+      while (j <= PayloadLengthInBytes(FDataBuffer)) and
             IsWhiteSpace(FDataBuffer[j]) do begin
         Delete(FDataBuffer, j, 1);
         CharDeleted := True;
       end;
       if (CharDeleted) then begin
-        BuffLen := Length(FDataBuffer);
+        BuffLen := PayloadLengthInBytes(FDataBuffer);
         CharDeleted := False;
       end;
     end;
@@ -1070,7 +1070,7 @@ begin
   { Did we find '--' within the comment? }
   if (TempComment <> '') and
      ((ApxPos('--', TempComment) <> 0) or
-      (TempComment[Length(TempComment)] = '-')) then
+      (TempComment[PayloadLengthInBytes(TempComment)] = '-')) then
     { Yes. Raise an error. }
     raise EAdParserError.CreateError(FFilter.Line,
                                      FFilter.LinePos,
@@ -1554,7 +1554,7 @@ begin
       end;
       Move(TempChar,
            PByteArray(Pointer(TempBuff))[CurrLength],
-           2);
+           2);      // --check
       Inc(CurrLength, 2);
       SkipChar;
       Added := True;
@@ -1668,7 +1668,7 @@ begin
   end;
   if (not Found) then begin
     {$IFDEF DCC4OrLater}
-    SetLength(TempStr, Length(S));
+    SetLength(TempStr, PayloadLengthInBytes(S));
     {$ENDIF}
     for i := 0 to High(S) do begin
       ApxUcs4ToIso88591(s[i], TempChar);
@@ -1780,11 +1780,11 @@ var
   MemStream  : TApdMemoryStream;
   TempString : string;
 begin
-  if Length(sVal) > 0 then begin
+  if PayloadLengthInBytes(sVal) > 0 then begin
     PushDocument;
     MemStream := TApdMemoryStream.Create;
-    TempString := WideCharLenToString(Pointer(sVal), Length(sVal));
-    MemStream.Write(TempString[1], Length(TempString));
+    TempString := WideCharLenToString(Pointer(sVal), PayloadLengthInBytes(sVal));
+    MemStream.Write(TempString[1], PayloadLengthInBytes(TempString));
     MemStream.Position := 0;
     FFilter := TApdInCharFilter.Create(MemStream, BufferSize);
   end;
@@ -1991,7 +1991,7 @@ begin
         SkipChar;
         Move(TempChar,
              PByteArray(Pointer(Result))^[CurrLen],
-             2);
+             2);       // --check
         Inc(CurrLen, 2);
       end else
         raise EAdParserError.CreateError(FFilter.Line,
@@ -2203,7 +2203,7 @@ var
   Good : Boolean;
 begin
   { Production [81]}
-  for i := 1 to Length(aValue) do begin
+  for i := 1 to PayloadLengthInBytes(aValue) do begin
     Good := False;
     if ((aValue[i] >= 'A') and
         (aValue[i] <= 'z')) then
@@ -2234,7 +2234,7 @@ var
   TempChr : DOMChar;
   i       : Integer;
 begin
-  for i := 1 to Length(aValue) do begin
+  for i := 1 to PayloadLengthInBytes(aValue) do begin
     TempChr := aValue[i];
     if (TempChr = '%') or
        (TempChr = '&') or
@@ -2294,7 +2294,7 @@ var
   Ucs4Char : TApdUcs4Char;
   i        : Integer;
 begin
-  for i := 1 to Length(aString) do begin
+  for i := 1 to PayloadLengthInBytes(aString) do begin
     ApxIso88591ToUcs4(AnsiChar(aString[i]), Ucs4Char);
     if (not ApxIsPubidChar(Ucs4Char)) then
       raise EAdParserError.CreateError(FFilter.Line,
@@ -2310,7 +2310,7 @@ var
   TempChr : char;
   Good    : Boolean;
 begin
-  for i := 1 to Length(aString) do begin
+  for i := 1 to PayloadLengthInBytes(aString) do begin
     Good := False;
     TempChr := aString[i];
     if (TempChr >= 'A') and

@@ -2106,7 +2106,7 @@ begin
       ModemFile := Dialog.SelectedModemFile;
       ModemManufacturer := Dialog.SelectedModemManufacturer;
       ModemName := Dialog.SelectedModemName;
-      Move(PLmModem(FModem[0])^, LmModem, SizeOf(TLmModem));
+      Move(PLmModem(FModem[0])^, LmModem, SizeOf(TLmModem));     // --check
       Result := True;
     end else
       Result := False;
@@ -2233,7 +2233,7 @@ begin
   for I := 0 to pred(FModem.Count) do begin
     if PLmModem(FModem[I])^.FriendlyName = ModemName then begin
       { oops, we assumed wrong... }
-      Move(PLmModem(FModem[I])^, Modem, SizeOf(TLmModem));
+      Move(PLmModem(FModem[I])^, Modem, SizeOf(TLmModem));       // --check
       Result := ecOK;
       Break;
     end;
@@ -2254,7 +2254,7 @@ begin
   LoadModem(ModemDetailFile, False);
   for I := 0 to pred(FModem.Count) do begin
     ModemDetail := TLmModemClass.Create;
-    Move(PLmModem(FModem[I])^, LmModem, SizeOf(TLmModem));
+    Move(PLmModem(FModem[I])^, LmModem, SizeOf(TLmModem));          // --check
     ModemDetail.LmModem := LmModem;
     Res.AddObject(ModemDetail.LmModem.FriendlyName, ModemDetail);
   end;

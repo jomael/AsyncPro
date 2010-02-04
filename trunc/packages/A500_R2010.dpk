@@ -43,6 +43,7 @@ contains
   AdSelCom in '..\source\AdSelCom.pas' {ComSelectForm},
   AdSocket in '..\source\AdSocket.pas',
   AdStatLt in '..\source\AdStatLt.pas',
+  AdStrMap in '..\source\AdStrMap.pas',
   Adwutil in '..\source\Adwutil.pas',
   AdXBase in '..\source\AdXBase.pas',
   AdXChrFlt in '..\source\AdXChrFlt.pas',

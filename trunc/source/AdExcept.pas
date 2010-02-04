@@ -374,13 +374,13 @@ type
   function XlatException(const E : Exception) : Integer;
     {-Translate an exception into an error code}
 
-  function AproLoadStr(const ErrorCode : SmallInt) : ShortString;
+  function AproLoadStr(const ErrorCode : SmallInt) : String;    // --check shortstring to sting
 
   function AproLoadZ(P : PChar; Code : Integer) : PChar;
 
-  function ErrorMsg(const ErrorCode : SmallInt) : ShortString;
+  function ErrorMsg(const ErrorCode : SmallInt) : String ; // --check shortstring to sting
   {$IFDEF UseResourceStrings}
-  function MessageNumberToString(MessageNumber : SmallInt) : ShortString;
+  function MessageNumberToString(MessageNumber : SmallInt) : String;   // --check shortstring to sting
   {$ENDIF}
   {.Z-}
 
@@ -405,17 +405,17 @@ uses
     {$ENDIF}
   end;
 
-  function AproLoadStr(const ErrorCode : SmallInt) : ShortString;
+  function AproLoadStr(const ErrorCode : SmallInt) : String;    // --check shortstring to sting
     {-Return an error message for ErrorCode}
   var
     Buffer : array[0..255] of Char;
 
-    function TrimWhite(const S : ShortString) : ShortString;
+    function TrimWhite(const S : ShortString) : string;// --check shortstring to sting
     var
       i : Integer;
     begin
       Result := S;
-      for i := length(Result) downto 1 do
+      for i := PayloadLengthInBytes(Result) downto 1 do
         if Result[i] < ' ' then
           Result[i] := ' ';
       i := pos('  ',Result);
@@ -440,14 +440,14 @@ uses
   end;
 
   {Alias for function above}
-  function ErrorMsg(const ErrorCode : SmallInt) : ShortString;
+  function ErrorMsg(const ErrorCode : SmallInt) : string;// --check shortstring to sting
     {-Return an error message for ErrorCode}
   begin
     Result := AproLoadStr(ErrorCode);
   end;
 
   {$IFDEF UseResourceStrings}
-  function MessageNumberToString(MessageNumber : SmallInt) : ShortString;
+  function MessageNumberToString(MessageNumber : SmallInt) : string;// --check shortstring to sting
   var
     Middle : integer;
     Min    : integer;

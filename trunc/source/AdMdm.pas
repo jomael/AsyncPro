@@ -576,8 +576,8 @@ var
     Psn := Pos(S, Response);
     if Psn > 0 then begin
       Result := True;
-      S := Copy(Response, Psn + Length(S) + 1, Length(Response));
-      S := Copy(S, 1, Length(S) - 2);
+      S := Copy(Response, Psn + PayloadLengthInBytes(S) + 1, PayloadLengthInBytes(Response));
+      S := Copy(S, 1, PayloadLengthInBytes(S) - 2);
     end else
       Result := False;
   end;
@@ -748,12 +748,12 @@ begin
   Result := S;
   while Pos('<CR>', AnsiUpperCase(Result)) > 0 do begin
     Psn := Pos('<CR>', AnsiUpperCase(Result));
-    Delete(Result, Psn, Length('<CR>'));
+    Delete(Result, Psn, PayloadLengthInBytes('<CR>'));
     Insert(#13, Result, Psn);
   end;
   while Pos('<LF>', AnsiUpperCase(Result)) > 0 do begin
     Psn := Pos('<LF>', AnsiUpperCase(Result));
-    Delete(Result, Psn, Length('<LF>'));
+    Delete(Result, Psn, PayloadLengthInBytes('<LF>'));
     Insert(#10, Result, Psn);
   end;
   { XML also doubles any '%' char, strip that }
@@ -1640,11 +1640,11 @@ begin
   Result := S;
   while Pos('<CR>', AnsiUpperCase(Result)) > 0 do begin
     Psn := Pos('<CR>', AnsiUpperCase(Result));
-    Delete(Result, Psn, Length('<CR>'));
+    Delete(Result, Psn, PayloadLengthInBytes('<CR>'));
   end;
   while Pos('<LF>', AnsiUpperCase(Result)) > 0 do begin
     Psn := Pos('<LF>', AnsiUpperCase(Result));
-    Delete(Result, Psn, Length('<LF>'));
+    Delete(Result, Psn, PayloadLengthInBytes('<LF>'));
   end;
   { XML also doubles any '%' char, strip that }
   while Pos('%%', Result) > 0 do

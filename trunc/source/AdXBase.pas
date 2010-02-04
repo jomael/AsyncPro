@@ -121,9 +121,9 @@ var
   cLast : DOMChar;
   i, j  : Integer;
 begin
-  j := Length(sSubStr);
+  j := PayloadLengthInBytes(sSubStr);
   cLast := sSubStr[j];
-  for i := Length(sTerm) downto j do begin
+  for i := PayloadLengthInBytes(sTerm) downto j do begin
     if (sTerm[i] = cLast) and
        (Copy(sTerm, i - j + 1, j) = sSubStr) then begin
       Result := i - j + 1;
@@ -271,7 +271,7 @@ var
   i           : Integer;
 begin
   InFirstByte := aInCh[1];
-  InCharLen := Length(aInCh);
+  InCharLen := PayloadLengthInBytes(aInCh);
   {the length of the UTF-8 character cannot be zero and must match
    that of the first ASCII character in the string}
   if ((InCharLen = 0) or

@@ -348,7 +348,7 @@ begin
                                      Line,
                                      LinePos,
                                      sBadUTF8Char);
-  Move(Len, Utf8Char[0], 1);
+  Move(Len, Utf8Char[0], 1);  // --check
   {get the remaining characters from the stream}
   for i := 2 to Len do begin
     {if the buffer is empty, fill it}
@@ -553,7 +553,7 @@ var
 begin
   if not ApxUcs4ToUtf8(aCh, UTF8) then
     raise EAdStreamError.CreateError(FStream.Position, sUCS_U8ConverErr);
-  for i := 1 to length(UTF8) do begin
+  for i := 1 to PayloadLengthInBytes(UTF8) do begin
     if (FBufPos = FBufSize) then
       csWriteBuffer;
     FBuffer[FBufPos] := UTF8[i];
@@ -629,7 +629,7 @@ var
   aBothUsed : Boolean;
   aLen, aPos : Integer;
 begin
-  aLen := Length(aText);
+  aLen := PayloadLengthInBytes(aText);
   aPos := 1;
   Result := True;
   while Result and (aPos <= aLen) do begin

@@ -128,7 +128,7 @@ const
 type
   TPipeEvent = record
     Event : Byte;
-    Data : ShortString;
+    Data : String;  // --check shortstring to sting
   end;
   TOleEnum = type DWORD;
   { XML definitions }
@@ -868,7 +868,7 @@ const
   ecTableFull              = -6013;    {Kermit window table is full, fatal error}
   ecAbortNoCarrier         = -6014;    {Aborting due to carrier loss}
   ecBadProtocolFunction    = -6015;    {Function not support by protocol}
-  ecProtocolAbort          = -6016;    {Session aborted}               
+  ecProtocolAbort          = -6016;    {Session aborted}
 
 const
   {INI database}
@@ -2346,6 +2346,7 @@ procedure ClearByteFlag(var Flags : Byte; FlagMask : Byte);
 
 function ByteFlagIsSet(Flags : Byte; FlagMask : Byte) : Bool;
 
+function PayloadLengthInBytes( const s: string): integer; { String length for all delphi}
 
 function AddWordToPtr(P : Pointer; W : Cardinal) : Pointer;
 
@@ -2478,7 +2479,7 @@ begin
       LogStream := TFileStream.Create('APAXDBG.TXT', fmCreate or fmShareDenyNone);
     LogStream.Seek(0, soFromEnd);
     TimeStamp := FormatDateTime('dd/mm/yy : hh:mm:ss - ', Now) + S + #13#10;
-    LogStream.WriteBuffer(TimeStamp[1], Length(TimeStamp) * SizeOf( ansichar))
+    LogStream.WriteBuffer(TimeStamp[1], PayloadLengthInBytes(TimeStamp))
   finally
     LogStream.Free;
   end;
@@ -2844,7 +2845,7 @@ type
     if Pos < Len then begin
       if (Len-Pos) < Count then
         Count := Len-Pos;
-      Move(S[Pos], Dest^, Count * SizeOf( Char));
+      Move(S[Pos], Dest^, Count * SizeOf( Char));  // --check
       Dest[Count] := #0;
     end else
       Dest[0] := #0;
@@ -2890,6 +2891,16 @@ type
   function GetPtr(P : Pointer; O : LongInt) : Pointer; assembler; register;
   asm
     add   eax,edx   {eax = P; edx = Offset}
+  end;
+
+{ length of the string for all delphi version }
+function PayloadLengthInBytes( const s: string): integer;
+  begin
+  {$IFDEF CompilerVersion >= 210}
+    result := Length( s) * StringElementSize( s)
+  {$ELSE}
+    result := Length( s) * SizeOf( Char)
+  {$ENDIF}
   end;
 
   procedure NotBuffer(var Buf; Len : Cardinal); assembler; register;
@@ -2961,10 +2972,10 @@ type
   begin
     Result := DirName;
     if DirName = '' then Exit;
-    IsQuoted := DirName[Length(DirName)] = '"';
+    IsQuoted := DirName[PayloadLengthInBytes(DirName)] = '"';
     if IsQuoted then
-      Result := Copy(DirName, 1, Length(DirName) - 1);
-    if not(Result[Length(Result)] in DosDelimSet) then
+      Result := Copy(DirName, 1, (PayloadLengthInBytes(DirName)) - 1);
+    if not(Result[PayloadLengthInBytes(Result)*StringElementSize(Result)] in DosDelimSet) then
       Result := Result+'\';
     if IsQuoted then
       Result := Result + '"';

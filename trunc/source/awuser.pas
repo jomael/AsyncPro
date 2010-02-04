@@ -1636,7 +1636,7 @@ end;
 
         if EndCount <> 0 then begin
           {Move data from end of dispatch buffer}
-          Move( GetPtr(DBuffer, NewTail)^, Pointer(Block)^, EndCount);
+          Move( GetPtr(DBuffer, NewTail)^, Pointer(Block)^, SizeOf( EndCount)); // --check
           Inc(NewTail, EndCount);
         end;
 
@@ -1644,7 +1644,7 @@ end;
           {Move data from beginning of dispatch buffer}
           Move(DBuffer^,
                GetPtr(Block, EndCount+1)^,
-               BeginCount);
+               SizeOf( BeginCount));  // --check
           NewTail := BeginCount;
         end;
 
@@ -1726,13 +1726,13 @@ end;
   function TApdBaseDispatcher.PutString(S : String) : Integer;
     {-Send as a block}
   begin
-    Result := PutBlock(S[1], Length(S));
+    Result := PutBlock(S[1], PayloadLengthInBytes(S));
   end;
 
   procedure TApdBaseDispatcher.AddStringToLog(S : string);
   begin
     if DLoggingOn then
-      AddDispatchEntry(dtUser, dstNone, 0, @S[1], length(S))
+      AddDispatchEntry(dtUser, dstNone, 0, @S[1], PayloadLengthInBytes(S))
   end;
 
   function TApdBaseDispatcher.PutBlock(const Block; Len : Cardinal) : Integer;
@@ -3075,7 +3075,7 @@ end;
           FillChar(tChkIndex, SizeOf(TCheckIndex), 0);
           tMatched := False;
           tIgnoreCase := IgnoreCase;
-          Move(Data^, tData, Len);
+          Move(Data^, tData, SizeOf( Len)); // --check
           if IgnoreCase and (Len <> 0) then
             AnsiUpperBuff(@tData, Len);
           Result := tHandle;
@@ -3178,7 +3178,7 @@ end;
                 TriggerHandle,@Ticks,sizeof(Ticks))
             else
               AddDispatchEntry(dtTriggerDataChange, dstTimerTrigger,
-                TriggerHandle,@DeactivateStr[1],Length(DeactivateStr));
+                TriggerHandle,@DeactivateStr[1],PayloadLengthInBytes(DeactivateStr));
           tActive := Activate;
           Result := ecOk;
         end
@@ -3864,7 +3864,7 @@ end;
   function GetTimeStr(drTime : DWORD) : string;
   begin
     Result := Format('%07.7d', [drTime]);
-    Insert('.', Result, Length(Result) - 2);                             {!!.04}
+    Insert('.', Result, PayloadLengthInBytes(Result) - 2);                             {!!.04}
   end;
 
   function TApdBaseDispatcher.DumpDispatchLogPrim(FName : PWideChar;
@@ -4333,11 +4333,11 @@ end;
                 NumToWrite := OutQue - OBufTail
               else begin
                 GetMem(TempBuff, OBufHead);
-                Move(OBuffer^, TempBuff^, OBufHead);
+                Move(OBuffer^, TempBuff^, SizeOf( OBufHead)); // --check
 //                Move(OBuffer^[OBufTail], OBuffer^, OutQue - OBufTail);
-                Move(GetPtr(OBuffer, OBufTail)^, OBuffer^, OutQue - OBufTail);
+                Move(GetPtr(OBuffer, OBufTail)^, OBuffer^, SizeOf( (OutQue - OBufTail)));// --check
 //                Move(TempBuff^, OBuffer^[OutQue - OBufTail], OBufHead);
-                Move(TempBuff^, GetPtr(OBuffer, (OutQue - OBufTail))^, OBufHead);
+                Move(TempBuff^, GetPtr(OBuffer, (OutQue - OBufTail))^, SizeOf( OBufHead));// --check
                 FreeMem(TempBuff);
                 Inc(OBufHead, OutQue - OBufTail);
                 NumToWrite := OBufHead;

@@ -303,7 +303,7 @@ implementation
       if SizeAtEnd >= Size then begin
         {can move data to output queue in one block}
 //        Move(Buf^, OBuffer^[OBufHead], Size);
-        Move(Buf^, GetPtr(OBuffer,OBufHead)^, Size);
+        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeOf( Size));// --check
         if SizeAtEnd = Size then
           OBufHead := 0
         else
@@ -311,9 +311,9 @@ implementation
       end else begin
         { need to use two moves }
 //        Move(Buf^, OBuffer^[OBufHead], SizeAtEnd);
-        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeAtEnd);
+        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeOf( SizeAtEnd));// --check
         LeftOver := Size - SizeAtEnd;
-        Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, LeftOver);
+        Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --check
         OBufHead := LeftOver;
       end;
     finally
