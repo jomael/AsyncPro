@@ -2438,7 +2438,8 @@ end;
 
       {Loop through new data in dispatch buffer}
       while I <> DBufHead do begin
-        C := DBuffer^[I];
+//        C := DBuffer^[I];
+        C := PAnsiChar( AddWordToPtr( DBuffer, I))^;
 
         {Check each trigger for a match on this character}
         AnyMatch := False;
@@ -2564,21 +2565,21 @@ end;
     try
       {Nothing to do if dispatch buffer is already full}
       if DispatchFull then begin
-        if (DLoggingOn) then                                                // SWB
-            AddDispatchEntry(dtDispatch,                                    // SWB
-                             dstStatus,                                     // SWB
-                             0,                                             // SWB
-                             PChar('Dispatch buffer full.'),                // SWB
-                             21);                                           // SWB
+        if (DLoggingOn) then                                             // SWB
+            AddDispatchEntry(dtDispatch,                                 // SWB
+                             dstStatus,                                  // SWB
+                             0,                                          // SWB
+                             PChar('Dispatch buffer full.'),             // SWB
+                             21);                                        // SWB
         Result := True;
         Exit;
       end;
 
-      {$IFDEF UseAwWin32}                                                   // SWB
-      RefreshStatus;                                                        // SWB
-      {$ELSE}                                                               // SWB
-      ComStatus.cbInQue := InQueueUsed;                                     // SWB
-      {$ENDIF}                                  // UseAwWin32               // SWB
+      {$IFDEF UseAwWin32}                                                // SWB
+      RefreshStatus;                                                     // SWB
+      {$ELSE}                                                            // SWB
+      ComStatus.cbInQue := InQueueUsed;                                  // SWB
+      {$ENDIF}                                  // UseAwWin32            // SWB
       if ComStatus.cbInQue > 0 then begin
         Result := True;
 
@@ -2611,7 +2612,8 @@ end;
 
         {Move data to end of dispatch buffer}
         if EndFree <> 0 then begin
-          Len := ReadCom(PAnsiChar(@DBuffer^[DBufHead]), EndFree);
+//          Len := ReadCom(PAnsiChar(@DBuffer^[DBufHead]), EndFree);
+          Len := ReadCom(PAnsiChar(AddWordToPtr(@DBuffer,DBufHead)), EndFree);
 
           {Restore data count on errors}
           if Len < 0 then begin
@@ -2623,8 +2625,11 @@ end;
             if Len = 0 then
               AddDispatchEntry(dtDispatch, dstReadCom, Len, nil, 0)
             else
+//              AddDispatchEntry(dtDispatch, dstReadCom, Len,
+//                                @DBuffer^[DBufHead], Len);
+
               AddDispatchEntry(dtDispatch, dstReadCom, Len,
-                                @DBuffer^[DBufHead], Len);
+                                PAnsiChar( AddWordToPtr( DBuffer, DBufHead)), Len);
 
           {Increment buffer head}
           Inc(DBufHead, Len);
@@ -2645,7 +2650,8 @@ end;
 
         {Move data to beginning of dispatch buffer}
         if BeginFree <> 0 then begin
-          Len := ReadCom(PAnsiChar(@DBuffer^[DBufHead]), BeginFree);
+//          Len := ReadCom(PAnsiChar(@DBuffer^[DBufHead]), BeginFree);
+          Len := ReadCom(PAnsiChar(AddWordToPtr( DBuffer, DBufHead)), BeginFree);
 
           {Restore data count on errors}
           if Len < 0 then begin
@@ -2657,8 +2663,12 @@ end;
             if Len = 0 then
               AddDispatchEntry(dtDispatch, dstReadCom, Len, nil, 0)
             else
+//              AddDispatchEntry(dtDispatch, dstReadCom, Len,
+//                                @DBuffer^[DBufHead], Len);
+
               AddDispatchEntry(dtDispatch, dstReadCom, Len,
-                                @DBuffer^[DBufHead], Len);
+                                AddWordToPtr( DBuffer, DBufHead), Len);
+
 
           {Increment buffer head}
           Inc(DBufHead, Len);
@@ -4324,19 +4334,27 @@ end;
               else begin
                 GetMem(TempBuff, OBufHead);
                 Move(OBuffer^, TempBuff^, OBufHead);
-                Move(OBuffer^[OBufTail], OBuffer^, OutQue - OBufTail);
-                Move(TempBuff^, OBuffer^[OutQue - OBufTail], OBufHead);
+//                Move(OBuffer^[OBufTail], OBuffer^, OutQue - OBufTail);
+                Move(GetPtr(OBuffer, OBufTail)^, OBuffer^, OutQue - OBufTail);
+//                Move(TempBuff^, OBuffer^[OutQue - OBufTail], OBufHead);
+                Move(TempBuff^, GetPtr(OBuffer, (OutQue - OBufTail))^, OBufHead);
                 FreeMem(TempBuff);
                 Inc(OBufHead, OutQue - OBufTail);
                 NumToWrite := OBufHead;
                 OBufTail := 0;
               end;
             end;
+//PAnsiChar(AddWordToPtr( OBuffer, OBuffTail));MOVE==GetPtr(DBuffer, NewTail)^
           finally
             LeaveCriticalSection(OutputSection);
           end;
+//          Ok := WriteFile(CidEx,
+//                          OBuffer^[OBufTail],
+//                          NumToWrite,
+//                          NumWritten,
+//                          @OutOL);
           Ok := WriteFile(CidEx,
-                          OBuffer^[OBufTail],
+                          GetPtr(OBuffer, OBufTail)^,
                           NumToWrite,
                           NumWritten,
                           @OutOL);

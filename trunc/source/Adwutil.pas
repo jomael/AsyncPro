@@ -52,8 +52,6 @@ uses
 
 type
   TSocket = Integer;
-  AnsiChar = Char;
-  PAnsiChar = ^Char;
 
 const
   { Version of Winsock that we support }
@@ -417,7 +415,7 @@ type
   end;
 
   { Server Entity }
-  PServEnt = ^TServEnt;
+   PServEnt = ^TServEnt;
   TServEnt = packed record
     s_name    : PAnsiChar;
     s_aliases : ^PAnsiChar;

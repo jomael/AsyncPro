@@ -153,7 +153,7 @@ type
     { Lookup routines }
     function LookupAddress(InAddr : TInAddr) : string;
     function LookupName(const Name : string) : TInAddr;
-    function LookupPort(Port : Word) : string;
+    function LookupPort(Port : Word) : Ansistring;
     function LookupService(const Service : string) : Integer;
     { Socket methods }
     function AcceptSocket(Socket : TSocket; var Address : TSockAddrIn) : TSocket;
@@ -464,7 +464,7 @@ begin
 end;
 
 { -Returns a service name for a port }
-function TApdSocket.LookupPort(Port : Word) : string;
+function TApdSocket.LookupPort(Port : Word) : Ansistring;
 var
   ServEnt : PServEnt;
 begin
@@ -472,7 +472,7 @@ begin
   CheckLoaded;
   ServEnt := SockFuncs.GetServByPort(htons(Port), nil);
   if Assigned(ServEnt) then
-    Result := StrPas(@ServEnt^.s_name^);
+    Result := StrPas( ServEnt^.s_name);
 end;
 
 { -Returns a port for a service name }

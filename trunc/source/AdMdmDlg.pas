@@ -38,8 +38,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  OOMisc, AdMdm, StdCtrls, Buttons, ExtCtrls, ImgList
-  {$IFDEF Delphi4}, ImgList{$ENDIF};
+  OOMisc, AdMdm, StdCtrls, Buttons, ExtCtrls, ImgList;
 
 type
   TApdModemStatusDialog = class(TForm)

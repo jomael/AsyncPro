@@ -73,7 +73,7 @@ type
     function GetComEventMask(EvtMask : Integer) : Cardinal; override;
     function GetComState(var DCB: TDCB): Integer; override;
     function SetComState(var DCB : TDCB) : Integer; override;
-    function ReadCom(Buf : PChar; Size: Integer) : Integer; override;
+    function ReadCom(Buf : PansiChar; Size: Integer) : Integer; override;
     function WriteCom(Buf : PChar; Size: Integer) : Integer; override;
     function SetupCom(InSize, OutSize : Integer) : Boolean; override;
     procedure StartDispatcher; override;
@@ -248,7 +248,7 @@ implementation
       Result := -1;
   end;
 
-  function TApdWin32Dispatcher.ReadCom(Buf: PChar; Size: Integer): Integer;
+  function TApdWin32Dispatcher.ReadCom(Buf: PansiChar; Size: Integer): Integer;
     {-Read Size bytes from the comport specified by Cid}
   var
     OK  : Bool;
@@ -302,14 +302,16 @@ implementation
       SizeAtEnd := OutQue - OBufHead;
       if SizeAtEnd >= Size then begin
         {can move data to output queue in one block}
-        Move(Buf^, OBuffer^[OBufHead], Size);
+//        Move(Buf^, OBuffer^[OBufHead], Size);
+        Move(Buf^, GetPtr(OBuffer,OBufHead)^, Size);
         if SizeAtEnd = Size then
           OBufHead := 0
         else
           Inc(OBufHead, Size);
       end else begin
         { need to use two moves }
-        Move(Buf^, OBuffer^[OBufHead], SizeAtEnd);
+//        Move(Buf^, OBuffer^[OBufHead], SizeAtEnd);
+        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeAtEnd);
         LeftOver := Size - SizeAtEnd;
         Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, LeftOver);
         OBufHead := LeftOver;

@@ -76,7 +76,7 @@ uses
 const
   ApVersionStr = 'v5.00';
   {$IFDEF Apax}
-  ApaxVersionStr = 'v1.14';                                                 // SWB
+  ApaxVersionStr = 'v1.14';                                              // SWB
   {$ENDIF}
 
   { Product name}
@@ -3047,18 +3047,19 @@ function ApWinExecAndWait32(FileName : PChar; CommandLine : PChar;
  { code when the process terminates }
 var
   zAppName:array[0..512] of char;
-  zCurDir:array[0..255] of char;
-  WorkDir:ShortString;
+//  zCurDir:array[0..255] of PAnsiChar;
+  zCurDir:PAnsiChar;
+  WorkDir:AnsiString;
   StartupInfo:TStartupInfo;
   ProcessInfo:TProcessInformation;
   Temp : DWORD;
 begin
   StrCopy(zAppName, FileName);
-  if assigned(CommandLine) then                                        
-    StrCat(zAppName, CommandLine);                                     
-  GetDir(0, WorkDir);                                                  
-  StrPCopy(zCurDir, WorkDir);                                          
-  FillChar(StartupInfo, Sizeof(StartupInfo),#0);                       
+  if assigned(CommandLine) then
+    StrCat(zAppName, CommandLine);
+  GetDir(0, WorkDir);
+  StrPCopy(zCurDir, WorkDir);
+  FillChar(StartupInfo, Sizeof(StartupInfo),#0);
   StartupInfo.cb := Sizeof(StartupInfo);                               
   StartupInfo.dwFlags := STARTF_USESHOWWINDOW;                         
   StartupInfo.wShowWindow := Visibility;                               

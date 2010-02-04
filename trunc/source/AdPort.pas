@@ -95,7 +95,7 @@ type
   TTapiMode = (tmNone, tmAuto, tmOn, tmOff);
 
   {Port state}
-  TPortState = (psClosed, psShuttingDown, psOpen);                   
+  TPortState = (psClosed, psShuttingDown, psOpen);
 
   {Hardware flow control types}
   THWFlowOptions = (
@@ -140,7 +140,7 @@ type
                                        LineBreak : Boolean) of object;
 
   {WaitChar event handler}
-  TWaitCharEvent = procedure(CP : TObject; C : Char) of object;
+  TWaitCharEvent = procedure(CP : TObject; C : AnsiChar) of object;
 
 
   {Port open/close callbacks}
@@ -242,7 +242,7 @@ type
     FCommNotificationLevel : Word;          {Comm notify level}
     FTapiCid         : Word;                {Cid from TAPI}
     FTapiMode        : TTapiMode;           {True if using TAPI}
-    FRS485Mode       : Boolean;             {True if in RS485 mode}  
+    FRS485Mode       : Boolean;             {True if in RS485 mode}
     FThreadBoost     : TApThreadBoost;      {Boost for dispatcher threads}
 
     {Modem control/status}
@@ -254,8 +254,8 @@ type
     FBufferResume    : Word;                {Flow control resume}
     FHWFlowOptions   : THWFlowOptionSet;    {Hardware flow control}
     FSWFlowOptions   : TSWFlowOptions;      {Software flow control}
-    FXOnChar         : Char;                {Xon character}
-    FXOffChar        : Char;                {Xoff character}
+    FXOnChar         : AnsiChar;                {Xon character}
+    FXOffChar        : AnsiChar;                {Xoff character}
 
     {Debugging}
     FTracing         : TTraceLogState;      {Controls Tracing state}
@@ -303,13 +303,13 @@ type
     procedure SetTracing(const NewState : TTraceLogState);
     procedure SetTraceSize(const NewSize : Cardinal);
     procedure SetLogging(const NewState : TTraceLogState);
-    procedure SetLogSize(const NewSize : Cardinal);                   
+    procedure SetLogSize(const NewSize : Cardinal);
     procedure SetOpen(const Enable : Boolean);
     procedure SetHWFlowOptions(const NewOpts : THWFlowOptionSet);
     function GetFlowState : TFlowControlState;
     procedure SetSWFlowOptions(const NewOpts : TSWFlowOptions);
-    procedure SetXonChar(const NewChar : Char);
-    procedure SetXoffChar(const NewChar : Char);
+    procedure SetXonChar(const NewChar : AnsiChar);
+    procedure SetXoffChar(const NewChar : AnsiChar);
     procedure SetBufferFull(const NewFull : Word);
     procedure SetBufferResume(const NewResume : Word);
     procedure SetTriggerLength(const NewLength : Word);
@@ -328,7 +328,7 @@ type
     procedure SetOnTriggerOutbuffUsed(const Value : TNotifyEvent);
     procedure SetOnTriggerOutSent(const Value : TNotifyEvent);
 
-    function GetBaseAddress : Word;                                
+    function GetBaseAddress : Word;
     function GetDispatcher : TApdBaseDispatcher;
     function GetModemStatus : Byte;
     function GetDSR : Boolean;
@@ -383,7 +383,7 @@ type
     procedure TriggerOutSent; virtual;
 
     {Wait trigger method}
-    procedure WaitChar(C : Char); virtual;
+    procedure WaitChar(C : AnsiChar); virtual;
 
     {Tracing}
     procedure InitTracing(const NumEntries : Cardinal);
@@ -474,9 +474,9 @@ type
     {I/O}
     function CharReady : Boolean;
       {-Return True if at least one character is in the input buffer}
-    function PeekChar(const Count : Word) : Char;
+    function PeekChar(const Count : Word) : AnsiChar;
       {-Return a received character other than the next one}
-    function GetChar : Char;
+    function GetChar : AnsiChar;
       {-Return the next received character}
     procedure PeekBlock(var Block; const Len : Word);
       {-Return a block of data other than the next block}
@@ -495,13 +495,13 @@ type
                             const S : String;
                             IgnoreCase : Boolean) : Boolean;
       {-Compare C against a sequence of chars, looking for S}
-    function WaitForString(const S : String;
+    function WaitForString(const S : AnsiString;
                            const Timeout : LongInt;
                            const Yield, IgnoreCase : Boolean) : Boolean;
       {-Wait for S}
-    function WaitForMultiString(const S : String; const Timeout : LongInt;
+    function WaitForMultiString(const S : AnsiString; const Timeout : LongInt;
                                 const Yield, IgnoreCase : Boolean;
-                                const SepChar : Char) : Integer;
+                                const SepChar : AnsiChar) : Integer;
       {-Wait for S, which contains several substrings separated by ^}
     procedure PrepareWait;
       {-Set EventBusy true to prevent triggers}
@@ -565,9 +565,9 @@ type
       read GetFlowState;
     property SWFlowOptions : TSWFlowOptions
       read FSWFlowOptions write SetSWFlowOptions default adpoDefSWFlowOptions;
-    property XOnChar : Char
+    property XOnChar : AnsiChar
       read FXonChar write SetXonChar default adpoDefXOnChar;
-    property XOffChar : Char
+    property XOffChar : AnsiChar
       read FXOffChar write SetXoffChar default adpoDefXOffChar;
     property BufferFull : Word
       read FBufferFull write SetBufferFull default adpoDefBufferFull;
@@ -604,7 +604,7 @@ type
       read FUseEventWord write SetUseEventWord default adpoDefUseEventWord;
 
     {Tracing}
-    procedure AddTraceEntry(const CurEntry, CurCh : Char);
+    procedure AddTraceEntry(const CurEntry, CurCh : AnsiChar);
       {-Add an entry to the trace buffer}
     procedure AddStringToLog(S : string);
       {-Add a string to the current LOG file}
@@ -874,19 +874,19 @@ const
     WinProcs.RegisterClass(XClass);
   end;
 
-  function TApdCustomComPort.ValidDispatcher : TApdBaseDispatcher;    
+  function TApdCustomComPort.ValidDispatcher : TApdBaseDispatcher;
     {- return the current dispatcher object. Raise an exception if NIL }
   begin
     if Dispatcher = nil then
       CheckException(Self,ecCommNotOpen);
-    Result := Dispatcher;                    
+    Result := Dispatcher;
   end;
 
   procedure TApdCustomComPort.SetDeviceLayer(const NewDevice : TDeviceLayer);
     {-Set a new device layer, ignore if port is open}
   begin
     if (NewDevice <> FDeviceLayer) and (PortState = psClosed) then
-      if NewDevice in FDeviceLayers then begin                       
+      if NewDevice in FDeviceLayers then begin
         FDeviceLayer := NewDevice;
         DeviceLayerChanged;
       end;
@@ -903,7 +903,7 @@ const
       WasOpen := (PortState = psOpen);
       OldTracing := tlOff;
       OldLogging := tlOff;
-      if (PortState = psOpen) then begin                           
+      if (PortState = psOpen) then begin
         Dispatcher.SaveTriggers(SaveTriggerBuffer);
         OldTracing := Tracing;
         OldLogging := Logging;
@@ -924,7 +924,7 @@ const
   begin
     if NewBaud <> FBaud then begin
       FBaud := NewBaud;
-      if (PortState = psOpen) then                                  
+      if (PortState = psOpen) then
         CheckException(Self,
           Dispatcher.SetLine(NewBaud, Ord(Parity), Databits, Stopbits));
     end;
@@ -935,7 +935,7 @@ const
   begin
     if NewParity <> FParity then begin
       FParity := NewParity;
-      if (PortState = psOpen) then                                 
+      if (PortState = psOpen) then
         CheckException(Self,
           Dispatcher.SetLine(Baud, Ord(FParity), Databits, Stopbits));
     end;
@@ -946,7 +946,7 @@ const
   begin
     if NewBits <> FDatabits then begin
       FDatabits := NewBits;
-      if (PortState = psOpen) then                                  
+      if (PortState = psOpen) then
         CheckException(Self,
           Dispatcher.SetLine(Baud, Ord(Parity), FDatabits, Stopbits));
     end;
@@ -957,7 +957,7 @@ const
   begin
     if NewBits <> FStopbits then begin
       FStopbits := NewBits;
-      if (PortState = psOpen) then                                  
+      if (PortState = psOpen) then
         CheckException(Self,
           Dispatcher.SetLine(Baud, Ord(Parity), Databits, FStopbits));
     end;
@@ -978,7 +978,7 @@ const
   begin
     if NewSize <> FOutSize then begin
       FOutSize := NewSize;
-      if (PortState = psOpen) then                             
+      if (PortState = psOpen) then
         Dispatcher.SetCommBuffers(InSize, NewSize);
     end;
   end;
@@ -987,7 +987,7 @@ const
     {-Set Tracing state, FTracing is modified by called methods}
   begin
     if (FTracing <> NewState) or Force then begin
-      if (PortState = psOpen) then begin                           
+      if (PortState = psOpen) then begin
         {Port is open -- do it}
         case NewState of
           tlOff    : if (FTracing = tlOn) or (FTracing = tlPause) then
@@ -1024,7 +1024,7 @@ const
     end;
   end;
 
-  procedure TApdCustomComPort.SetTraceSize(const NewSize : Cardinal); 
+  procedure TApdCustomComPort.SetTraceSize(const NewSize : Cardinal);
     {-Set trace size}
   var
     OldState : TTraceLogState;
@@ -1032,9 +1032,9 @@ const
     if NewSize <> FTraceSize then begin
       if NewSize > HighestTrace then
         FTraceSize := HighestTrace
-      else                                                           
+      else
         FTraceSize := NewSize;
-      if (PortState = psOpen) and ((FTracing = tlOn) or (FTracing = tlPause)) then begin 
+      if (PortState = psOpen) and ((FTracing = tlOn) or (FTracing = tlPause)) then begin
         {Trace file is open: abort, then restart to get new size}
         OldState := Tracing;
         AbortTracing;
@@ -1047,7 +1047,7 @@ const
     {-Set Logging state, FLogging is modified by called methods}
   begin
     if (FLogging <> NewState) or Force then begin
-      if (PortState = psOpen) then begin                             
+      if (PortState = psOpen) then begin
         case NewState of
           tlOff    : if (FLogging = tlOn) or (FLogging = tlPause) then
                        AbortLogging;
@@ -1083,7 +1083,7 @@ const
     end;
   end;
 
-  procedure TApdCustomComPort.SetLogSize(const NewSize : Cardinal);  
+  procedure TApdCustomComPort.SetLogSize(const NewSize : Cardinal);
     {-Set log size}
   var
     OldState : TTraceLogState;
@@ -1093,7 +1093,7 @@ const
         FLogSize := MaxDLogQueueSize
       else
         FLogSize := NewSize;
-      if (PortState = psOpen) and ((FLogging = tlOn) or (FLogging = tlPause)) then begin 
+      if (PortState = psOpen) and ((FLogging = tlOn) or (FLogging = tlPause)) then begin
         {Log file is open: abort, then restart to get new size}
         OldState := FLogging;
         AbortLogging;
@@ -1165,9 +1165,9 @@ const
   function TApdCustomComPort.GetFlowState : TFlowControlState;
     {-Return the current state of flow control}
   begin
-    if (PortState <> psShuttingDown) then begin                    
+    if (PortState <> psShuttingDown) then begin
       Result := TFlowControlState(Pred(CheckException(Self,
-        ValidDispatcher.HWFlowState)));                            
+        ValidDispatcher.HWFlowState)));
       if Result = fcOff then
         Result := TFlowControlState(Pred(CheckException(Self,
           Dispatcher.SWFlowState)));
@@ -1209,7 +1209,7 @@ const
     end;
   end;
 
-  procedure TApdCustomComPort.SetXonChar(const NewChar : Char);
+  procedure TApdCustomComPort.SetXonChar(const NewChar : AnsiChar);
     {-Set new xon character}
   begin
     if (NewChar <> FXOnChar) or Force then begin
@@ -1219,7 +1219,7 @@ const
     end;
   end;
 
-  procedure TApdCustomComPort.SetXoffChar(const NewChar : Char);
+  procedure TApdCustomComPort.SetXoffChar(const NewChar : AnsiChar);
     {-Set new xoff character}
   begin
     if (NewChar <> FXOffChar) or Force then begin
@@ -1468,7 +1468,7 @@ const
   begin
     if (FTriggerLength <> NewLength) or Force then begin
       FTriggerLength := NewLength;
-      if (PortState = psOpen) then                                  
+      if (PortState = psOpen) then
         Dispatcher.ChangeLengthTrigger(NewLength);
     end;
   end;
@@ -1476,7 +1476,7 @@ const
   function TApdCustomComPort.GetInBuffUsed : Word;
     {-Return the number of used bytes in the input buffer}
   begin
-    if (PortState = psOpen) then                                     
+    if (PortState = psOpen) then
       Result := Dispatcher.InBuffUsed
     else
       Result := 0;
@@ -1485,16 +1485,16 @@ const
   function TApdCustomComPort.GetInBuffFree : Word;
     {-Return amount of freespace in inbuf}
   begin
-    if (PortState = psOpen) then                                     
+    if (PortState = psOpen) then
       Result := Dispatcher.InBuffFree
     else
-      Result := DispatchBufferSize;                                  
+      Result := DispatchBufferSize;
   end;
 
   function TApdCustomComPort.GetOutBuffUsed : Word;
     {-Return number of used bytes in output buffer}
   begin
-    if (PortState = psOpen) then                                     
+    if (PortState = psOpen) then
       Result := Dispatcher.OutBuffUsed
     else
       Result := 0;
@@ -1503,7 +1503,7 @@ const
   function TApdCustomComPort.GetOutBuffFree : Word;
     {-Return amount of free space in outbuff}
   begin
-    if (PortState = psOpen) then                                   
+    if (PortState = psOpen) then
       Result := Dispatcher.OutBuffFree
     else
       Result := FOutSize;
@@ -1824,7 +1824,7 @@ const
       FOnTriggerOutSent(Self);
   end;
 
-  procedure TApdCustomComPort.WaitChar(C : Char);
+  procedure TApdCustomComPort.WaitChar(C : AnsiChar);
     {-Received a character in WaitForString or WaitForMultiString}
   begin
     if Assigned(FOnWaitChar) then
@@ -1861,7 +1861,7 @@ const
                                 nil);                   {parameter}
 
       {Register it}
-      FDispatcher.RegisterWndTriggerHandler(ComWindow);              
+      FDispatcher.RegisterWndTriggerHandler(ComWindow);
     end else begin
       {Deregister it}
       FDispatcher.DeregisterWndTriggerHandler(ComWindow);
@@ -1871,7 +1871,7 @@ const
 
   procedure TApdCustomComPort.ValidateComport;
   var
-    ComSelDlg : TComSelectForm;                                    
+    ComSelDlg : TComSelectForm;
   begin
     if (FComNumber = 0) then
       if (not FPromptForPort) then
@@ -1886,7 +1886,7 @@ const
         finally
           ComSelDlg.Free;
         end;
-      end;                                                           
+      end;
   end;
 
   constructor TApdCustomComPort.Create(AOwner : TComponent);
@@ -2005,7 +2005,7 @@ const
     nDataBits : TDatabits;
     nStopBits : TStopbits;
     nHWOpts, nSWOpts, nBufferFull, nBufferResume : Cardinal;
-    nOnChar, nOffChar : Char;
+    nOnChar, nOffChar : AnsiChar;
   begin
     { Validate the comport -- not needed for Tapi }
     if TapiMode <> tmOn then
@@ -2323,7 +2323,7 @@ const
     UL : PUserListEntry;
     I : Word;
   begin
-    if csDestroying in ComponentState then Exit;                         {!!.05}  
+    if csDestroying in ComponentState then Exit;                         {!!.05}
     if Assigned(UserList) and (UserList.Count > 0) then begin
       for I := UserList.Count-1 downto 0 do begin
         UL := UserList.Items[I];
@@ -2355,13 +2355,13 @@ const
     {-Flush the output buffer}
   begin
     if (PortState = psShuttingDown) then Exit;
-    CheckException(Self, ValidDispatcher.FlushOutBuffer);          
+    CheckException(Self, ValidDispatcher.FlushOutBuffer);
   end;
 
   procedure TApdCustomComPort.InitTracing(const NumEntries : Cardinal);
     {-Start tracing}
   begin
-    if (PortState = psShuttingDown) then Exit;                    
+    if (PortState = psShuttingDown) then Exit;
     if NumEntries <> 0 then
       FTraceSize := NumEntries;
     CheckException(Self, Dispatcher.InitTracing(NumEntries));
@@ -2376,7 +2376,7 @@ const
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self, Dispatcher.DumpTrace(StrPCopy(Dest, FName),
-      InHex, TraceAllHex));                                          
+      InHex, TraceAllHex));
     FTracing := tlOff;
   end;
 
@@ -2396,19 +2396,19 @@ const
   procedure TApdCustomComPort.ClearTracing;
     {-Clear the trace buffer but keep tracing}
   begin
-    if (PortState = psShuttingDown) then Exit;                      
+    if (PortState = psShuttingDown) then Exit;
     CheckException(Self, Dispatcher.ClearTracing);
   end;
 
   procedure TApdCustomComPort.AbortTracing;
     {-Abort tracing without dumping the trace file}
   begin
-    if (PortState = psShuttingDown) then Exit;                      
+    if (PortState = psShuttingDown) then Exit;
     Dispatcher.AbortTracing;
     FTracing := tlOff;
   end;
 
-  procedure TApdCustomComPort.AddTraceEntry(const CurEntry, CurCh : Char);
+  procedure TApdCustomComPort.AddTraceEntry(const CurEntry, CurCh : AnsiChar);
     {-Add a trace entry}
   begin
     if (PortState = psShuttingDown) then Exit;
@@ -2417,14 +2417,14 @@ const
 
   procedure TApdCustomComPort.AddStringToLog(S : string);
   begin
-    if (PortState = psShuttingDown) then Exit;                     
+    if (PortState = psShuttingDown) then Exit;
     ValidDispatcher.AddStringToLog(S);
   end;
 
   procedure TApdCustomComPort.StartTracing;
     {-Resume tracing after StopTracing}
   begin
-    if (PortState = psShuttingDown) then Exit;                       
+    if (PortState = psShuttingDown) then Exit;
     Dispatcher.StartTracing;
     FTracing := tlOn;
   end;
@@ -2432,7 +2432,7 @@ const
   procedure TApdCustomComPort.StopTracing;
     {-Temporarily stop tracing}
   begin
-    if (PortState = psShuttingDown) then Exit;                     
+    if (PortState = psShuttingDown) then Exit;
     Dispatcher.StopTracing;
     FTracing := tlPause;
   end;
@@ -2461,7 +2461,7 @@ const
   procedure TApdCustomComPort.InitLogging(const Size : Cardinal);
     {-Start dispatch logging}
   begin
-    if (PortState = psShuttingDown) then Exit;                      
+    if (PortState = psShuttingDown) then Exit;
     if Size <> 0 then
       FLogSize := Size;
     Dispatcher.InitDispatchLogging(FLogSize);
@@ -2474,7 +2474,7 @@ const
   var
     Dest : array[0..255] of Char;
   begin
-    if (PortState = psShuttingDown) then Exit;                      
+    if (PortState = psShuttingDown) then Exit;
     CheckException(Self,
       Dispatcher.DumpDispatchLog(StrPCopy(Dest, FName), InHex, LogAllHex));
     FLogging := tlOff;
@@ -2496,14 +2496,14 @@ const
   procedure TApdCustomComPort.ClearLogging;
     {-Clear the log but keep logging}
   begin
-    if (PortState = psShuttingDown) then Exit;                     
+    if (PortState = psShuttingDown) then Exit;
     Dispatcher.ClearDispatchLogging;
   end;
 
   procedure TApdCustomComPort.AbortLogging;
     {-Abort logging without dumping the log}
   begin
-    if (PortState = psShuttingDown) then Exit;                     
+    if (PortState = psShuttingDown) then Exit;
     Dispatcher.AbortDispatchLogging;
     FLogging := tlOff;
   end;
@@ -2511,7 +2511,7 @@ const
   procedure TApdCustomComPort.StartLogging;
     {-Resume logging after stopping}
   begin
-    if (PortState = psShuttingDown) then Exit;                       
+    if (PortState = psShuttingDown) then Exit;
     Dispatcher.StartDispatchLogging;
     FLogging := tlOn;
   end;
@@ -2519,7 +2519,7 @@ const
   procedure TApdCustomComPort.StopLogging;
     {-Temporarily stop logging}
   begin
-    if (PortState = psShuttingDown) then Exit;                      
+    if (PortState = psShuttingDown) then Exit;
     Dispatcher.StopDispatchLogging;
     FLogging := tlPause;
   end;
@@ -2538,16 +2538,16 @@ const
     Len := Length(Data);
     Move(Data[1], P, Len);
     Result := Word(CheckException(Self,
-        ValidDispatcher.AddDataTriggerLen(P, IgnoreCase, Len)));      
+        ValidDispatcher.AddDataTriggerLen(P, IgnoreCase, Len)));
   end;
 
   function TApdCustomComPort.AddTimerTrigger : Word;
     {-Add a timer trigger}
   begin
-    if (PortState = psShuttingDown) then                             
-      Result := 0                                                    
+    if (PortState = psShuttingDown) then
+      Result := 0
     else
-      Result := Word(CheckException(Self, ValidDispatcher.AddTimerTrigger)); 
+      Result := Word(CheckException(Self, ValidDispatcher.AddTimerTrigger));
   end;
 
   function TApdCustomComPort.AddStatusTrigger(const SType : Word) : Word;
@@ -2557,7 +2557,7 @@ const
       Result := 0
     else
       Result := Word(CheckException(Self,
-        ValidDispatcher.AddStatusTrigger(SType)));                   
+        ValidDispatcher.AddStatusTrigger(SType)));
   end;
 
   procedure TApdCustomComPort.RemoveTrigger(const Handle : Word);
@@ -2570,7 +2570,7 @@ const
   procedure TApdCustomComPort.RemoveAllTriggers;
     {-Remove all triggers}
   begin
-    if (PortState = psOpen) then begin                               
+    if (PortState = psOpen) then begin
       Dispatcher.RemoveAllTriggers;
       FTriggerLength := 0;
     end;
@@ -2581,8 +2581,8 @@ const
                                               const Activate : Boolean);
     {-Set the timer for trigger Index}
   begin
-    if (PortState = psShuttingDown) then Exit;                        
-    CheckException(Self, ValidDispatcher.SetTimerTrigger(Handle, Ticks, Activate)); 
+    if (PortState = psShuttingDown) then Exit;
+    CheckException(Self, ValidDispatcher.SetTimerTrigger(Handle, Ticks, Activate));
   end;
 
   procedure TApdCustomComPort.SetStatusTrigger(const Handle : Word;
@@ -2590,9 +2590,9 @@ const
                                                const Activate : Boolean);
     {-Set status trigger}
   begin
-    if (PortState = psShuttingDown) then Exit;                         
+    if (PortState = psShuttingDown) then Exit;
     CheckException(Self,
-      ValidDispatcher.SetStatusTrigger(Handle, Value, Activate));     
+      ValidDispatcher.SetStatusTrigger(Handle, Value, Activate));
   end;
 
 {I/O}
@@ -2603,20 +2603,20 @@ const
     if (PortState = psShuttingDown) then
       Result := False
     else
-      Result := ValidDispatcher.CharReady;                           
+      Result := ValidDispatcher.CharReady;
   end;
 
-  function TApdCustomComPort.PeekChar(const Count : Word) : Char;
+  function TApdCustomComPort.PeekChar(const Count : Word) : AnsiChar;
     {-Peek at the Count'th character in the buffer (1=next)}
   var
     Res : Integer;
-    C   : Char;
+    C   : AnsiChar;
   begin
     if (PortState = psShuttingDown) then begin
       Res := ecOk;
       C := #0;
     end else
-      Res := ValidDispatcher.PeekChar(C, Count);                     
+      Res := ValidDispatcher.PeekChar(C, Count);
     if Res = ecOK then
       Result := C
     else begin
@@ -2625,11 +2625,11 @@ const
     end;
   end;
 
-  function TApdCustomComPort.GetChar : Char;
+  function TApdCustomComPort.GetChar : AnsiChar;
     {-Retrieve the next character from the input queue}
   var
     Res : Integer;
-    C   : Char;
+    C   : AnsiChar;
   begin
     if (PortState = psShuttingDown) then begin
       Res := ecOk;
@@ -2647,28 +2647,28 @@ const
   procedure TApdCustomComPort.PeekBlock(var Block; const Len : Word);
     {-Peek at the next Len characters, but don't remove from buffer}
   begin
-    if (PortState = psShuttingDown) then Exit;                        
-    CheckException(Self, ValidDispatcher.PeekBlock(PChar(@Block), Len)); 
+    if (PortState = psShuttingDown) then Exit;
+    CheckException(Self, ValidDispatcher.PeekBlock(PAnsiChar(@Block), Len));
   end;
 
   procedure TApdCustomComPort.GetBlock(var Block; const Len : Word);
     {-Return the next Len characters from the buffer}
   begin
     if (PortState = psShuttingDown) then Exit;
-    CheckException(Self, ValidDispatcher.GetBlock(PChar(@Block), Len));
+    CheckException(Self, ValidDispatcher.GetBlock(PAnsiChar(@Block), Len));
   end;
 
   procedure TApdCustomComPort.PutChar(const C : Char);
     {-Add C to the output buffer}
   begin
     if (PortState = psShuttingDown) then Exit;
-    CheckException(Self, ValidDispatcher.PutChar(C));                 
+    CheckException(Self, ValidDispatcher.PutChar(C));
   end;
 
   procedure TApdCustomComPort.PutString(const S : String);
     {-Add S to the output buffer}
   begin
-    if (PortState = psShuttingDown) then Exit;                        
+    if (PortState = psShuttingDown) then Exit;
    {$IFOPT H+}
     CheckException(Self, ValidDispatcher.PutBlock(Pointer(S)^, Length(S)));
    {$ELSE}
@@ -2720,16 +2720,16 @@ const
         Index := 0;
   end;
 
-  function TApdCustomComPort.WaitForString(const S : String;
+  function TApdCustomComPort.WaitForString(const S : AnsiString;
                                            const Timeout : LongInt;
                                            const Yield, IgnoreCase : Boolean)
                                            : Boolean;
     {-Wait for data, generate ETimeout exception if not found}
   var
     ET        : EventTimer;
-    C         : Char;
-    CurChar   : Char;
-    StartChar : Char;
+    C         : AnsiChar;
+    CurChar   : AnsiChar;
+    StartChar : AnsiChar;
     Index     : Byte;
     Finished  : Boolean;
     WasBusy   : Boolean;
@@ -2738,11 +2738,11 @@ const
     Result := True;
 
     {Exit immediately if nothing to do}
-    if (S = '') or (PortState = psShuttingDown) then                 
-      Exit;                                                         
+    if (S = '') or (PortState = psShuttingDown) then
+      Exit;
 
     {Set busy flag}
-    ValidDispatcher.SetEventBusy(WasBusy, True);                    
+    ValidDispatcher.SetEventBusy(WasBusy, True);
 
     {Note the length of the string}
     Len := Length(S);
@@ -2818,22 +2818,22 @@ const
     BusyBeforeWait := False;
   end;
 
-  function TApdCustomComPort.WaitForMultiString(const S : String;
+  function TApdCustomComPort.WaitForMultiString(const S : AnsiString;
                                                 const Timeout : LongInt;
                                                 const Yield : Boolean;
                                                 const IgnoreCase : Boolean;
-                                                const SepChar : Char) : Integer;
+                                                const SepChar : AnsiChar) : Integer;
     {-Wait for S, which contains several substrings separated by ^}
   const
     MaxSubs = 127;
   var
     ET         : EventTimer;
     I, Total   : Word;
-    C          : Char;
-    CurChar    : Char;
+    C          : AnsiChar;
+    CurChar    : AnsiChar;
     Finished   : Boolean;
     WasBusy    : Boolean;
-    StartChar  : array[1..MaxSubs] of Char;
+    StartChar  : array[1..MaxSubs] of AnsiChar;
     StartIndex : array[1..MaxSubs] of Byte;
     EndIndex   : array[1..MaxSubs] of Byte;
     Index      : array[1..MaxSubs] of Byte;
@@ -2842,14 +2842,14 @@ const
     Result := 0;
 
     {Exit immediately if nothing to do}
-    if (S = '') or (PortState = psShuttingDown) then                 
+    if (S = '') or (PortState = psShuttingDown) then
       Exit;
 
     {Note the length of the string}
     Len := Length(S);
 
     {Set busy flag}
-    ValidDispatcher.SetEventBusy(WasBusy, True);                     
+    ValidDispatcher.SetEventBusy(WasBusy, True);
 
     {Prepare to parse for substrings}
     Total := 1;
@@ -3001,5 +3001,3 @@ begin                                                                       // S
 end;                                                                        // SWB
 
 end.
-
-

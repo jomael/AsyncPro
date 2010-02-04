@@ -791,7 +791,7 @@ begin
   LibModem := TApdLibModem.Create(Self);
   FModemConfig := DefaultDeviceConfig;
   FCallerIDProvided := False;
-  with CallerIDInfo do begin
+  with FCallerIDInfo do begin
     HasData := False;
     Date   := '';
     Time   := '';

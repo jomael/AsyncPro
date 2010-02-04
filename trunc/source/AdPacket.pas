@@ -630,7 +630,7 @@ begin
       inc(dpDataBufferSize,DispatchBufferSize);
       ReAllocMem(fDataBuffer,dpDataBufferSize);
     end;
-    wParam := fComPort.Dispatcher.GetBlock(pChar(@fDataBuffer[BufferPtr]),wParam);
+    wParam := fComPort.Dispatcher.GetBlock(PAnsiChar(@fDataBuffer[BufferPtr]),wParam);
     inc(BufferPtr,wParam);
     NotifyData(NewDataStart);
   end else if (Msg = apw_TriggerTimer) and

@@ -1,4 +1,4 @@
-package A407_D100;
+package A500_R2010;
 
 {$R *.res}
 {$ALIGN 8}
@@ -29,17 +29,28 @@ package A407_D100;
 requires
   designide,
   rtl,
-  vclx,
-  A407_R100;
+  vclx;
 
 contains
-  APROReg in '..\source\APROREG.PAS',
-  AdAbout in '..\source\adabout.pas' {ApdAboutForm},
-  AdPackEd in '..\source\adpacked.pas' {PacketEditor},
-  AdPEdit0 in '..\source\Adpedit0.pas' {AdPEdit},
-  AdPEditT in '..\source\Adpeditt.pas',
-  Adproped in '..\source\AdPropEd.pas',
-  AdStatEd in '..\source\AdStatEd.pas' {frmStateEdit},
-  AdStatE0 in '..\source\AdStatE0.pas' {frmConditionEdit};
+  OoMisc in '..\source\OoMisc.pas',
+  AdExcept in '..\source\AdExcept.pas',
+  AdLibMdm in '..\source\AdLibMdm.pas' {ApdModemSelectionDialog},
+  AdMdm in '..\source\AdMdm.pas',
+  AdMdmCfg in '..\source\AdMdmCfg.pas' {ApdModemConfigDialog},
+  AdMdmDlg in '..\source\AdMdmDlg.pas' {ApdModemStatusDialog},
+  AdPacket in '..\source\AdPacket.pas',
+  AdPort in '..\source\AdPort.pas',
+  AdSelCom in '..\source\AdSelCom.pas' {ComSelectForm},
+  AdSocket in '..\source\AdSocket.pas',
+  AdStatLt in '..\source\AdStatLt.pas',
+  Adwutil in '..\source\Adwutil.pas',
+  AdXBase in '..\source\AdXBase.pas',
+  AdXChrFlt in '..\source\AdXChrFlt.pas',
+  AdXLbMdm in '..\source\AdXLbMdm.pas',
+  AdXParsr in '..\source\AdXParsr.pas',
+  awuser in '..\source\awuser.pas',
+  AwWin32 in '..\source\AwWin32.pas',
+  LnsQueue in '..\source\LnsQueue.pas',
+  LNSWin32 in '..\source\LNSWin32.pas';
 
 end.
