@@ -47,9 +47,9 @@ uses
 
 type
   TApdUcs4Char = Longint;
-  TApdUtf8Char = string[6];
-  DOMChar = WideChar;
-  PDOMChar = PWideChar;
+  TApdUtf8Char = AnsiString; // packed array [0..6] of ansichar;   // --sm does use 8Char=8bit is ansiString=8bit
+  DOMChar = WideChar;         // --sm OK
+  PDOMChar = PWideChar;       // --sm OK
 
   { Character encoding types}
   TApdCharEncoding = (ceUnknown, ceUTF8);
@@ -113,7 +113,7 @@ uses
 {== Utility methods ==================================================}
 function ApxPos(const aSubStr, aString : DOMString) : Integer;
 begin
-  Result := AnsiPos(aSubStr, aString);
+  Result := AnsiPos(aSubStr, aString);  // --sm OK
 end;
 {--------}
 function ApxRPos(const sSubStr, sTerm : DOMString) : Integer;
@@ -209,20 +209,20 @@ begin
   aInCh := abs(aInCh);
   {if the UCS-4 value is $00 to $7f, no conversion is required}
   if (aInCh < $80) then begin
-    aOutCh[0] := #1;
+    SetLength( aOutCh, 1);
     aOutCh[1] := AnsiChar(aInCh);
   end
   {if the UCS-4 value is $80 to $7ff, a two character string is
    produced}
   else if (aInCh < $800) then begin
-    aOutCh[0] := #2;
+    SetLength( aOutCh, 2);
     aOutCh[1] := AnsiChar($C0 or (aInCh shr 6));
     aOutCh[2] := AnsiChar($80 or (aInCh and $3F));
   end
   {if the UCS-4 value is $800 to $ffff, a three character string is
    produced}
   else if (aInCh < $10000) then begin
-    aOutCh[0] := #3;
+    SetLength( aOutCh, 3);
     aOutCh[1] := AnsiChar($E0 or (aInCh shr 12));
     aOutCh[2] := AnsiChar($80 or ((aInCh shr 6) and $3F));
     aOutCh[3] := AnsiChar($80 or (aInCh and $3F));
@@ -233,7 +233,7 @@ begin
   {if the UCS-4 value is $10000 to $1fffff, a four character string
    is produced}
   else if (aInCh < $200000) then begin
-    aOutCh[0] := #4;
+    SetLength( aOutCh, 4);
     aOutCh[1] := AnsiChar($F0 or (aInCh shr 18));
     aOutCh[2] := AnsiChar($80 or ((aInCh shr 12) and $3F));
     aOutCh[3] := AnsiChar($80 or ((aInCh shr 6) and $3F));
@@ -242,7 +242,7 @@ begin
   {if the UCS-4 value is $200000 to $3ffffff, a five character
    string is produced}
   else if (aInCh < $4000000) then begin
-    aOutCh[0] := #5;
+    SetLength( aOutCh, 5);
     aOutCh[1] := AnsiChar($F8 or (aInCh shr 24));
     aOutCh[2] := AnsiChar($80 or ((aInCh shr 18) and $3F));
     aOutCh[3] := AnsiChar($80 or ((aInCh shr 12) and $3F));
@@ -251,7 +251,7 @@ begin
   end
   {for all other UCS-4 values, a six character string is produced}
   else begin
-    aOutCh[0] := #6;
+    SetLength( aOutCh, 6);
     aOutCh[1] := AnsiChar($FC or (aInCh shr 30));
     aOutCh[2] := AnsiChar($80 or ((aInCh shr 24) and $3F));
     aOutCh[3] := AnsiChar($80 or ((aInCh shr 18) and $3F));

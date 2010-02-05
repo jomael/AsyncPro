@@ -55,7 +55,7 @@ type
 
 const
   { Version of Winsock that we support }
-  Sock_Version = $0101;
+  Sock_Version = $0101;   // --sm version 1.1?  does it support xp and win7?
 
   Fd_Setsize = 64;
 
@@ -127,7 +127,7 @@ const
 
   { Get # bytes to read }
   FiOnRead = Ioc_Out or ((LongInt(SizeOf(LongInt)) and IocParm_Mask) shl 16) or
-    (LongInt(Byte('f')) shl 8) or 127;
+    (LongInt(Byte('f')) shl 8) or 127;  // --sm OK
 
   { Set/Clear non-blocking i/o }
   FiOnBio  = Ioc_In or((LongInt(SizeOf(LongInt)) and IocParm_Mask) shl 16) or
@@ -415,7 +415,7 @@ type
   end;
 
   { Server Entity }
-   PServEnt = ^TServEnt;
+  PServEnt = ^TServEnt;
   TServEnt = packed record
     s_name    : PAnsiChar;
     s_aliases : ^PAnsiChar;
@@ -977,7 +977,7 @@ end;
 
 initialization
   AddExitProc(WinsockExit);
-  FillChar(SockFuncs, Sizeof(SockFuncs), #0);
+  FillChar(SockFuncs, Sizeof(SockFuncs), #0); // --sm OK
   SocketModule := 0;
 
 
@@ -986,4 +986,3 @@ finalization
   WinsockExit;
 
 end.
-

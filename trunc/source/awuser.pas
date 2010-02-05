@@ -3880,7 +3880,7 @@ end;
     Col : Cardinal;
     Res : Integer;
     DumpFile : Text;
-    C : Char;
+    C : AnsiChar;     // --sm ansi
     LogFileBuffer : array[1..512] of Char;
     S : string[80];
     logBfr      : TLogBuffer;                                               // SWB
@@ -4175,7 +4175,7 @@ end;
                                     DST,                                    // SWB
                                     GetDispatchTime,                        // SWB
                                     Data,                                   // SWB
-                                    PChar(Buffer),                          // SWB
+                                    PansiChar(Buffer),                          // SWB
                                     BufferLen);                             // SWB
         DLoggingQueue.Push(logBuf);                                         // SWB
     end;                                                                    // SWB
@@ -4909,4 +4909,3 @@ finalization
   DeleteCriticalSection(PortListSection);
 
 end.
-

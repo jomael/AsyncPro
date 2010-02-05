@@ -54,13 +54,13 @@ type
 
   TDataBuffer = class(TIOBuffer)
   private
-    FData       : PChar;
+    FData       : PwideChar;    // --sm Wide
     FDataUsed   : Integer;
     FDataRead   : Integer;
   public
     constructor Create(size : Integer);
     destructor Destroy; override;
-    property Data : PChar read FData write FData;
+    property Data : PwideChar read FData write FData;
     property BytesUsed : Integer read FDataUsed write FDataUsed;
     property BytesRead : Integer read FDataRead write FDataRead;
   end;
@@ -78,7 +78,7 @@ type
     FSubType    : TDispatchSubType;
     FTime       : DWord;
     FData       : Cardinal;
-    FBuffer     : PChar;
+    FBuffer     : PAnsiChar;     // --sm ansi
 
     function  GetMoreData : Cardinal;
   public
@@ -86,7 +86,7 @@ type
                        styp : TDispatchSubType;
                        tim : DWORD;
                        data : Cardinal;
-                       bfr : PChar;
+                       bfr : PAnsiChar;
                        bfrLen : Integer);
     destructor  Destroy; override;
 
@@ -95,7 +95,7 @@ type
     property drTime : DWORD read FTime;
     property drData : Cardinal read FData;
     property drMoreData : Cardinal read GetMoreData;
-    property drBuffer : PChar read FBuffer;
+    property drBuffer : PAnsiChar read FBuffer;
   end;
   // A queue to hold serial port I/O buffers for delivery to / from the
   // dispatcher thread.  Also used to queue items to the dispatcher log.
@@ -141,7 +141,7 @@ constructor TLogBuffer.Create(typ : TDispatchType;
                               styp : TDispatchSubType;
                               tim : DWORD;
                               data : Cardinal;
-                              bfr : PChar;
+                              bfr : PansiChar;  // --sm ansi
                               bfrLen : Integer);
 begin
     inherited Create;
@@ -153,7 +153,7 @@ begin
     if (FDataSize > 0) then
     begin
         GetMem(FBuffer, FDataSize);
-        Move(bfr^, FBuffer^, SizeOf( FDataSize));// --check
+        Move(bfr^, FBuffer^, SizeOf( FDataSize));// --sm OK
     end;
 end;
 
