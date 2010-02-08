@@ -135,7 +135,7 @@ type
   DOMString = WideString;
 
 type
-  CharSet = set of char;
+  CharSet = set of Ansichar;  // --sm
 
   TPassString = string[255];  // !!! There is a good case to remove this type.
   TApdHwnd = HWND;
@@ -2363,11 +2363,6 @@ function ElapsedTimeInSecs(ET : EventTimer) : LongInt;
 function RemainingTime(ET : EventTimer) : LongInt;
 function RemainingTimeInSecs(ET : EventTimer) : LongInt;
 function DelayTicks(Ticks: LongInt; Yield : Bool) : Longint;
-function Long2StrZ(Dest : PChar; L : LongInt) : PChar;
-function Str2LongZ(S : PChar; var I : LongInt) : Bool;
-function JustPathnameZ(Dest : PChar; PathName : PChar) : PChar;
-function JustFilenameZ(Dest : PChar; PathName : PChar) : PChar;
-function JustExtensionZ(Dest : PChar; Name : PChar) : PChar;
 function StrStCopy(Dest : PChar; S : PChar; Pos, Count : Cardinal) : PChar;
 function AddBackSlashZ(Dest : PChar; DirName : PChar) : PChar;
 function ExistFileZ(FName : PChar) : Bool;
@@ -2754,87 +2749,12 @@ const
     DelayTicks := Res;
   end;
 
-  function Long2StrZ(Dest : PChar; L : LongInt) : PChar;
-    {-Convert a long/Cardinal/integer/byte/shortint to a string}
-  var
-    S : string;
-  begin
-    Str(L, S);
-    Result := StrPCopy(Dest, S);
-  end;
-
 const
   MaxLen  = 255;
   ExtLen = 3;
 
 type
   TSmallArray = Array[0..MaxLen-1] of Char;
-
-  function Str2LongZ(S : PChar; var I : LongInt) : Bool;
-    {-Convert a string to a longint, returning true if successful}
-  var
-    Err : Integer;
-  begin
-    Val(StrPas(S),I,Err);
-    Result := Err = 0;
-  end;
-
-  function JustPathnameZ(Dest : PChar; PathName : PChar) : PChar;
-    {-Return just the drive:directory portion of a pathname}
-  var
-    I : Integer;
-
-  begin
-    I := StrLen(PathName);
-    repeat
-      Dec(I);
-    until (I = -1) or (PathName[I] in DosDelimSet);
-
-    if I = -1 then
-      {Had no drive or directory name}
-      Dest[0] := #0
-    else if I = 0 then begin
-      {Either the root directory of default drive or invalid pathname}
-      Dest[0] := PathName[0];
-      Dest[1] := #0;
-    end else if (PathName[I] = '\') then begin
-      if PathName[Pred(I)] = ':' then
-        {Root directory of a drive, leave trailing backslash}
-        Dest := StrStCopy(Dest, PathName, 0, Succ(I))
-      else
-        {Subdirectory, remove the trailing backslash}
-        Dest := StrStCopy(Dest, PathName, 0, I);
-    end else
-      {Either the default directory of a drive or invalid pathname}
-      Dest:= StrStCopy(Dest, PathName, 0, Succ(I));
-    Result := Dest;
-  end;
-
-  function JustFilenameZ(Dest : PChar; PathName : PChar) : PChar;
-    {-Return just the filename of a pathname}
-  var
-    I : Cardinal;
-  begin
-    I := StrLen(PathName);
-    while (I > 0) and (not (PathName[I-1] in DosDelimSet)) do
-      Dec(I);
-    Dest := StrStCopy(Dest, PathName, I, MaxLen);
-    Result := Dest;
-  end;
-
-  {$IFNDEF PrnDrv}
-  function JustExtensionZ(Dest : PChar; Name : PChar) : PChar;
-  var
-    X : string[4];
-  begin
-    X := ExtractFileExt(StrPas(Name));
-    if X = '' then
-      Dest := #0
-    else
-      StrPCopy(Dest,copy(X,2,255));
-    Result := Dest;
-  end;
-  {$ENDIF}
 
   function StrStCopy(Dest : PChar; S : PChar; Pos, Count : Cardinal) : PChar;
   var

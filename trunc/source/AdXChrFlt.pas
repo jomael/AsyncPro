@@ -100,9 +100,8 @@ type
       procedure csAdvanceLinePos;
       procedure csGetCharPrim(var aCh : TApdUcs4Char;
                               var aIsLiteral : Boolean);
-      function csGetNextBuffer : Boolean;
-      function csGetTwoAnsiChars(var Buffer) : Boolean;
-      function csGetUtf8Char : TApdUcs4Char;
+      function  csGetNextBuffer : Boolean;
+      function  csGetUtf8Char : TApdUcs4Char;
       procedure csIdentifyFormat;
       procedure csPushCharPrim(aCh : TApdUcs4Char);
       procedure csSetFormat(const aValue : TApdStreamFormat); override;
@@ -120,12 +119,12 @@ type
          read FEOF;
     public
       procedure SkipChar;
-      function TryRead(const S : array of Longint) : Boolean;
-      function ReadChar : DOMChar;
-      function ReadAndSkipChar : DOMChar;
-      property Line : LongInt
+      function  TryRead(const S : array of Longint) : Boolean;
+      function  ReadChar : DOMChar;
+      function  ReadAndSkipChar : DOMChar;
+      property  Line : LongInt
          read FLine;
-      property LinePos : LongInt
+      property  LinePos : LongInt
          read FLinePos;
   end;
 
@@ -297,30 +296,7 @@ begin
   FBufPos := 0;
   Result := FBufEnd <> 0;
 end;
-{--------}
-function TApdInCharFilter.csGetTwoAnsiChars(var Buffer) : Boolean;
-type
-  TTwoChars = array [0..1] of AnsiChar;
-var
-  i : integer;
-begin
-  {get two byte characters from the stream}
-  for i := 0 to 1 do begin
-    {if the buffer is empty, fill it}
-    if (FBufPos >= FBufEnd - FBufDMZ) and
-       (not FInTryRead) then begin
-      {if we exhaust the stream, we couldn't satisfy the request}
-      if not csGetNextBuffer then begin
-        Result := false;
-        Exit;
-      end;
-    end;
-    {get the first byte character from the buffer}
-    TTwoChars(Buffer)[i] := FBuffer[FBufPos];
-    inc(FBufPos);
-  end;
-  Result := true;
-end;
+
 {--------}
 function TApdInCharFilter.csGetUtf8Char : TApdUcs4Char;
 var
@@ -348,7 +324,7 @@ begin
                                      Line,
                                      LinePos,
                                      sBadUTF8Char);
-  Move(Len, Utf8Char, 1);  // --check
+  Move(Len, Utf8Char, 1);  // --sm check
   {get the remaining characters from the stream}
   for i := 2 to Len do begin
     {if the buffer is empty, fill it}

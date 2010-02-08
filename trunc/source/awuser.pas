@@ -119,7 +119,7 @@ const
 
 
 type
-  TApHandlerFlagUpdate = (fuKeepPort, fuEnablePort, fuDisablePort);  
+  TApHandlerFlagUpdate = (fuKeepPort, fuEnablePort, fuDisablePort);
 
   TApdBaseDispatcher = class;
   TApdDispatcherThread = class(TThread)
@@ -132,9 +132,9 @@ type
       H : TApdBaseDispatcher;                                               // SWB
     public
       constructor Create(Disp : TApdBaseDispatcher);
-      procedure SyncNotify(Msg, Trigger : Cardinal; lParam : LongInt; Event : TApdNotifyEvent);
-      procedure Sync(Method: TThreadMethod);
-      property ReturnValue;                                                 // SWB
+      procedure   SyncNotify(Msg, Trigger : Cardinal; lParam : LongInt; Event : TApdNotifyEvent);
+      procedure   Sync(Method: TThreadMethod);
+      property    ReturnValue;                                              // SWB
   end;
 
   TOutThread = class(TApdDispatcherThread)
@@ -266,11 +266,11 @@ type
         lpOverlapped : POverlapped) : Boolean; virtual; abstract;
       function SetupCom(InSize, OutSize : Integer) : Boolean; virtual; abstract;
 
+// --sm to delete unwanted functions and procedures
       function CheckReceiveTriggers : Boolean;
       function CheckStatusTriggers : Boolean;
       function CheckTimerTriggers : Boolean;
       function CheckTriggers : Boolean;
-      procedure CreateDispatcherWindow;
       procedure DonePortPrim; virtual;
       function DumpDispatchLogPrim(
                                   FName : PChar;
@@ -296,7 +296,7 @@ type
       procedure ResetDataTriggers;
       function SendNotify(Msg, Trigger, Data: Cardinal) : Boolean;
       function SetCommStateFix(var DCB : TDCB) : Integer;
-      procedure StartDispatcher; virtual; abstract;
+      procedure StartDispatcher; virtual; abstract; // --sm need it
       procedure StopDispatcher;  virtual; abstract;
       procedure ThreadGone(Sender: TObject);                                // SWB
       procedure ThreadStart(Sender : TObject);                              // SWB
@@ -346,7 +346,6 @@ type
                                   InHex, AllHex : Boolean) : Integer;
       function AppendTrace(FName : PChar;
                             InHex, AllHEx : Boolean) : Integer;
-      procedure BufferSizes(var InSize, OutSize : Cardinal);
       function ChangeBaud(NewBaud : LongInt) : Integer;
       procedure ChangeLengthTrigger(Length : Cardinal);
       function CheckCTS : Boolean;
@@ -444,8 +443,6 @@ type
       procedure UpdateHandlerFlags(FlagUpdate : TApHandlerFlagUpdate); virtual;
   end;
 
-function GetTComRecPtr(Cid : Integer; DeviceLayerClass : TApdDispatcherClass) : Pointer;
-
 var
   PortList : TList;
 
@@ -493,32 +490,6 @@ const
   LastCID : Integer = -1;
   LastDispatcher : TApdBaseDispatcher = nil;
 
-function GetTComRecPtr(Cid : Integer; DeviceLayerClass : TApdDispatcherClass) : Pointer;
-  {-Find the entry into the port array which has the specified Cid}
-var
-  i : Integer;
-begin
-  LockPortList;
-  try
-    {find the correct com port record}
-    if (LastCID = Cid) and (LastDispatcher <> nil) then
-      Result := LastDispatcher
-    else begin
-      for i := 0 to pred(PortList.Count) do
-        if PortList[i] <> nil then
-          with TApdBaseDispatcher(PortList[i]) do
-            if (CidEx = Cid) and (TObject(PortList[i]) is DeviceLayerClass) then begin
-              Result := TApdBaseDispatcher(PortList[i]);
-              LastCID := Cid;
-              LastDispatcher := Result;
-              exit;
-            end;
-      Result := nil;
-    end;
-  finally
-    UnlockPortList;
-  end;
-end;
 
 {$IFDEF DebugThreadConsole}
   type
@@ -607,7 +578,7 @@ end;
 
     if Sender = StatusThread then                                           // SWB
         StatusThread := nil;                                                // SWB
-        
+
     if (InterLockedDecrement(ActiveThreads) = 0) then begin
       DispActive := False;
     end;
@@ -652,7 +623,7 @@ end;
     GeneralEvent := INVALID_HANDLE_VALUE;
     OutputEvent := INVALID_HANDLE_VALUE;
     SentEvent := INVALID_HANDLE_VALUE;
-    OutFlushEvent := INVALID_HANDLE_VALUE;                              
+    OutFlushEvent := INVALID_HANDLE_VALUE;
 
     LockPortList;
     try
@@ -1100,7 +1071,7 @@ end;
       DonePortPrim;
   end;
 
-  function ActualBaud(BaudCode : LongInt) : Longint;              
+  function ActualBaud(BaudCode : LongInt) : Longint;
   const
     BaudTable : array[0..23] of LongInt =
       (110,    300,    600,    1200,    2400,    4800,    9600,    14400,
@@ -1501,7 +1472,7 @@ end;
       ClearCommBreak(CidEx);
       if RS485Mode and (OutBuffUsed = 0) then                            {!!.01}
         SetRTS(False);                                                   {!!.01}
-    end;                                                                 {!!.01}                                                                     
+    end;                                                                 {!!.01}
   end;
 
   function TApdBaseDispatcher.CharReady : Boolean;
@@ -1726,13 +1697,13 @@ end;
   function TApdBaseDispatcher.PutString(S : String) : Integer;
     {-Send as a block}
   begin
-    Result := PutBlock(S[1], PayloadLengthInBytes(S));
+    Result := PutBlock(S[1], PayloadLengthInBytes(S));    // --sm ok
   end;
 
   procedure TApdBaseDispatcher.AddStringToLog(S : string);
   begin
     if DLoggingOn then
-      AddDispatchEntry(dtUser, dstNone, 0, @S[1], PayloadLengthInBytes(S))
+      AddDispatchEntry(dtUser, dstNone, 0, @S[1], PayloadLengthInBytes(S)) // --sm OK
   end;
 
   function TApdBaseDispatcher.PutBlock(const Block; Len : Cardinal) : Integer;
@@ -1903,13 +1874,6 @@ end;
     finally
       LeaveCriticalSection(DispSection);
     end;
-  end;
-
-  procedure TApdBaseDispatcher.BufferSizes(var InSize, OutSize : Cardinal);
-    {-Return buffer sizes}
-  begin
-    InSize := InQue;
-    OutSize := OutQue;
   end;
 
   function TApdBaseDispatcher.HWFlowOptions(
@@ -2272,8 +2236,8 @@ end;
   begin
     Result := False;
 
-    if IgnoreCase then                                               
-      AnsiUpperBuff(@C, 1);                                           
+    if IgnoreCase then
+      AnsiUpperBuff(@C, 1);
 
     GotFirst := False;
     Check := True;
@@ -2281,7 +2245,7 @@ end;
       {Check another index?}
       if Check then begin
         {Compare this index...}
-        if C = P[Indexes[I]] then
+        if C = P[Indexes[I]] then       // -- sm wants to modified this => if C = P[Indexes[I]*PayloadLengthInBytes(P)] then
           {Got match, was it complete?}
           if Indexes[I] = Len-1 then begin
             Indexes[I] := 0;
@@ -2707,25 +2671,6 @@ end;
     Result := False;
   end;
 
-  procedure TApdBaseDispatcher.CreateDispatcherWindow;
-    {-Create dispatcher window element}
-    {-Only used by the Winsock dispatcher}
-  begin
-    fDispatcherWindow :=
-      CreateWindow(DispatcherClassName,    {window class name}
-                   '',                     {caption}
-                   ws_Overlapped,          {window style}
-                   0,                      {X}
-                   0,                      {Y}
-                   10,                     {width}
-                   10,                     {height}
-                   0,                      {parent}
-                   0,                      {menu}
-                   HInstance,              {instance}
-                   nil);                   {parameter}
-
-    ShowWindow(fDispatcherWindow, sw_Hide);
-  end;
 
 {Trigger functions}
 
@@ -4333,18 +4278,17 @@ end;
                 NumToWrite := OutQue - OBufTail
               else begin
                 GetMem(TempBuff, OBufHead);
-                Move(OBuffer^, TempBuff^, SizeOf( OBufHead)); // --check
+                Move(OBuffer^, TempBuff^, SizeOf( OBufHead)); // --sm check
 //                Move(OBuffer^[OBufTail], OBuffer^, OutQue - OBufTail);
-                Move(GetPtr(OBuffer, OBufTail)^, OBuffer^, SizeOf( (OutQue - OBufTail)));// --check
+                Move(GetPtr(OBuffer, OBufTail)^, OBuffer^, SizeOf( (OutQue - OBufTail)));// --sm check
 //                Move(TempBuff^, OBuffer^[OutQue - OBufTail], OBufHead);
-                Move(TempBuff^, GetPtr(OBuffer, (OutQue - OBufTail))^, SizeOf( OBufHead));// --check
+                Move(TempBuff^, GetPtr(OBuffer, (OutQue - OBufTail))^, SizeOf( OBufHead));// --sm check
                 FreeMem(TempBuff);
                 Inc(OBufHead, OutQue - OBufTail);
                 NumToWrite := OBufHead;
                 OBufTail := 0;
               end;
             end;
-//PAnsiChar(AddWordToPtr( OBuffer, OBuffTail));MOVE==GetPtr(DBuffer, NewTail)^
           finally
             LeaveCriticalSection(OutputSection);
           end;

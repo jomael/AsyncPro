@@ -103,7 +103,6 @@ function ApxIsLetter(aCh : TApdUcs4Char) : Boolean;
 function ApxIsNameChar(aCh : TApdUcs4Char) : Boolean;
 function ApxIsNameCharFirst(aCh : TApdUcs4Char) : Boolean;
 function ApxIsPubidChar(aCh : TApdUcs4Char) : Boolean;
-function ApxIsSpace(aCh : TApdUcs4Char) : Boolean;
 
 implementation
 
@@ -125,7 +124,7 @@ begin
   cLast := sSubStr[j];
   for i := PayloadLengthInBytes(sTerm) downto j do begin
     if (sTerm[i] = cLast) and
-       (Copy(sTerm, i - j + 1, j) = sSubStr) then begin
+       (Copy(sTerm, i - j + 1, j) = sSubStr) then begin // --sm check j value = 4
       Result := i - j + 1;
       Exit;
     end;
@@ -658,11 +657,6 @@ begin
             (aCh = ord('#')) or (aCh = ord('@')) or
             (aCh = ord('$')) or (aCh = ord('_')) or
             (aCh = ord('%'));
-end;
-{--------}
-function ApxIsSpace(aCh : TApdUcs4Char) : Boolean;
-begin
-  Result := (aCh <= $20) and (AnsiChar(aCh) in [' ', #9, #13, #10]);
 end;
 
 {==TApdMemoryStream===================================================}
