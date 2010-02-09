@@ -2334,6 +2334,7 @@ type
     }
   {$ENDIF}
 
+// --sm SetFlag procedure
 procedure SetFlag(var Flags : Cardinal; FlagMask : Cardinal);
 
 procedure ClearFlag(var Flags : Cardinal; FlagMask : Cardinal);

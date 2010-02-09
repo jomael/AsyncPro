@@ -124,7 +124,8 @@ type
     FXMLDecParsed : Boolean;
 
     procedure Cleanup;
-    procedure CheckParamEntityNesting(const aString : DOMString);
+// --sm to delete function CheckParamEntityNesting
+//    procedure CheckParamEntityNesting(const aString : DOMString);
     procedure DataBufferAppend(const sVal : DOMString);
     procedure DataBufferFlush;
     procedure DataBufferNormalize;
@@ -559,23 +560,23 @@ begin
   FDocStack.Free;
   inherited Destroy;
 end;
+
 {--------}
-procedure TApdParser.CheckParamEntityNesting(const aString : DOMString);
-var
-  OpenPos : Integer;
-  ClosePos : Integer;
-begin
-  OpenPos := ApxPos('(', aString);
-  ClosePos := ApxPos(')', aString);
-  if (((OpenPos <> 0) and
-       (ClosePos = 0)) or
-      ((ClosePos <> 0) and
-       (OpenPos = 0))) then
-     raise EAdParserError.CreateError(FFilter.Line,
-                                       FFilter.LinePos,
-                                       sBadParamEntNesting +
-                                       aString);
-end;
+// --sm to delete
+//procedure TApdParser.CheckParamEntityNesting(const aString : DOMString);
+//var
+//  OpenPos : Integer;
+//  ClosePos : Integer;
+//begin
+//  OpenPos := ApxPos('(', aString);
+//  ClosePos := ApxPos(')', aString);
+//  if (((OpenPos  <> 0) and (ClosePos = 0)) or
+//      ((ClosePos <> 0) and (OpenPos  = 0))) then
+//     raise EAdParserError.CreateError(FFilter.Line,
+//                                       FFilter.LinePos,
+//                                       sBadParamEntNesting +
+//                                       aString);
+//end;
 {--------}
 procedure TApdParser.Cleanup;
 var
@@ -2066,7 +2067,7 @@ begin
   oElemInfo.SetAttribute(sName, oAttrInfo);
 end;
 {--------}
-procedure TApdParser.SetElement(const sName         : DOMString;
+procedure TApdParser.SetElement(const sName        : DOMString;
                                      wType         : Integer;
                                const sContentModel : DOMString);
 var
@@ -2303,6 +2304,7 @@ begin
                                        QuotedStr(aString[i]));
   end;
 end;
+
 {--------}
 procedure TApdParser.ValidateVersNum(const aString : string);
 var
