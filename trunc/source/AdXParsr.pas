@@ -1555,7 +1555,7 @@ begin
       end;
       Move(TempChar,
            PByteArray(Pointer(TempBuff))[CurrLength],
-           2);      // --check
+           2);      // --sm check
       Inc(CurrLength, 2);
       SkipChar;
       Added := True;
@@ -1992,7 +1992,7 @@ begin
         SkipChar;
         Move(TempChar,
              PByteArray(Pointer(Result))^[CurrLen],
-             2);       // --check
+             2);       // --sm check
         Inc(CurrLen, 2);
       end else
         raise EAdParserError.CreateError(FFilter.Line,

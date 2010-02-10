@@ -54,13 +54,13 @@ type
 
   TDataBuffer = class(TIOBuffer)
   private
-    FData       : PwideChar;    // --sm Wide
+    FData       : PAnsiChar;    // --sm Ansi
     FDataUsed   : Integer;
     FDataRead   : Integer;
   public
     constructor Create(size : Integer);
     destructor Destroy; override;
-    property Data : PwideChar read FData write FData;
+    property Data : PansiChar read FData write FData;
     property BytesUsed : Integer read FDataUsed write FDataUsed;
     property BytesRead : Integer read FDataRead write FDataRead;
   end;
@@ -195,7 +195,7 @@ end;
 // when the dispatcher is requested to flush the buffers.
 procedure TIOQueue.Clear;
 var
-    i           : Integer;
+    i: Integer;
 begin
     if (Assigned(FLock)) then
         FLock.Acquire;

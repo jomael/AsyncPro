@@ -456,9 +456,9 @@ begin
       begin
         { got the message to answer the call... }
         PrepForConnect(True);
-        {$IFDEF AdModemDebug}
-        FComPort.AddStringToLog('Answering');
-        {$ENDIF}
+//        {$IFDEF AdModemDebug}                // --sm to delete
+//        FComPort.AddStringToLog('Answering');
+//        {$ENDIF}
         if not SendCommands(LmModem.Answer) then
           DoFail(ecModemRejectedCommand);
       end;
@@ -501,9 +501,9 @@ begin
   FCallerIDProvided := False;
   if not Initialized then
     Initialize;
-  {$IFDEF AdModemDebug}
-  FComPort.AddStringToLog('autoanswer for ' + IntToStr(FAnswerOnRing));
-  {$ENDIF}
+//  {$IFDEF AdModemDebug}// --sm to delete
+//  FComPort.AddStringToLog('autoanswer for ' + IntToStr(FAnswerOnRing));
+//  {$ENDIF}
   { turn on the CallerID detection }
   SendCommands(LmModem.Voice.EnableCallerID);
 
@@ -527,10 +527,10 @@ begin
   { save currente modem state }                                          {!!.KINO}
   vLastState := FModemState;                                             {!!.KINO}
   DoStatus(msCancel);
-  {$IFDEF AdModemDebug}
-  if Assigned(FComPort) then
-    FComPort.AddStringToLog('cancel call');
-  {$ENDIF}
+//  {$IFDEF AdModemDebug}// --sm to delete
+//  if Assigned(FComPort) then
+//    FComPort.AddStringToLog('cancel call');
+//  {$ENDIF}
 
   if Connected then begin
     DoStatus(msHangup);
@@ -731,9 +731,9 @@ procedure TAdCustomModem.ConfigAndOpen;
 begin
   FCallerIDProvided := False;
   CheckReady;       
-  {$IFDEF AdModemDebug}
-  FComPort.AddStringToLog('ConfigAndOpen');
-  {$ENDIF}
+//  {$IFDEF AdModemDebug}               // --sm to delete
+//  FComPort.AddStringToLog('ConfigAndOpen');
+//  {$ENDIF}
   PassthroughMode := True;
   Initialize;
   DoStatus(msIdle);
@@ -880,9 +880,9 @@ procedure TAdCustomModem.Dial(const ANumber: string);
 begin
   FCallerIDProvided := False;
   CheckReady;
-  {$IFDEF AdModemDebug}
-  FComPort.AddStringToLog('dial');
-  {$ENDIF}
+//  {$IFDEF AdModemDebug}               // --sm to delete
+//  FComPort.AddStringToLog('dial');
+//  {$ENDIF}
   PrepForConnect(True);
   FPhoneNumber := ANumber;
   PassthroughMode := False;
@@ -897,9 +897,9 @@ procedure TAdCustomModem.DoCallerID;
   { Generate the OnModemCallerID event }
 begin
   FCallerIDProvided := True;
-  {$IFDEF AdModemDebug}
-  FComPort.AddStringToLog('CallerID');
-  {$ENDIF}
+//  {$IFDEF AdModemDebug}               // --sm to delete
+//  FComPort.AddStringToLog('CallerID');
+//  {$ENDIF}
   if Assigned(FOnModemCallerID) then
     FOnModemCallerID(Self, FCallerIDInfo);
 end;
@@ -939,9 +939,9 @@ procedure TAdCustomModem.DoFail(Failure : Integer);
   { Generate the OnModemFail event }
 begin
   FFailCode := Failure;
-  {$IFDEF AdModemDebug}
-  FComPort.AddStringToLog('Fail: ' + IntToStr(FFailCode));
-  {$ENDIF}
+//  {$IFDEF AdModemDebug}               // --sm to delete
+//  FComPort.AddStringToLog('Fail: ' + IntToStr(FFailCode));
+//  {$ENDIF}
   if Assigned(FOnModemFail) then
     FOnModemFail(Self, Failure)
   else
@@ -1089,9 +1089,9 @@ var
 begin
   { set the msInitializing state }
   DoStatus(msInitializing);
-  {$IFDEF AdModemDebug}
-  FComPort.AddStringToLog('Initialize');
-  {$ENDIF}
+//  {$IFDEF AdModemDebug}                // --sm to delete
+//  FComPort.AddStringToLog('Initialize');
+//  {$ENDIF}
   if not DeviceSelected then                                             {!!.04}
     raise EDeviceNotSelected.Create(ecDeviceNotSelected, False);
   if not SendCommands(LmModem.Init) then begin
@@ -1149,15 +1149,15 @@ begin
       PoundReplace(LmModem.Settings.InactivityTimeout, InactivityTimeout) + ' ';
     ConfigInit := ConfigInit + LmModem.Settings.Terminator;
 
-    {$IFDEF AdModemDebug}
-    FComPort.AddStringToLog('Init 1');
-    {$ENDIF}
+//    {$IFDEF AdModemDebug}               // --sm to delete
+//    FComPort.AddStringToLog('Init 1');
+//    {$ENDIF}
     SendCommand(ConvertXML(ConfigInit));
 
     if ExtraSettings <> '' then begin
-      {$IFDEF AdModemDebug}
-      FComPort.AddStringToLog('Init 2');
-      {$ENDIF}
+//      {$IFDEF AdModemDebug}               // --sm to delete
+//      FComPort.AddStringToLog('Init 2');
+//      {$ENDIF}
       SendCommand(ConvertXML(ExtraSettings + #13));
     end;
   end;
@@ -1285,9 +1285,9 @@ begin
   { if we're waiting for the connection, add the response to the list }
   if FModemState in [msConnectWait, msAnswerWait] then begin
     if Data <> #13#10 then begin
-      {$IFDEF AdModemDebug}
-      FComPort.AddStringToLog('Informative response');
-      {$ENDIF}
+//      {$IFDEF AdModemDebug}               // --sm to delete
+//      FComPort.AddStringToLog('Informative response');
+//      {$ENDIF}
       FNegotiationResponses.Add(Data);
     end;
   end;
@@ -1323,21 +1323,21 @@ begin
       begin
         if CheckResponses(Data, ApxDefOKResponse, LmModem.Responses.OK) then begin
           { it's an OK }
-          {$IFDEF AdModemDebug}
-          FComPort.AddStringToLog('OKResponse');
-          {$ENDIF}
+//          {$IFDEF AdModemDebug}               // --sm to delete
+//          FComPort.AddStringToLog('OKResponse');
+//          {$ENDIF}
           OKResponse := True;
           WaitingForResponse := False;
         end else
           if Pos(LastCommand, Data) > 0 then begin
-            {$IFDEF AdModemDebug}
-            FComPort.AddStringToLog('EchoResponse');
-            {$ENDIF}
+//            {$IFDEF AdModemDebug}               // --sm to delete
+//            FComPort.AddStringToLog('EchoResponse');
+//            {$ENDIF}
             ResponsePacket.Enabled := True;
           end else begin
-            {$IFDEF AdModemDebug}
-            FComPort.AddStringToLog('Unknown response');
-            {$ENDIF}
+//            {$IFDEF AdModemDebug}               // --sm to delete
+//            FComPort.AddStringToLog('Unknown response');
+//            {$ENDIF}
             DoFail(ecModemRejectedCommand);
             WaitingForResponse := False;
           end;
@@ -1350,9 +1350,9 @@ begin
             DoCallerID;
           end;
           FRingCount := 1;
-          {$IFDEF AdModemDebug}
-          FComPort.AddStringToLog('Ring' + IntToStr(FRingCount));
-          {$ENDIF}
+//          {$IFDEF AdModemDebug}               // --sm to delete
+//          FComPort.AddStringToLog('Ring' + IntToStr(FRingCount));
+//          {$ENDIF}
           DoStatus(msAutoAnswerWait);
           ChangeResponseTimeout(MSecs2Ticks(FRingWaitTimeout),           {!!.KINO}
                                 MSecs2Ticks(FRingWaitTimeout));          {!!.KINO}
@@ -1374,15 +1374,15 @@ begin
             DoStatus(msAnswerWait);
             WaitingForResponse := False;
             { send the ATA }
-            {$IFDEF AdModemDebug}
-            FComPort.AddStringToLog('AutoAnswer post');
-            {$ENDIF}
+//            {$IFDEF AdModemDebug}               // --sm to delete
+//            FComPort.AddStringToLog('AutoAnswer post');
+//            {$ENDIF}
             Postmessage(Handle, apw_AutoAnswer, 0, 0);
           end else begin
             { not enough rings }
-            {$IFDEF AdModemDebug}
-            FComPort.AddStringToLog('Ring' + IntToStr(FRingCount));
-            {$ENDIF}
+//            {$IFDEF AdModemDebug}               // --sm to delete
+//            FComPort.AddStringToLog('Ring' + IntToStr(FRingCount));
+//            {$ENDIF}
             DoStatus(msAutoAnswerWait);
             ChangeResponseTimeout(MSecs2Ticks(FRingWaitTimeout),         {!!.KINO}
                                   MSecs2Ticks(FRingWaitTimeout));        {!!.KINO}
@@ -1402,9 +1402,9 @@ begin
           ConnectResponse := True;
           OKResponse := True;
           WaitingForResponse := False;
-          {$IFDEF AdModemDebug}
-          FComPort.AddStringToLog('Connect response');
-          {$ENDIF}
+//          {$IFDEF AdModemDebug}               // --sm to delete
+//          FComPort.AddStringToLog('Connect response');
+//          {$ENDIF}
           if not FConnected then begin
             DoStatus(msConnected);
             DoConnect;
@@ -1443,23 +1443,23 @@ begin
       raise EInOutError.CreateFmt(                                       {!!.06}
         'Modemcap folder not found'#13#10'(%s)', [FModemCapFolder]);     {!!.06}
         
-    {$IFDEF AdModemDebug}
-    if Assigned(FComPort) then
-      FComPort.AddStringToLog('Selecting');
-    {$ENDIF}
+//    {$IFDEF AdModemDebug}               // --sm to delete
+//    if Assigned(FComPort) then
+//      FComPort.AddStringToLog('Selecting');
+//    {$ENDIF}
     LibModem.LibModemPath := FModemCapFolder;
     Result := LibModem.SelectModem(
       FSelectedDevice.FModemFile,
       FSelectedDevice.FManufacturer,
       FSelectedDevice.FName, LmModem);
     FDeviceSelected := Result;                                    {!!.04}{!!.05}
-    {$IFDEF AdModemDebug}
-    if Result and Assigned(FComPort) then begin
-       FComPort.AddStringToLog('Selected from ' + FSelectedDevice.FModemFile);
-       FComPort.AddStringToLog('Selected manufacturer: ' + FSelectedDevice.FManufacturer);
-       FComPort.AddStringToLog('Selected device: ' + FSelectedDevice.FName);
-    end;
-    {$ENDIF}
+//    {$IFDEF AdModemDebug}               // --sm to delete
+//    if Result and Assigned(FComPort) then begin
+//       FComPort.AddStringToLog('Selected from ' + FSelectedDevice.FModemFile);
+//       FComPort.AddStringToLog('Selected manufacturer: ' + FSelectedDevice.FManufacturer);
+//       FComPort.AddStringToLog('Selected device: ' + FSelectedDevice.FName);
+//    end;
+//    {$ENDIF}
   finally
     { eat the exeption here }
   end;
@@ -1560,10 +1560,10 @@ end;
 procedure TAdCustomModem.SetDevConfig(const Config: TApdModemConfig);
   { forces new configuration }
 begin
-  {$IFDEF AdModemDebug}
-  if Assigned(FComPort) then
-    FComPort.AddStringToLog('ConfigChange');
-  {$ENDIF}
+//  {$IFDEF AdModemDebug}               // --sm to delete
+//  if Assigned(FComPort) then
+//    FComPort.AddStringToLog('ConfigChange');
+//  {$ENDIF}
   if CompareMem(@FModemConfig, @Config, SizeOf(TApdModemConfig)) then    {!!.06}
     Initialized := False;                                                {!!.06}
   FModemConfig := Config;
@@ -1619,10 +1619,10 @@ begin
         end;
     end;
   end;
-  {$IFDEF AdMdmDebug}
-  if Assigned(FComPort) then                                             {!!.01}
-    FComPort.AddStringToLog('.SetSelectedDevice');
-  {$ENDIF}
+//  {$IFDEF AdMdmDebug}               // --sm to delete
+//  if Assigned(FComPort) then                                             {!!.01}
+//    FComPort.AddStringToLog('.SetSelectedDevice');
+//  {$ENDIF}
 end;
 
 procedure TAdCustomModem.SetStatusDisplay(

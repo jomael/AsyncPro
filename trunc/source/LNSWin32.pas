@@ -112,7 +112,7 @@ type
   TReadThread = class(TApdWin32Thread)
   protected
     procedure Execute; override;
-    function  ReadSerial(Buf : PChar;
+    function  ReadSerial(Buf : PansiChar;
                          Size: Integer;
                          ovl : POverlapped) : Integer;
   end;
@@ -158,20 +158,20 @@ type
     procedure StopDispatcher; override;
     function  WaitComEvent(var EvtMask : DWORD;
                            lpOverlapped : POverlapped) : Boolean; override;
-    function  WriteCom(Buf : PChar; Size: Integer) : Integer; override;
+    function  WriteCom(Buf : PansiChar; Size: Integer) : Integer; override;
   public
     constructor Create(Owner : TObject);
     destructor  Destroy; override;
     function  CloseCom : Integer; override;
-    function  OpenCom(ComName: PChar; InQueue, OutQueue : Cardinal) : Integer; override;
+    function  OpenCom(ComName: PansiChar; InQueue, OutQueue : Cardinal) : Integer; override;
     function  ProcessCommunications : Integer; override;
   end;
 
   TApdTAPI32Dispatcher = class(TApdWin32Dispatcher)
   public
     constructor Create(Owner : TObject; InCid : Integer);
-    function OpenCom(ComName: PChar; InQueue,
-      OutQueue : Cardinal) : Integer; override;                      
+    function OpenCom(ComName: PansiChar; InQueue,
+      OutQueue : Cardinal) : Integer; override;
   end;
 
 implementation
@@ -195,7 +195,7 @@ end;
 // Close the comport and wait for the I/O threads to terminate
 function TApdWin32Dispatcher.CloseCom : Integer;
 var
-    ET          : EventTimer;
+    ET : EventTimer;
 begin
     // Under certain circumstances, it is possible that CloseCom can be called
     // recursively.  In that event, we don't want to be re-executing this code.
@@ -357,10 +357,10 @@ else
     Result := -1;
 end;
 // Open the COM port specified by ComName
-function TApdWin32Dispatcher.OpenCom(ComName: PChar; InQueue, OutQueue: Cardinal): Integer;
+function TApdWin32Dispatcher.OpenCom(ComName: PansiChar; InQueue, OutQueue: Cardinal): Integer;
 begin
     {Open the device}
-    Result := CreateFile(ComName,                       {name}
+    Result := CreateFile(PWideChar(ComName[1]),         {name}  // --sm Check on PWideChar [1]
                          GENERIC_READ or GENERIC_WRITE, {access attributes}
                          0,                             {no sharing}
                          nil,                           {no security}
@@ -448,7 +448,7 @@ begin
                     // Read either all the data in the buffer or as much as the caller
                     // can accept.
                     bytesToRead := Min(len, BytesUsed - BytesRead);
-                    Move((Data + BytesRead)^, Buf^, SizeOf( bytesToRead));// --check
+                    Move((Data + BytesRead)^, Buf^, SizeOf( bytesToRead));// --sm check
                     BytesRead := BytesRead + bytesToRead;
                     Dec(len, bytesToRead);
                     Inc(Buf, bytesToRead);
@@ -558,7 +558,7 @@ begin
     Result := True;
 end;
 //  Place outbound data into the output buffer & wake up the output thread
-function TApdWin32Dispatcher.WriteCom(Buf: PChar; Size: Integer): Integer;
+function TApdWin32Dispatcher.WriteCom(Buf: PansiChar; Size: Integer): Integer;
 type
     PBArray = ^TBArray;
     TBArray = array[0..pred(High(Integer))] of Byte;
@@ -575,7 +575,7 @@ begin
         begin
             {can move data to output queue in one block}
 //            Move(Buf^, OBuffer^[OBufHead], Size);
-            Move(Buf^, GetPtr(OBuffer, OBufHead)^, SizeOf( Size));// --check
+            Move(Buf^, GetPtr(OBuffer, OBufHead)^, SizeOf( Size));// --csm heck
 
             if SizeAtEnd = Size then
                 OBufHead := 0
@@ -585,9 +585,9 @@ begin
         begin
             { need to use two moves }
 //            Move(Buf^, OBuffer^[OBufHead], SizeAtEnd);
-            Move(Buf^, GetPtr(OBuffer, OBufHead)^, SizeOf( SizeAtEnd));// --check
+            Move(Buf^, GetPtr(OBuffer, OBufHead)^, SizeOf( SizeAtEnd));// --sm check
             LeftOver := Size - SizeAtEnd;
-            Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --check
+            Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --sm check
             OBufHead := LeftOver;
         end;
     finally
@@ -692,10 +692,10 @@ var
     istat       : Integer;
 begin
     ThreadStart(Self);
-{$IFDEF DebugThreads}
-    if (DLoggingOn) then
-        AddDispatchEntry(dtThread, dstThreadStart, 1, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//    if (DLoggingOn) then
+//        AddDispatchEntry(dtThread, dstThreadStart, 1, nil, 0);
+//{$ENDIF}
     FillChar(rovl, SizeOf(rovl), 0);
     rovl.hEvent := CreateEvent(nil, True, False, nil);
     dbfr := nil;
@@ -709,10 +709,10 @@ begin
         while ((not Terminated) and (not KillThreads)) do
         begin
             // Wait for something to happen on the serial port
-{$IFDEF DebugThreads}
-            if (DLoggingOn) then
-                AddDispatchEntry(dtThread, dstThreadSleep, 1, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//            if (DLoggingOn) then
+//                AddDispatchEntry(dtThread, dstThreadSleep, 1, nil, 0);
+//{$ENDIF}
             stat := SerialEvent.WaitFor(50);
             if ((stat <> wrSignaled) and (stat <> wrTimeout)) then
             begin
@@ -721,10 +721,10 @@ begin
                 KillThreads := True;
                 Continue;
             end;
-{$IFDEF DebugThreads}
-            if (DLoggingOn) then
-                AddDispatchEntry(dtThread, dstThreadWake, 1, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//            if (DLoggingOn) then
+//                AddDispatchEntry(dtThread, dstThreadWake, 1, nil, 0);
+//{$ENDIF}
             // Was it an input arrival notification?  If so, read the
             // available input & queue it to the dispatcher thread.
             try
@@ -739,14 +739,14 @@ begin
             bytesRead := ReadSerial(dbfr.Data, dbfr.Size, @rovl);
             while (bytesRead > 0) do
             begin
-{$IFDEF DebugThreads}
-                if (DLoggingOn) then
-                    AddDispatchEntry(dtThread,
-                                     dstThreadDataQueued,
-                                     ComHandle,
-                                     dbfr.Data,
-                                     bytesRead);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//                if (DLoggingOn) then
+//                    AddDispatchEntry(dtThread,
+//                                     dstThreadDataQueued,
+//                                     ComHandle,
+//                                     dbfr.Data,
+//                                     bytesRead);
+//{$ENDIF}
                 dbfr.BytesUsed := bytesRead;
                 Queue.Push(dbfr);
                 try
@@ -762,13 +762,14 @@ begin
             if (bytesRead < 0) then
             begin
                 istat := GetLastError;
-{$IFDEF DebugSerialIO}
-                MessageBox(0,
-                           PChar(Format('ReadSerial failed! Error = %d.',
-                                        [istat])),
-                           '',
-                           MB_OK or MB_APPLMODAL or MB_ICONEXCLAMATION);
-{$ENDIF}
+// --sm to delete
+//{$IFDEF DebugSerialIO}
+//                MessageBox(0,
+//                           PChar(Format('ReadSerial failed! Error = %d.',
+//                                        [istat])),
+//                           '',
+//                           MB_OK or MB_APPLMODAL or MB_ICONEXCLAMATION);
+//{$ENDIF}
                 // An invalid handle error means that someone else (probably
                 // TAPI) has closed the port. So just quit without an error.
                 if (istat <> ERROR_INVALID_HANDLE) then
@@ -784,17 +785,17 @@ begin
         CloseHandle(rovl.hEvent);
         if (Assigned(dbfr)) then
             dbfr.Free;
-{$IFDEF DebugThreads}
-        if (DLoggingOn) then
-            AddDispatchEntry(dtThread, dstThreadExit, 1, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//        if (DLoggingOn) then
+//            AddDispatchEntry(dtThread, dstThreadExit, 1, nil, 0);
+//{$ENDIF}
         ThreadGone(Self);
     end;
 end;
 //  Read up to Size bytes from the serial port into Buf.  Return the number of
 //  bytes read or a negative error number.  An error code of ERROR_OPERATION_ABORTED
 //  is caused by flushing the com port so we just ignore it.
-function  TReadThread.ReadSerial(Buf : PChar;
+function  TReadThread.ReadSerial(Buf : PansiChar;
                                  Size : Integer;
                                  ovl : POverlapped) : Integer;
 var
@@ -846,10 +847,10 @@ var
     istat       : Integer;
 begin
     ThreadStart(Self);
-{$IFDEF DebugThreads}
-    if (DLoggingOn) then
-        AddDispatchEntry(dtThread, dstThreadStart, 3, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//    if (DLoggingOn) then
+//        AddDispatchEntry(dtThread, dstThreadStart, 3, nil, 0);
+//{$ENDIF}
     outEvents[0] := OutputEvent;
     outEvents[1] := OutFlushEvent;
     FillChar(ovl, SizeOf(ovl), 0);
@@ -858,19 +859,19 @@ begin
         ReturnValue := 0;
         while ((not Terminated) and (not KillThreads)) do
         begin
-{$IFDEF DebugThreads}
-            if (DLoggingOn) then
-                AddDispatchEntry(dtThread, dstThreadSleep, 3, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//            if (DLoggingOn) then
+//                AddDispatchEntry(dtThread, dstThreadSleep, 3, nil, 0);
+//{$ENDIF}
             // Wait for output to appear in the queue or for a flush request
-            stat := WaitForMultipleObjects(length(outEvents), // --check
+            stat := WaitForMultipleObjects(length(outEvents), // --sm check
                                            @outEvents[0],
                                            False,
                                            100);
-{$IFDEF DebugThreads}
-            if (DLoggingOn) then
-                AddDispatchEntry(dtThread, dstThreadWake, 3, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//            if (DLoggingOn) then
+//                AddDispatchEntry(dtThread, dstThreadWake, 3, nil, 0);
+//{$ENDIF}
             case stat of
               WAIT_OBJECT_0:
                 // Output has arrived in buffer, send it
@@ -878,13 +879,14 @@ begin
                     if (WriteSerial(@ovl) <> 0) then
                     begin
                         istat := GetLastError;
-{$IFDEF DebugSerialIO}
-                        MessageBox(0,
-                                   PChar(Format('WriteSerial failed! Error = %d.',
-                                                [istat])),
-                                   '',
-                                   MB_OK or MB_APPLMODAL or MB_ICONEXCLAMATION);
-{$ENDIF}
+// --sm to delete
+//{$IFDEF DebugSerialIO}
+//                        MessageBox(0,
+//                                   PChar(Format('WriteSerial failed! Error = %d.',
+//                                                [istat])),
+//                                   '',
+//                                   MB_OK or MB_APPLMODAL or MB_ICONEXCLAMATION);
+//{$ENDIF}
                         // An invalid handle error means that someone else (probably
                         // TAPI) has closed the port. So just quit without an error.
                         if (istat <> ERROR_INVALID_HANDLE) then
@@ -909,10 +911,10 @@ begin
         end;
     finally
         CloseHandle(ovl.hEvent);
-{$IFDEF DebugThreads}
-        if (DLoggingOn) then
-            AddDispatchEntry(dtThread, dstThreadExit, 3, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//        if (DLoggingOn) then
+//            AddDispatchEntry(dtThread, dstThreadExit, 3, nil, 0);
+//{$ENDIF}
         ThreadGone(Self);
     end;
 end;
@@ -956,16 +958,16 @@ begin
                         numToWrite := OBufHead - OBufTail;
                         GetMem(tempBuff, numToWrite);
 //                        Move(OBuffer^[OBufTail], tempBuff^, numToWrite);
-                        Move(GetPtr(OBuffer,OBufTail)^, tempBuff^, SizeOf( numToWrite));// --check
+                        Move(GetPtr(OBuffer,OBufTail)^, tempBuff^, SizeOf( numToWrite));// --sm check
 //PAnsiChar(AddWordToPtr( tempBuff, (OutQue - OBufTail)));GetPtr(DBuffer, NewTail)^
                     end else
                     begin
                         numToWrite := (OutQue - OBufTail) + OBufHead;
                         GetMem(tempBuff, numToWrite);
 //                        Move(OBuffer^[OBufTail], tempBuff^, OutQue - OBufTail);
-                        Move(GetPtr( OBuffer, OBufTail)^, tempBuff^, SizeOf((OutQue - OBufTail)));// --check
+                        Move(GetPtr( OBuffer, OBufTail)^, tempBuff^, SizeOf((OutQue - OBufTail)));// --sm check
 //                        Move(OBuffer^[0], tempBuff^[OutQue - OBufTail], OBufHead);
-                        Move( GetPtr( OBuffer,0)^, tempBuff^[OutQue - OBufTail], SizeOf( OBufHead));// --check
+                        Move( GetPtr( OBuffer,0)^, tempBuff^[OutQue - OBufTail], SizeOf( OBufHead));// --sm check
 
                     end;
                     // Reset the queue head and tail
@@ -980,14 +982,14 @@ begin
                 count := 0;
                 while (count < numToWrite) do
                 begin
-{$IFDEF DebugThreads}
-                    if (DLoggingOn) then
-                        AddDispatchEntry(dtThread,
-                                         dstThreadDataWritten,
-                                         ComHandle,
-                                         tempBuff,
-                                         numToWrite - count);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//                    if (DLoggingOn) then
+//                        AddDispatchEntry(dtThread,
+//                                         dstThreadDataWritten,
+//                                         ComHandle,
+//                                         tempBuff,
+//                                         numToWrite - count);
+//{$ENDIF}
                     if (not WriteFile(ComHandle,
                                       tempBuff^[count],
                                       numToWrite - count,
@@ -1064,7 +1066,7 @@ begin
     waitEvents[0] := ovl.hEvent;
     waitEvents[1] := OutFlushEvent;
     repeat
-        stat := WaitForMultipleObjects(length(waitEvents),  // --check
+        stat := WaitForMultipleObjects(length(waitEvents),  // --sm check
                                        @waitEvents[0],
                                        False,
                                        100);
@@ -1101,10 +1103,10 @@ var
     istat       : Integer;
 begin
     ThreadStart(Self);
-{$IFDEF DebugThreads}
-    if (DLoggingOn) then
-        AddDispatchEntry(dtThread, dstThreadStart, 4, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//    if (DLoggingOn) then
+//        AddDispatchEntry(dtThread, dstThreadStart, 4, nil, 0);
+//{$ENDIF}
     FillChar(wovl, SizeOf(wovl), 0);
     wovl.hEvent := CreateEvent(nil, True, False, nil);
     sbfr := nil;
@@ -1121,21 +1123,22 @@ begin
         ReturnValue := 0;
         while ((not Terminated) and (not KillThreads)) do
         begin
-{$IFDEF DebugThreads}
-            if (DLoggingOn) then
-                AddDispatchEntry(dtThread, dstThreadSleep, 4, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//            if (DLoggingOn) then
+//                AddDispatchEntry(dtThread, dstThreadSleep, 4, nil, 0);
+//{$ENDIF}
             stat := WaitSerialEvent(evt, @wovl);
             if (stat < 0) then
             begin
                 istat := GetLastError;
-{$IFDEF DebugSerialIO}
-                MessageBox(0,
-                           PChar(Format('ReadSerial failed! Error = %d.',
-                                        [istat])),
-                           '',
-                           MB_OK or MB_APPLMODAL or MB_ICONEXCLAMATION);
-{$ENDIF}
+// --sm to delete
+//{$IFDEF DebugSerialIO}
+//                MessageBox(0,
+//                           PChar(Format('ReadSerial failed! Error = %d.',
+//                                        [istat])),
+//                           '',
+//                           MB_OK or MB_APPLMODAL or MB_ICONEXCLAMATION);
+//{$ENDIF}
                 // An invalid handle error means that someone else (probably
                 // TAPI) has closed the port. So just quit without an error.
                 if (istat <> ERROR_INVALID_HANDLE) then
@@ -1143,10 +1146,10 @@ begin
                 KillThreads := True;
                 Continue;
             end;
-{$IFDEF DebugThreads}
-            if (DLoggingOn) then
-                AddDispatchEntry(dtThread, dstThreadWake, 4, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//            if (DLoggingOn) then
+//                AddDispatchEntry(dtThread, dstThreadWake, 4, nil, 0);
+//{$ENDIF}
             // Was it a data notification event?  If so, kick the read thread
             // in the butt.
             if ((evt and EV_RXCHAR) <> 0) then
@@ -1162,14 +1165,14 @@ begin
                     ReturnValue := ecNoMem;
                     KillThreads := True;
                 end;
-{$IFDEF DebugThreads}
-                if (DLoggingOn) then
-                    AddDispatchEntry(dtThread,
-                                     dstThreadStatusQueued,
-                                     ComHandle,
-                                     @evt,
-                                     SizeOf(evt));
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//                if (DLoggingOn) then
+//                    AddDispatchEntry(dtThread,
+//                                     dstThreadStatusQueued,
+//                                     ComHandle,
+//                                     @evt,
+//                                     SizeOf(evt));
+//{$ENDIF}
                 sbfr.Status := evt;
                 Queue.Push(sbfr);
                 sbfr := nil;
@@ -1179,10 +1182,10 @@ begin
         CloseHandle(wovl.hEvent);
         if (Assigned(sbfr)) then
             sbfr.Free;
-{$IFDEF DebugThreads}
-        if (DLoggingOn) then
-            AddDispatchEntry(dtThread, dstThreadExit, 4, nil, 0);
-{$ENDIF}
+//{$IFDEF DebugThreads}       // --sm to delete
+//        if (DLoggingOn) then
+//            AddDispatchEntry(dtThread, dstThreadExit, 4, nil, 0);
+//{$ENDIF}
         ThreadGone(Self);
     end;
 end;
@@ -1230,7 +1233,7 @@ begin
     inherited Create(Owner);
 end;
 
-function TApdTAPI32Dispatcher.OpenCom(ComName: PChar; InQueue, OutQueue : Cardinal) : Integer;
+function TApdTAPI32Dispatcher.OpenCom(ComName: PansiChar; InQueue, OutQueue : Cardinal) : Integer;
 begin
     if CidEx <> 0 then
         Result := CidEx

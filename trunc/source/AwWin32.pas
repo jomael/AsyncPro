@@ -74,7 +74,7 @@ type
     function GetComState(var DCB: TDCB): Integer; override;
     function SetComState(var DCB : TDCB) : Integer; override;
     function ReadCom(Buf : PansiChar; Size: Integer) : Integer; override;
-    function WriteCom(Buf : PChar; Size: Integer) : Integer; override;
+    function WriteCom(Buf : PansiChar; Size: Integer) : Integer; override;
     function SetupCom(InSize, OutSize : Integer) : Boolean; override;
     procedure StartDispatcher; override;
     procedure StopDispatcher; override;
@@ -83,7 +83,7 @@ type
     function OutBufUsed: Cardinal; override;                                // SWB
   public
     function CloseCom : Integer; override;
-    function OpenCom(ComName: PChar; InQueue,
+    function OpenCom(ComName: PansiChar; InQueue,
       OutQueue : Cardinal) : Integer; override;
     function ProcessCommunications : Integer; override;
   end;
@@ -91,7 +91,7 @@ type
   TApdTAPI32Dispatcher = class(TApdWin32Dispatcher)
   public
     constructor Create(Owner : TObject; InCid : Integer);
-    function OpenCom(ComName: PChar; InQueue,
+    function OpenCom(ComName: PansiChar; InQueue,
       OutQueue : Cardinal) : Integer; override;                      
   end;
 
@@ -216,11 +216,11 @@ implementation
       Result := -1;
   end;
 
-  function TApdWin32Dispatcher.OpenCom(ComName: PChar; InQueue, OutQueue: Cardinal): Integer;
+  function TApdWin32Dispatcher.OpenCom(ComName: PansiChar; InQueue, OutQueue: Cardinal): Integer;
     {-Open the comport specified by ComName}
   begin
     {Open the device}
-    Result := CreateFile(ComName,                       {name}
+    Result := CreateFile(PWideChar(ComName[1]),                       {name}    // --sm check
                          GENERIC_READ or GENERIC_WRITE, {access attributes}
                          0,                             {no sharing}
                          nil,                           {no security}
@@ -229,7 +229,7 @@ implementation
                          FILE_FLAG_OVERLAPPED,          {attributes}
                          0);                            {no template}
 
-    if Result <> Integer(INVALID_HANDLE_VALUE) then begin             
+    if Result <> Integer(INVALID_HANDLE_VALUE) then begin
       CidEx := Result;
       {Create port data structure}
       ReadOL.hEvent := CreateEvent(nil, True, False, nil);
@@ -286,7 +286,7 @@ implementation
       Result := -Integer(GetLastError);                               
   end;
 
-  function TApdWin32Dispatcher.WriteCom(Buf: PChar; Size: Integer): Integer;
+  function TApdWin32Dispatcher.WriteCom(Buf: PansiChar; Size: Integer): Integer;
     {-Write data to the comport}
   type
     PBArray = ^TBArray;
@@ -303,7 +303,7 @@ implementation
       if SizeAtEnd >= Size then begin
         {can move data to output queue in one block}
 //        Move(Buf^, OBuffer^[OBufHead], Size);
-        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeOf( Size));// --check
+        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeOf( Size));// --sm check
         if SizeAtEnd = Size then
           OBufHead := 0
         else
@@ -311,9 +311,9 @@ implementation
       end else begin
         { need to use two moves }
 //        Move(Buf^, OBuffer^[OBufHead], SizeAtEnd);
-        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeOf( SizeAtEnd));// --check
+        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeOf( SizeAtEnd));// --sm check
         LeftOver := Size - SizeAtEnd;
-        Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --check
+        Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --sm check
         OBufHead := LeftOver;
       end;
     finally
@@ -483,7 +483,7 @@ implementation
     inherited Create(Owner);
   end;
 
-  function TApdTAPI32Dispatcher.OpenCom(ComName: PChar; InQueue, OutQueue : Cardinal) : Integer;
+  function TApdTAPI32Dispatcher.OpenCom(ComName: PAnsiChar; InQueue, OutQueue : Cardinal) : Integer;
   begin
     ReadOL.hEvent := CreateEvent(nil, True, False, nil);
     WriteOL.hEvent := CreateEvent(nil, True, False, nil);

@@ -128,7 +128,7 @@ const
 type
   TPipeEvent = record
     Event : Byte;
-    Data : String;  // --check shortstring to sting
+    Data : String;  // --sm check shortstring to sting
   end;
   TOleEnum = type DWORD;
   { XML definitions }
@@ -2766,7 +2766,7 @@ type
     if Pos < Len then begin
       if (Len-Pos) < Count then
         Count := Len-Pos;
-      Move(S[Pos], Dest^, Count * SizeOf( Char));  // --check
+      Move(S[Pos], Dest^, Count * SizeOf( Char));  // --sm check sizeof
       Dest[Count] := #0;
     end else
       Dest[0] := #0;

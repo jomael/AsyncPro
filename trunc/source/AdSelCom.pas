@@ -90,7 +90,7 @@ implementation
 {$R *.DFM}
 
 function IsPortAvailable(ComNum : Cardinal) : Boolean;
-  function MakeComName(const Dest : PChar; const ComNum : Cardinal) : PChar;
+  function MakeComName(const Dest : PansiChar; const ComNum : Cardinal) : PansiChar;
     {-Return a string like 'COMXX'}
   begin
     StrFmt(Dest,'\\.\COM%d',[ComNum]);
@@ -98,7 +98,7 @@ function IsPortAvailable(ComNum : Cardinal) : Boolean;
   end;
 
 var
-  ComName : array[0..12] of Char;
+  ComName : array[0..12] of AnsiChar;
   Res : Integer;
   DeviceLayer : TApdBaseDispatcher;
 begin
@@ -120,7 +120,7 @@ begin
           DeviceLayer.CloseCom;
         end;
       end else begin
-        Res := CreateFile(MakeComName(ComName, ComNum),
+        Res := CreateFile(PWideChar(MakeComName(ComName, ComNum)[1]),   // --sm check
                  GENERIC_READ or GENERIC_WRITE,
                  0,
                  nil,

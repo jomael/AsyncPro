@@ -441,7 +441,7 @@ begin
     fCurBfrOffset := -1;
 {$endif}
   if BufferPtr > 0 then begin
-    move(fDataBuffer[NewStart],fDataBuffer[0],SizeOf( BufferPtr)); // --check
+    move(fDataBuffer[NewStart],fDataBuffer[0],SizeOf( BufferPtr)); // --sm check
   end else
     DisposeBuffer;
   for i := 0 to pred(PacketList.Count) do
@@ -1311,7 +1311,7 @@ begin
         raise EStringSizeError.Create(ecPacketTooLong, False);
       {$ENDIF}
       SetLength(S, fDataSize);
-      Move(PacketBuffer^, S[1], SizeOf( fDataSize)); // --check
+      Move(PacketBuffer^, S[1], SizeOf( fDataSize)); // --sm check
       fOnStringPacket(Self,S);
     end;
   except                                                               
@@ -1427,7 +1427,7 @@ begin
     SLength := 255;
   {$ENDIF}
   SetLength(Data, SLength);
-  Move(PacketBuffer^, Data[1], SizeOf( SLength));// --check
+  Move(PacketBuffer^, Data[1], SizeOf( SLength));// --sm check
 end;
 
 procedure TApdDataPacket.GetCollectedData(var Data: Pointer;
@@ -1456,7 +1456,7 @@ begin
       Res := 255;
     {$ENDIF}
     SetLength(Data, Res);
-    Move(PacketBuffer^, Data[1], SizeOf( Res)); // --check
+    Move(PacketBuffer^, Data[1], SizeOf( Res)); // --sm check
   end;
 end;
 
