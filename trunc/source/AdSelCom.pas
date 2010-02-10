@@ -98,7 +98,7 @@ function IsPortAvailable(ComNum : Cardinal) : Boolean;
   end;
 
 var
-  ComName : array[0..12] of AnsiChar;
+  ComName : array[0..12] of AnsiChar;   // --sm ansistring?
   Res : Integer;
   DeviceLayer : TApdBaseDispatcher;
 begin
