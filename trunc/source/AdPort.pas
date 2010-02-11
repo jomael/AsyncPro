@@ -399,7 +399,7 @@ type
     {DispatchLogging}
     procedure InitLogging(const Size : Cardinal);
     procedure DumpLog(const FName : String; const InHex : Boolean);// --sm check shortstring to sting
-    procedure AppendLog(const FName : String;  // --sm check shortstring to sting                        // SWB
+    procedure AppendLog(const FName : AnsiString;  // --sm check shortstring to sting                        // SWB
                         const InHex : Boolean;                              // SWB
                         const NewState : TTraceLogState);                   // SWB
     procedure ClearLogging;
@@ -837,8 +837,8 @@ const
         end;
       end;
     finally
-      UnlockPortList;
-    end;
+      UnlockPortList
+    end
   end;
 
 {Misc}
@@ -871,7 +871,7 @@ const
       lpszMenuName  := nil;
       lpszClassName := ComWindowClass;
     end;
-    WinProcs.RegisterClass(XClass);
+    WinProcs.RegisterClass(XClass)
   end;
 
   function TApdCustomComPort.ValidDispatcher : TApdBaseDispatcher;
@@ -2480,7 +2480,7 @@ const
     FLogging := tlOff;
   end;
 
-  procedure TApdCustomComPort.AppendLog(const FName : String;// --sm check shortstring to sting
+  procedure TApdCustomComPort.AppendLog(const FName : AnsiString;// --sm check shortstring to sting
                                         const InHex : Boolean;
                                         const NewState : TTraceLogState);   // SWB
     {-Dump the dispatch log}
@@ -2671,7 +2671,7 @@ const
     if (PortState = psShuttingDown) then Exit;
    {$IFOPT H+}
     CheckException(Self, ValidDispatcher.PutBlock(Pointer(S)^, PayloadLengthInBytes(S)));
-   {$ELSE}
+   {$ELSE}      // --sm
     CheckException(Self, ValidDispatcher.PutString(S));
    {$ENDIF}
   end;

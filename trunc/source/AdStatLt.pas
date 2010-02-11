@@ -96,7 +96,7 @@ type
       {-Set the color the light is displayed in when it is not lit}
 
     function GetVersion : string;
-    procedure SetVersion(const Value : string);                 
+//    procedure SetVersion(const Value : string); // --sm
 
     procedure Paint; override;
     procedure Loaded; override;
@@ -430,9 +430,10 @@ implementation
     Result := ApVersionStr;
   end;
 
-  procedure TApdCustomStatusLight.SetVersion(const Value : string);
-  begin
-  end;
+// --sm
+//  procedure TApdCustomStatusLight.SetVersion(const Value : string);
+//  begin
+//  end;
 
 {TLightSet}
 

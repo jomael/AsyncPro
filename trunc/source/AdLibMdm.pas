@@ -650,7 +650,7 @@ begin
 
     // Create new record
 
-    FModemList.Add (AllocMem (SizeOf (TLmModemName)));
+    FModemList.Add (AllocMem (SizeOf (TLmModemName))); // --sm check sizeof
     FCurIndex := FModemList.Count - 1;
 
     // There are some strange things that go on in the parsing of the file.
@@ -1121,7 +1121,7 @@ end;
 
 function TApdLibModem.CreateModem : PLmModem;
 begin
-  Result := AllocMem (Sizeof (TLmModem));
+  Result := AllocMem (Sizeof (TLmModem)); // --sm check AllocMem and Sizeof functions
   if not Assigned (Result) then
     Exit;
 
@@ -1184,7 +1184,7 @@ begin
   Result.Voice.VoiceToDataAnswer := TList.Create;
   Result.Voice.WaveDriver.WaveFormat := TList.Create;
 
-  { Create Fax Entries }
+  { Create Fax Entries } // --sm do we need fax?
 
   Result.FaxDetails.FaxClass1.AnswerCommand := TList.Create;
   Result.FaxDetails.FaxClass2.AnswerCommand := TList.Create;
@@ -1572,7 +1572,7 @@ procedure TApdLibModem.LoadModemResponses (oOwner     : TObject;
   var
     Response : PLmResponseData;
   begin
-    Response := AllocMem (SizeOf (TLmResponseData));
+    Response := AllocMem (SizeOf (TLmResponseData)); // --sm check AllocMem & SizeOF
     Response.Response := sValue;
     Location.Add (Response);
   end;
@@ -1663,7 +1663,7 @@ procedure TApdLibModem.AddCommand (CmdList : TList; sValue : DOMString);
 var
   Command : PLmModemCommand;
 begin
-  Command := AllocMem (SizeOf (TLmModemCommand));
+  Command := AllocMem (SizeOf (TLmModemCommand)); // --sm
   Command.Command := sValue;
   Command.Sequence := FLastSeq;
   CmdList.Add (Command);
@@ -1778,7 +1778,7 @@ begin
   else if (sValue = 'Options') then
     FModemLoadState := mlsOptions
 
-  // Handle all the fax options
+  // Handle all the fax options                 // --sm Fax to delete
 
   else if (sValue = 'FaxDetails') then
     FModemLoadState := mlsFaxDetails
@@ -1794,7 +1794,7 @@ begin
       flsClass2   : FFaxLoadState := flsClass2Answer;
       flsClass2_0 : FFaxLoadState := flsClass2_0Answer;
     end
-  // Handle all the voice options
+  // Handle all the voice options             // --sm Voice to delete
 
   else if (sValue = 'Voice') then
     FModemLoadState := mlsVoice
@@ -2337,7 +2337,7 @@ begin
     AvailableModems.Objects[pred(AvailableModems.Count)].Free;           {!!.05}
     AvailableModems.Delete(pred(AvailableModems.Count));                 {!!.05}
   end;                                                                   {!!.05}
-  AvailableModems.Free;
+  AvailableModems.Free
 end;
 
 procedure TApdModemSelectionDialog.LoadModemEvent(ModemName, Manufacturer,

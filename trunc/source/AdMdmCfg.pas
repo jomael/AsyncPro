@@ -109,6 +109,7 @@ implementation
 
 { TApxModemConfigDialog }
 
+
 function TApdModemConfigDialog.GetModemConfig: TApdModemConfig;
 begin
   { General tab }

@@ -698,7 +698,7 @@ begin
       fComPort.Dispatcher.DeregisterEventTriggerHandler(PacketTriggerHandler);
     end;                                                                 {!!.02}
     HandlerInstalled := False;
-    DisposeBuffer;                                                  
+    DisposeBuffer;
   end;
 end;
 
@@ -706,7 +706,7 @@ constructor TApdDataPacket.Create(AOwner : TComponent);
 begin
   inherited Create(AOwner);
 
-  FSyncEvents := True;                                               
+  FSyncEvents := True;
   {Search for comport}
   if (csDesigning in ComponentState) then
     ComPort := SearchComPort(Owner);
@@ -715,7 +715,7 @@ begin
   if csDesigning in ComponentState then
     fEnabled := adpDefEnabled
   else
-    fEnabled := False;                                              
+    fEnabled := False;
   fIncludeStrings := adpDefIncludeStrings;
   fEndCond := [];
   fAutoEnable := adpDefAutoEnable;

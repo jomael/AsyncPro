@@ -104,7 +104,7 @@ type
   TApdModemConfig = record
     ConfigVersion : string[8];       { version tag to support future features }
     { port settings }
-    AttachedTo : string[20];
+    AttachedTo : string[20];      // --sm
     Manufacturer : string[100];
     ModemName : string[100];
     ModemModel : string[100];
@@ -268,7 +268,7 @@ type
     { check for the CallerID tags }
     procedure CheckCallerID(const Response  : string);
     { check <StandardConnect> response for extra info }
-    function ParseStandardConnect(const Response : string): Boolean;      {!!.05}
+    function ParseStandardConnect(const Response : ansistring): Boolean;      {!!.05}
 
     procedure ChangeResponseTimeout(aTimeout, aEnableTimeout: integer);   {!!.KINO}
   public
@@ -1666,12 +1666,12 @@ begin                                                                    {!!.05}
     DoDisconnect;                                                        {!!.05}
 end;                                                                     {!!.05}
 
-function TAdCustomModem.ParseStandardConnect(const Response: string) : Boolean;{!!.05}
+function TAdCustomModem.ParseStandardConnect(const Response: ansistring) : Boolean;{!!.05} // --sm ansi
 var
   Position      : Integer;
   Len           : Integer;
   SavedPosition : Integer;
-  S : string;
+  S : ansistring;
 
   procedure SkipWhitespace;
   begin
