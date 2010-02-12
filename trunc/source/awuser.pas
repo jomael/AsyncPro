@@ -86,7 +86,7 @@
 {.$DEFINE DebugThreads}         // --sm to delete
 
 {$IFDEF CONSOLE}
-{.$DEFINE DebugThreadConsole}
+{.$DEFINE DebugThreadConsole}   // --sm to delete
 {$ENDIF}
 
 {!!.02} { removed Win16 references }
@@ -334,9 +334,9 @@ type
 
       procedure AbortDispatchLogging;
       procedure AbortTracing;
-      function AddDataTrigger(Data : PChar;
+      function AddDataTrigger(Data : PansiChar; // --sm PansiChar
                                IgnoreCase : Boolean) : Integer;
-      function AddDataTriggerLen(Data : PChar;
+      function AddDataTriggerLen(Data : PansiChar;  // --sm Pansichar
                               IgnoreCase : Boolean;
                               Len : Cardinal) : Integer;
       function AddStatusTrigger(SType : Cardinal) : Integer;
@@ -3004,7 +3004,7 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.AddDataTriggerLen(Data : PChar;
+  function TApdBaseDispatcher.AddDataTriggerLen(Data : PansiChar;
                               IgnoreCase : Boolean; Len : Cardinal) : Integer;
     {-Add a data trigger, data is any ASCIIZ string so no embedded zeros}
   var
@@ -3039,7 +3039,7 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.AddDataTrigger(Data : PChar;
+  function TApdBaseDispatcher.AddDataTrigger(Data : PansiChar;
                            IgnoreCase : Boolean) : Integer;
     {-Add a data trigger, data is any ASCIIZ string so no embedded nulls}
   begin
@@ -3793,12 +3793,12 @@ const
     TelnetBase    = 15700;
     MSTagBase     = 15601;
 
-  function GetDTStr(drType : TDispatchType) : string;
+  function GetDTStr(drType : TDispatchType) : ansistring;   // --sm ansi
   begin
     Result := AproLoadStr(drTypeBase + ord(drType));
   end;
 
-  function GetDSTStr(drsType : TDispatchSubType) : string;
+  function GetDSTStr(drsType : TDispatchSubType) : ansistring;  // --sm ansi
   begin
     if drsType = dstNone then
       Result := ''
@@ -3809,7 +3809,7 @@ const
   function GetTimeStr(drTime : DWORD) : string;
   begin
     Result := Format('%07.7d', [drTime]);
-    Insert('.', Result, PayloadLengthInBytes(Result) - 2);                             {!!.04}
+    Insert('.', Result, Length(Result) - 2);                              {!!.04}
   end;
 
   function TApdBaseDispatcher.DumpDispatchLogPrim(FName : PWideChar;
@@ -3838,6 +3838,7 @@ const
       OSVersion.dwOSVersionInfoSize := SizeOf(OSVersion);
       GetVersionEx(OSVersion);
       SerPack := '';                                                     {!!.04}
+
       case OSVersion.dwPlatformID of
         VER_PLATFORM_WIN32s        : begin                               {!!.04}
           SerPack := StrPas(OSVersion.szCSDVersion);                     {!!.04}
@@ -3861,17 +3862,24 @@ const
         VER_PLATFORM_WIN32_NT      : begin                               {!!.04}
           SerPack := StrPas(OSVersion.szCSDVersion);                     {!!.04}
           case OSVersion.dwMajorVersion of                               {!!.04}
+            2 : if OsVersion.dwMinorVersion = 6 then                     // --sm
+                  Result := 'Window CE ';                                // --sm
             3 : Result := 'Windows NT 3.5 ';                             {!!.04}
             4 : Result := 'Windows NT 4 ';                               {!!.04}
             5 : case OSVersion.dwMinorVersion of                         {!!.04}
                 0 : Result := 'Windows 2000 ';                           {!!.04}
                 1 : Result := 'Windows XP ';                             {!!.04}
+                2 : Result := 'Windows 2003 ';                           // --sm
+                end;
+            6 : case OSVersion.dwMinorVersion of                         // --sm
+                0 : Result := 'Windows Vista ';                          // --sm
+                1 : Result := 'Windows 7 ';                              // --sm
                 end;                                                     {!!.04}
             else Result := 'WinNT ';                                     {!!.04}
           end;                                                           {!!.04}
-        end;                                                             {!!.04}
+        end                                                              {!!.04}
         else Result := 'Unknown';
-      end;
+       end;
       Result := Result + IntToStr(OSVersion.dwMajorVersion) + '.' +
         IntToStr(OSVersion.dwMinorVersion) + ' ' + SerPack;              {!!.04}
     end;
@@ -3937,14 +3945,24 @@ const
         S := 'Delphi 6';
         {$ENDIF}
         {$IFDEF VER150}
-        S := 'Delphi 7';                                                 {!!.06}
+        S := 'Delphi 7';                                     {!!.06}
         {$ENDIF}
-        {$IFDEF VER180}	   					                                // KGM
-        S := 'Delphi 2006';                                                 // KGM
+        {$IFDEF VER180}	   			                              // KGM
+        S := 'Delphi 2006';                                   // KGM
         {$ENDIF}							                                // KGM
-        {$IFDEF VER190}	   					                                // KGM
-        S := 'Delphi 2007';                                                 // KGM
+        {$IFDEF VER190}	   			                              // KGM
+        S := 'Delphi 2007';                                   // KGM
         {$ENDIF}							                                // KGM
+        {$IFDEF VER200}                                       // --sm
+        S := 'Delphi 2009';
+        {$IFDEF VER210}	   		                                // --sm
+        S := 'Delphi 2010';
+        {$ifdef DELPHI_Future}                                // --sm
+          {$define DELPHI_2010_UP}
+          S := 'Delphi 2010 UP';
+        {$endif}
+
+{$ENDIF}		        {$ENDIF}
 
         {$IFDEF VER93}
         S := 'C++ Builder 1';
@@ -4280,9 +4298,9 @@ const
                 GetMem(TempBuff, OBufHead);
                 Move(OBuffer^, TempBuff^, SizeOf( OBufHead)); // --sm check
 //                Move(OBuffer^[OBufTail], OBuffer^, OutQue - OBufTail);
-                Move(GetPtr(OBuffer, OBufTail)^, OBuffer^, SizeOf( (OutQue - OBufTail)));// --sm check
+                Move(GetPtr(OBuffer, OBufTail)^, OBuffer^, (OutQue - OBufTail));// --sm check
 //                Move(TempBuff^, OBuffer^[OutQue - OBufTail], OBufHead);
-                Move(TempBuff^, GetPtr(OBuffer, (OutQue - OBufTail))^, SizeOf( OBufHead));// --sm check
+                Move(TempBuff^, GetPtr(OBuffer, (OutQue - OBufTail))^, OBufHead);// --sm check
                 FreeMem(TempBuff);
                 Inc(OBufHead, OutQue - OBufTail);
                 NumToWrite := OBufHead;
@@ -4407,10 +4425,6 @@ const
     try
       FillChar(OutOL, SizeOf(OutOL), #0);
       with H do begin
-//        {$IFDEF DebugThreads}       // --sm to delete
-//        if DLoggingOn then
-//          AddDispatchEntry(dtThread, dstThreadStart, 3, nil, 0);
-//        {$ENDIF}
 
         {set the event used for overlapped i/o to signal completion}
         OutOL.hEvent := SentEvent;
@@ -4420,10 +4434,6 @@ const
 
         {Repeat until port is closed}
         repeat
-//          {$IFDEF DebugThreads}       // --sm to delete
-//          if DLoggingOn then
-//            AddDispatchEntry(dtThread, dstThreadSleep, 3, nil, 0);
-//          {$ENDIF}
 
           {Wait for either an output event or a flush event}
           {$IFDEF DebugThreadConsole}
@@ -4436,10 +4446,6 @@ const
           {$IFDEF DebugThreadConsole}
           Writeln(ThreadStatus(OutWake));
           {$ENDIF}
-//          {$IFDEF DebugThreads}       // --sm to delete
-//          if DLoggingOn then
-//            AddDispatchEntry(dtThread, dstThreadWake, 3, nil, 0);
-//          {$ENDIF}
 
           case Res of
             WAIT_OBJECT_0 :
@@ -4447,10 +4453,6 @@ const
                 {output event}
                 {Exit immediately if thread was killed while waiting}
                 if KillThreads then begin
-//                  {$IFDEF DebugThreads}       // --sm to delete
-//                  if DLoggingOn then
-//                    AddDispatchEntry(dtThread, dstThreadExit, 3, nil, 0);
-//                  {$ENDIF}
                   {Finished here, okay to close the port}
                   H.ThreadGone(Self);
                   Exit;
@@ -4468,10 +4470,6 @@ const
             {unexpected problem with WaitFor}
           end;
         until KillThreads or ClosePending;
-//        {$IFDEF DebugThreads}       // --sm to delete
-//        if DLoggingOn then
-//          AddDispatchEntry(dtThread, dstThreadExit, 3, nil, 0);
-//        {$ENDIF}
       end;
       H.ThreadGone(Self);
     except
@@ -4492,10 +4490,6 @@ const
     try
       FillChar(ComOL, SizeOf(ComOL), #0);
       with H do begin
-//        {$IFDEF DebugThreads}       // --sm to delete
-//        if DLoggingOn then
-//          AddDispatchEntry(dtThread, dstThreadStart, 1, nil, 0);
-//        {$ENDIF}
 
         ComOL.hEvent := CreateEvent(nil, True, False, nil);
 
@@ -4519,10 +4513,6 @@ const
 
         {Repeat until port is closed}
         repeat
-//          {$IFDEF DebugThreads}       // --sm to delete
-//          if DLoggingOn then
-//            AddDispatchEntry(dtThread, dstThreadSleep, 1, nil, 0);
-//          {$ENDIF}
 
           {$IFDEF DebugThreadConsole}
           Writeln(ThreadStatus(ComSleep));
@@ -4568,10 +4558,6 @@ const
           {Exit immediately if thread was killed while waiting}
           if KillThreads then begin
             SetEvent(GeneralEvent);
-//            {$IFDEF DebugThreads}       // --sm to delete
-//            if DLoggingOn then
-//              AddDispatchEntry(dtThread, dstThreadExit, 1, nil, 0);
-//            {$ENDIF}
             CloseHandle(ComOL.hEvent);
             H.ThreadGone(Self);
             Exit;
@@ -4580,10 +4566,6 @@ const
           {$IFDEF DebugThreadConsole}
           Writeln(ThreadStatus(ComWake));
           {$ENDIF}
-//          {$IFDEF DebugThreads}       // --sm to delete
-//          if DLoggingOn then
-//            AddDispatchEntry(dtThread, dstThreadWake, 1, @CurrentEvent, 2);
-//          {$ENDIF}
 
           {Signal com event}
           SetEvent(ComEvent);
@@ -4600,11 +4582,6 @@ const
           {$ENDIF}
 
         until KillThreads;
-
-//        {$IFDEF DebugThreads}       // --sm to delete
-//        if DLoggingOn then
-//          AddDispatchEntry(dtThread, dstThreadExit, 1, nil, 0);
-//        {$ENDIF}
 
         {Finished here, okay to close the port}
         SetEvent(GeneralEvent);
@@ -4658,12 +4635,6 @@ const
           MapEventsToMS(CurrentEvent);
 
 
-//          {$IFDEF DebugThreads}       // --sm to delete
-//          if DLoggingOn then
-//            AddDispatchEntry(dtDispatch, dstModemStatus,
-//                              ModemStatus, @CurrentEvent, 2);
-//          {$ENDIF}
-
           {Check for status triggers}
           if not fEventBusy then begin
             while CheckStatusTriggers do
@@ -4680,12 +4651,6 @@ const
         if CurrentEvent and LineEvent <> 0 then begin
           {A line status/error event}
           RefreshStatus;
-
-//          {$IFDEF DebugThreads}       // --sm to delete
-//          if DLoggingOn then
-//            AddDispatchEntry(dtDispatch, dstLineStatus,
-//                              0, @CurrentEvent, 2);
-//          {$ENDIF}
 
           {Check for status triggers}
           if not fEventBusy then begin
@@ -4737,10 +4702,6 @@ const
           if GlobalStatHit then
             ResetStatusHits;
         end else begin
-//          {$IFDEF DebugThreads}       // --sm to delete
-//          if DLoggingOn then
-//            AddDispatchEntry(dtError, dstNone, 0, nil, 0);
-//          {$ENDIF}
         end;
       end;
     end;
@@ -4749,10 +4710,6 @@ const
     InterLockedIncrement(H.ActiveThreads);
     try
       with H do begin
-// --sm to delete
-//        if DLoggingOn then
-//          AddDispatchEntry(dtThread, dstThreadStart, 2, nil, 0);
-//        {$ENDIF}
 
         try
           {Ready to go, set the general event}
@@ -4760,10 +4717,6 @@ const
 
           {Repeat until port is closed}
           repeat
-//            {$IFDEF DebugThreads}       // --sm to delete
-//            if DLoggingOn then
-//              AddDispatchEntry(dtThread, dstThreadSleep, 2, nil, 0);
-//            {$ENDIF}
 
             {$IFDEF DebugThreadConsole}
             Writeln(ThreadStatus(DispSleep));
@@ -4781,17 +4734,9 @@ const
 
             {Exit immediately if thread was killed while waiting}
             if KillThreads then begin
-//              {$IFDEF DebugThreads}       // --sm to delete
-//              if DLoggingOn then
-//                AddDispatchEntry(dtThread, dstThreadExit, 2, nil, 0);
-//              {$ENDIF}
               {Finished here, okay to close the port}
               Exit;
             end;
-//            {$IFDEF DebugThreads}       // --sm to delete
-//            if DLoggingOn then
-//              AddDispatchEntry(dtThread, dstThreadWake, 2, nil, 0);
-//            {$ENDIF}
 
             {Process it...}
             ProcessComEvent(H);
@@ -4799,10 +4744,6 @@ const
 
           until KillThreads or ClosePending;
 
-//          {$IFDEF DebugThreads}       // --sm to delete
-//          if DLoggingOn then
-//            AddDispatchEntry(dtThread, dstThreadExit, 2, nil, 0);
-//          {$ENDIF}
 
           {Finished here, okay to close the port}
           SetEvent(GeneralEvent);

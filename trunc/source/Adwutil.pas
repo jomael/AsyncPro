@@ -55,7 +55,7 @@ type
 
 const
   { Version of Winsock that we support }
-  Sock_Version = $0101;   // --sm version 1.1?  does it support xp and win7?
+  Sock_Version = $0101;
 
   Fd_Setsize = 64;
 

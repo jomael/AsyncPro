@@ -132,7 +132,11 @@ type
   end;
   TOleEnum = type DWORD;
   { XML definitions }
-  DOMString = WideString;
+  {$IFDEF unicode}
+    DOMString = unicodeString;
+  {$Else}
+    DOMString = WideString;
+  {$EndIf}
 
 type
   CharSet = set of Ansichar;  // --sm

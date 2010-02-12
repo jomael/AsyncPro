@@ -2529,7 +2529,7 @@ const
     {-Add a ShortString data trigger}
   var
     Len : Word;
-    P : array[0..255] of Char;
+    P : array[0..255] of ansiChar;  // --sm ansi
   begin
     if (PortState = psShuttingDown) then begin
       Result := 0;

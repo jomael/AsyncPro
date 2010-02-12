@@ -269,13 +269,13 @@ begin
 end;
 
 { -Gets the name of the local host machine }
-function TApdSocket.GetLocalHost : ansistring;
+function TApdSocket.GetLocalHost : ansistring; // --sm how GetLocalHost is called - none
 var
   HostStr : array[0..255] of AnsiChar;      // --sm AnsiString?
 begin
   Result := '';
   CheckLoaded;
-  if SockFuncs.GetHostName(@HostStr, SizeOf(HostStr)) = 0 then begin
+  if SockFuncs.GetHostName(@HostStr, SizeOf(HostStr)) = 0 then begin   // --sm GetHostName
     Result := StrPas(HostStr);
   end;
 end;

@@ -112,7 +112,8 @@ uses
 {== Utility methods ==================================================}
 function ApxPos(const aSubStr, aString : DOMString) : Integer;
 begin
-  Result := AnsiPos(aSubStr, aString);  // --sm OK
+  Result := AnsiPos(aSubStr, aString);  // --sm change to AnsiPos to Pos - there is no WidePos
+  Result := Pos(aSubStr, aString);
 end;
 {--------}
 function ApxRPos(const sSubStr, sTerm : DOMString) : Integer;
@@ -120,9 +121,9 @@ var
   cLast : DOMChar;
   i, j  : Integer;
 begin
-  j := PayloadLengthInBytes(sSubStr);
+  j := Length(sSubStr);
   cLast := sSubStr[j];
-  for i := PayloadLengthInBytes(sTerm) downto j do begin
+  for i := Length(sTerm) downto j do begin
     if (sTerm[i] = cLast) and
        (Copy(sTerm, i - j + 1, j) = sSubStr) then begin // --sm check j value = 4
       Result := i - j + 1;
