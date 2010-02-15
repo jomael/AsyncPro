@@ -112,7 +112,7 @@ uses
 {== Utility methods ==================================================}
 function ApxPos(const aSubStr, aString : DOMString) : Integer;
 begin
-  Result := AnsiPos(aSubStr, aString);  // --sm change to AnsiPos to Pos - there is no WidePos
+  Result := AnsiPos(aSubStr, aString);  // --sm change - AnsiPos to Pos - there is no WidePos
   Result := Pos(aSubStr, aString);
 end;
 {--------}

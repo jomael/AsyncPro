@@ -20,13 +20,11 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *  Sulaiman Mah
- *  Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADSTATLT.PAS 5.00                   *}
+{*                   ADSTATLT.PAS 4.06                   *}
 {*********************************************************}
 {* TApdSLController, TApdStatusLight component           *}
 {*********************************************************}
@@ -96,7 +94,7 @@ type
       {-Set the color the light is displayed in when it is not lit}
 
     function GetVersion : string;
-    procedure SetVersion(const Value : string);
+    procedure SetVersion(const Value : string);                 
 
     procedure Paint; override;
     procedure Loaded; override;
@@ -432,8 +430,6 @@ implementation
 
   procedure TApdCustomStatusLight.SetVersion(const Value : string);
   begin
-//  ApVersionStr := Value    // --sm, it was blank
-// Cannot assign to constant value , OoMisc
   end;
 
 {TLightSet}
@@ -560,7 +556,7 @@ implementation
     if not ComPort.Open then begin
       MonitoringPending := NewMon;
       if MonitoringPending then
-        Exit;
+        Exit;                                                         
     end;
 
     FMonitoring := NewMon;

@@ -75,6 +75,14 @@
 			<DCCReference Include="..\source\AdSocket.pas"/>
 			<DCCReference Include="..\source\AdStatLt.pas"/>
 			<DCCReference Include="..\source\AdStrMap.pas"/>
+			<DCCReference Include="..\source\AdTapi.pas"/>
+			<DCCReference Include="..\source\adtsel.pas">
+				<Form>DeviceSelectionForm</Form>
+			</DCCReference>
+			<DCCReference Include="..\source\AdTStat.pas">
+				<Form>ApdStandardTapiDisplay</Form>
+			</DCCReference>
+			<DCCReference Include="..\source\AdTUtil.pas"/>
 			<DCCReference Include="..\source\Adwutil.pas"/>
 			<DCCReference Include="..\source\AdXBase.pas"/>
 			<DCCReference Include="..\source\AdXChrFlt.pas"/>
