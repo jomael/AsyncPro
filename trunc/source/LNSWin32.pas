@@ -26,7 +26,8 @@
  *                                event handlers didn't return control to
  *                                the dispatch thread fast enough.
  *                                August 2005.
- *
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  * ***** END LICENSE BLOCK ***** *)
 {*********************************************************}
 {*                   LNSWIN32.PAS 4.06                   *}
@@ -482,11 +483,13 @@ if SetCommState(CidEx, DCB) then
 else
     Result := -Integer(GetLastError);
 end;
+
 // Set new in/out buffer sizes
 function TApdWin32Dispatcher.SetupCom(InSize, OutSize : Integer) : Boolean;
 begin
     Result := SetupComm(CidEx, InSize, OutSize);
 end;
+
 //  Start all threads and generally get the dispatcher ready to go
 procedure TApdWin32Dispatcher.StartDispatcher;
 begin
@@ -508,6 +511,7 @@ begin
         LeaveCriticalSection(DataSection);
     end;
 end;
+
 //  Shutdown the dispatcher
 procedure TApdWin32Dispatcher.StopDispatcher;
 begin
@@ -550,6 +554,7 @@ begin
             OutFlushEvent := INVALID_HANDLE_VALUE;
     end;
 end;
+
 //  This doesn't apply to WIN32 dispatcher any more
 function TApdWin32Dispatcher.WaitComEvent(var EvtMask : DWORD;
                                           lpOverlapped : POverlapped) : Boolean;
@@ -557,6 +562,7 @@ begin
     EvtMask := 0;
     Result := True;
 end;
+
 //  Place outbound data into the output buffer & wake up the output thread
 function TApdWin32Dispatcher.WriteCom(Buf: PansiChar; Size: Integer): Integer;
 type
@@ -597,6 +603,7 @@ begin
     SetEvent(OutputEvent);
     Result := Size;   {report all was sent}
 end;
+
 //  TApdWin32Threads.  Contains some general support routines required by both
 //  read & write threads.
 procedure TApdWin32Thread.AddDispatchEntry(DT : TDispatchType;
@@ -652,6 +659,7 @@ procedure TApdWin32Thread.ThreadStart(Sender : TObject);
 begin
     TApdWin32Dispatcher(H).ThreadStart(Sender);
 end;
+
 //  Wait for an overlapped I/O to complete.  We wake up every 100ms and check to
 //  see if the dispatcher has been shutdown.
 function  TApdWin32Thread.WaitForOverlapped(ovl : POverlapped) : Integer;
@@ -679,6 +687,7 @@ begin
         Result := ecDeviceRead;
     end;
 end;
+
 //  TReadThread methods.  This thread does nothing except wait for input
 //  from the comm port.  When input is received it is placed onto the queue
 //  for the dispatcher thread to process.
@@ -760,6 +769,7 @@ begin
         ThreadGone(Self);
     end;
 end;
+
 //  Read up to Size bytes from the serial port into Buf.  Return the number of
 //  bytes read or a negative error number.  An error code of ERROR_OPERATION_ABORTED
 //  is caused by flushing the com port so we just ignore it.
@@ -902,16 +912,16 @@ begin
                         numToWrite := OBufHead - OBufTail;
                         GetMem(tempBuff, numToWrite);
 //                        Move(OBuffer^[OBufTail], tempBuff^, numToWrite);
-                        Move(GetPtr(OBuffer,OBufTail)^, tempBuff^, SizeOf( numToWrite));// --sm check
+                        Move(GetPtr(OBuffer,OBufTail)^, tempBuff^, SizeOf( numToWrite));// --sm delete SizeOf
 //PAnsiChar(AddWordToPtr( tempBuff, (OutQue - OBufTail)));GetPtr(DBuffer, NewTail)^
                     end else
                     begin
                         numToWrite := (OutQue - OBufTail) + OBufHead;
                         GetMem(tempBuff, numToWrite);
 //                        Move(OBuffer^[OBufTail], tempBuff^, OutQue - OBufTail);
-                        Move(GetPtr( OBuffer, OBufTail)^, tempBuff^, SizeOf((OutQue - OBufTail)));// --sm check
+                        Move(GetPtr( OBuffer, OBufTail)^, tempBuff^, SizeOf((OutQue - OBufTail)));// --sm delete SizeOf
 //                        Move(OBuffer^[0], tempBuff^[OutQue - OBufTail], OBufHead);
-                        Move( GetPtr( OBuffer,0)^, tempBuff^[OutQue - OBufTail], SizeOf( OBufHead));// --sm check
+                        Move( GetPtr( OBuffer,0)^, tempBuff^[OutQue - OBufTail], SizeOf( OBufHead));// --sm delete SizeOf
 
                     end;
                     // Reset the queue head and tail
@@ -1027,6 +1037,7 @@ begin
       end;
     end;
 end;
+
 //  TStatusThread methods.  This thread does nothing except wait for line and / or
 //  modem events.  When an event occurs a status buffer is added to the queue
 //  for processing by the dispatcher thread.

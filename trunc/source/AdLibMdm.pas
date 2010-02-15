@@ -1184,7 +1184,7 @@ begin
   Result.Voice.VoiceToDataAnswer := TList.Create;
   Result.Voice.WaveDriver.WaveFormat := TList.Create;
 
-  { Create Fax Entries } // --sm do we need fax?
+  { Create Fax Entries } // --sm, do we need fax?
 
   Result.FaxDetails.FaxClass1.AnswerCommand := TList.Create;
   Result.FaxDetails.FaxClass2.AnswerCommand := TList.Create;

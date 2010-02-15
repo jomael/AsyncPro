@@ -22,7 +22,7 @@ package A500_R2010;
 {$WRITEABLECONST ON}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'TurboPower Async Professional 4.07 Designtime Package - VCL100'}
+{$DESCRIPTION 'TurboPower Async Professional 5.00 Designtime Package - VCL100'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 

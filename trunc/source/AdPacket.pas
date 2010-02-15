@@ -20,7 +20,8 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *
+ *  Sulaiman Mah
+ *  Sean B. Durkin
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
@@ -822,9 +823,9 @@ begin
         Match := False;
     end;
     if Match and (BeginMatch <= Manager.BufferPtr-1) then begin
-      if StartMatchPos >= PayloadLengthInBytes(InternalStartString) then
+      if StartMatchPos >= PayloadLengthInBytes( InternalStartString) then
         if (EndCond = []) then begin
-          fDataSize := PayloadLengthInBytes(InternalStartString);
+          fDataSize := PayloadLengthInBytes( InternalStartString);
           Packet(ecPacketSize);
           exit;
         end else
@@ -1242,7 +1243,7 @@ begin
     if (ecString in EndCond) then begin
       if (EndString  = '') then
         raise EInvalidProperty.Create(ecEmptyEndString, False);
-      LogPacketEvent(dstEndStr,@FEndString[1],PayloadLengthInBytes(EndString));
+      LogPacketEvent(dstEndStr,@FEndString[1],PayloadLengthInBytes(EndString)); // --sm Length
       if not IncludeStrings then
         inc(LocalPacketSize,PayloadLengthInBytes(EndString));
       if IgnoreCase then
@@ -1328,12 +1329,12 @@ begin
     Enabled := False;
     LocalSize := fDataSize;
     if (StartCond = scString) and not IncludeStrings then begin
-      PacketBuffer := pansiChar(@Manager.DataBuffer[BeginMatch+PayloadLengthInBytes(InternalStartString)]);
-      dec(fDataSize,PayloadLengthInBytes(InternalStartString));
+      PacketBuffer := pansiChar(@Manager.DataBuffer[BeginMatch+PayloadLengthInBytes(InternalStartString)]); // --sm Length
+      dec(fDataSize,PayloadLengthInBytes(InternalStartString)); // --sm Length
     end else
       PacketBuffer := pansiChar(@Manager.DataBuffer[BeginMatch]);
     if not IncludeStrings and (Reason = ecString) then
-      dec(fDataSize,PayloadLengthInBytes(InternalEndString));
+      dec(fDataSize,PayloadLengthInBytes(InternalEndString)); // --sm Length
     LogPacketEvent(dstStringPacket,nil,0);
     case Reason of
     ecString :
