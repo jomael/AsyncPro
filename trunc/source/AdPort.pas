@@ -745,7 +745,7 @@ type
     property Tag;
   end;
 
-  function ComName(const ComNumber : Word) : ansistring;// --sm check shortstring to sting
+  function ComName(const ComNumber : Word) : string;
   function SearchComPort(const C : TComponent) : TApdCustomComPort;
 
 implementation
@@ -2535,8 +2535,7 @@ const
       Result := 0;
       Exit;
     end;
-    Len := PayloadLengthInBytes(Data);
-    Move(Data[1], P, SizeOf( Len));   // --sm check
+    StrPLCopy(P, Data, Length(P) - 1);
     Result := Word(CheckException(Self,
         ValidDispatcher.AddDataTriggerLen(P, IgnoreCase, Len)));
   end;
@@ -2745,7 +2744,7 @@ const
     ValidDispatcher.SetEventBusy(WasBusy, True);
 
     {Note the length of the string}
-    Len := PayloadLengthInBytes(S);
+    Len := Length(S);
 
     {Prepare...}
     NewTimer(ET, Timeout);
@@ -2846,7 +2845,7 @@ const
       Exit;
 
     {Note the length of the string}
-    Len := PayloadLengthInBytes(S);
+    Len := Length(S);
 
     {Set busy flag}
     ValidDispatcher.SetEventBusy(WasBusy, True);
@@ -2989,7 +2988,7 @@ const
     Result := FindComPort(C);
   end;
 
-  function ComName(const ComNumber : Word) : ansistring;// --sm check shortstring to sting
+  function ComName(const ComNumber : Word) : string;
     {-Return a comname ShortString for ComNumber}
   begin
     Result := 'COM' + IntToStr(ComNumber);
