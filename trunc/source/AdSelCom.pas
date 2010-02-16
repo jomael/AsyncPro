@@ -20,6 +20,7 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *   Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -41,8 +42,7 @@ unit AdSelCom;
 interface
 
 uses
-  WinTypes,
-  WinProcs,
+  Windows,
   SysUtils,
   Classes,
   Messages,
@@ -72,7 +72,7 @@ type
     procedure FormCreate(Sender: TObject);
   private
   public
-    function SelectedCom : ansiString;
+    function SelectedCom : String;
     function SelectedComNum : Word;
   end;
 
@@ -90,7 +90,7 @@ implementation
 {$R *.DFM}
 
 function IsPortAvailable(ComNum : Cardinal) : Boolean;
-  function MakeComName(const Dest : PansiChar; const ComNum : Cardinal) : PansiChar;
+  function MakeComName(const Dest : PChar; const ComNum : Cardinal) : PChar;
     {-Return a string like 'COMXX'}
   begin
     StrFmt(Dest,'\\.\COM%d',[ComNum]);
@@ -98,44 +98,67 @@ function IsPortAvailable(ComNum : Cardinal) : Boolean;
   end;
 
 var
-  ComName : array[0..12] of AnsiChar;
+  ComName : array[0..12] of Char;
   Res : Integer;
   DeviceLayer : TApdBaseDispatcher;
+  CC: TCommConfig;
+  Len: Cardinal;
 begin
   DeviceLayer := nil;
   try
     if (ComNum = 0) then
       Result := False
     else begin
-      if UseDispatcherForAvail then begin
+      if UseDispatcherForAvail then
+      begin
         DeviceLayer  := TApdWin32Dispatcher.Create(nil);
-        Res := DeviceLayer.OpenCom(MakeComName(ComName,ComNum), 64, 64);
-        if (Res < 0) then
-          if ShowPortsInUse then
-            Result := GetLastError = DWORD(Abs(ecAccessDenied))
-          else
-            Result := False
-        else begin
-          Result := True;
-          DeviceLayer.CloseCom;
+
+        if ShowPortsInUse then
+        begin
+          Result := DeviceLayer.CheckPort(MakeComName(ComName,ComNum));
+        end
+        else
+        begin
+          Res := DeviceLayer.OpenCom(MakeComName(ComName,ComNum), 64, 64);
+          if (Res < 0) then
+            if ShowPortsInUse then
+              Result := GetLastError = DWORD(Abs(ecAccessDenied))
+            else
+              Result := False
+          else begin
+            Result := True;
+            DeviceLayer.CloseCom;
+          end;
         end;
-      end else begin
-        Res := CreateFile(PWideChar(MakeComName(ComName, ComNum)),   // --zer0 PWideChar
-                 GENERIC_READ or GENERIC_WRITE,
-                 0,
-                 nil,
-                 OPEN_EXISTING,
-                 FILE_ATTRIBUTE_NORMAL or
-                 FILE_FLAG_OVERLAPPED,
-                 0);
-        if Res > 0 then begin
-          CloseHandle(Res);
-          Result := True;
-        end else begin
-          if ShowPortsInUse then
-            Result := GetLastError = DWORD(Abs(ecAccessDenied))
-          else
-            Result := False;
+      end else
+      begin
+        if ShowPortsInUse then  //SZ: optimize this one - otherwise bluetooth devices may request confirmation
+        begin
+          FillChar(CC, SizeOf(CC), 0);
+          CC.dwSize := SizeOf(CC);
+          Len := SizeOf(CC);
+          Result := GetDefaultCommConfig(MakeComName(ComName, ComNum) + 4, CC, Len);
+        end
+        else
+        begin
+          Res := CreateFile(MakeComName(ComName, ComNum),
+                   GENERIC_READ or GENERIC_WRITE,
+                   0,
+                   nil,
+                   OPEN_EXISTING,
+                   FILE_ATTRIBUTE_NORMAL or
+                   FILE_FLAG_OVERLAPPED,
+                   0);
+
+          if Res > 0 then begin
+            CloseHandle(Res);
+            Result := True;
+          end else begin
+            if ShowPortsInUse then
+              Result := GetLastError = DWORD(Abs(ecAccessDenied))
+            else
+              Result := False;
+          end;
         end;
       end;
     end;
@@ -148,7 +171,7 @@ end;
 procedure TComSelectForm.FormCreate(Sender: TObject);
 var
   I : Integer;
-  S : ansiString;
+  S : string;
 begin
   for I := 1 to MaxComHandles do
     if IsPortAvailable(I) then begin
@@ -158,14 +181,14 @@ begin
   PortsComboBox.ItemIndex := 0;
 end;
 
-function TComSelectForm.SelectedCom : ansiString;
+function TComSelectForm.SelectedCom : String;
 begin
   Result := PortsComboBox.Items[PortsComboBox.ItemIndex];
 end;
 
 function TComSelectForm.SelectedComNum : Word;
 var
-  S : ansiString;
+  S : String;
 begin
   S := PortsComboBox.Items[PortsComboBox.ItemIndex];
   S := Copy(S, 4, 255);

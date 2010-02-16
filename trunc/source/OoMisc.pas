@@ -22,6 +22,7 @@
  * Contributor(s):
  *    Sulaiman Mah
  *    Sean B. Durkin
+ *    Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -52,8 +53,7 @@ unit OoMisc;
 interface
 
 uses
-  WinTypes,
-  WinProcs,
+  Windows,
   {$IFNDEF PrnDrv}
   Classes,
   Controls,
@@ -152,7 +152,6 @@ type
     ExpireTicks : LongInt; {Tick count when timer will expire}
   end;
 
-{$IFNDEF PRNDRV}                                                         {!!.06}
 type{ moved from AdTapi.pas }                                            {!!.06}
   { TAPI device config record, opaque and undefined by definition }      {!!.06}
   PTapiConfigRec = ^TTapiConfigRec;                                      {!!.06}
@@ -203,8 +202,8 @@ type { moved from AdRasUtl.pas }                                         {!!.06}
     dwfOptions         : DWord;                                          {!!.06}
     dwCountryID        : DWord;                                          {!!.06}
     dwCountryCode      : DWord;                                          {!!.06}
-    szAreaCode         : array[0..RasMaxAreaCode] of ansichar;
-    szLocalPhoneNumber : array[0..RasMaxPhoneNumber] of ansichar;
+    szAreaCode         : array[0..RasMaxAreaCode] of char;               {!!.06}     // tchar
+    szLocalPhoneNumber : array[0..RasMaxPhoneNumber] of char;            {!!.06}     // tchar
     dwAlternateOffset  : DWord;                                          {!!.06}
     IPAddr             : TRasIPAddr;                                     {!!.06}
     IPAddrDns          : TRasIPAddr;                                     {!!.06}
@@ -214,15 +213,15 @@ type { moved from AdRasUtl.pas }                                         {!!.06}
     dwFrameSize        : DWord;                                          {!!.06}
     dwfNetProtocols    : DWord;                                          {!!.06}
     dwFramingProtocol  : DWord;                                          {!!.06}
-    szScript           : array[0..Max_PATH-1] of ansichar;                   {!!.06} // --sm ansi
-    szAutodialDll      : array[0..Max_PATH-1] of ansichar;                   {!!.06}
-    szAutodialFunc     : array[0..Max_PATH-1] of ansichar;                   {!!.06}
-    szDeviceType       : array[0..RasMaxDeviceType] of ansichar;             {!!.06}
-    szDeviceName       : array[0..RasMaxDeviceName] of ansichar;             {!!.06}
-    szX25PadType       : array[0..RasMaxPadType] of ansichar;                {!!.06}
-    szX25Address       : array[0..RasMaxX25Address] of ansichar;             {!!.06}
-    szX25Facilities    : array[0..RasMaxFacilities] of ansichar;             {!!.06}
-    szX25UserData      : array[0..RasMaxUserData] of ansichar;               {!!.06}
+    szScript           : array[0..Max_PATH-1] of char;                   {!!.06} // --SZ TCHAR in ras.h, so use char here 
+    szAutodialDll      : array[0..Max_PATH-1] of char;                   {!!.06}
+    szAutodialFunc     : array[0..Max_PATH-1] of char;                   {!!.06}
+    szDeviceType       : array[0..RasMaxDeviceType] of char;             {!!.06}
+    szDeviceName       : array[0..RasMaxDeviceName] of char;             {!!.06}
+    szX25PadType       : array[0..RasMaxPadType] of char;                {!!.06}
+    szX25Address       : array[0..RasMaxX25Address] of char;             {!!.06}
+    szX25Facilities    : array[0..RasMaxFacilities] of char;             {!!.06}
+    szX25UserData      : array[0..RasMaxUserData] of char;               {!!.06}
     dwChannels         : DWord;                                          {!!.06}
     dwReserved1        : DWord;                                          {!!.06}
     dwReserved2        : DWord;                                          {!!.06}
@@ -368,7 +367,7 @@ const
   atStrip              = 1;  {Strip CRs or LFs}
   atAddCRBefore        = 2;  {Add CR before each LF}
   atAddLFAfter         = 3;  {Add LF after each CR}      
-  atEOFMarker          : char = ^Z; {Add constant for standard EOF }   
+  atEOFMarker          : Ansichar = ^Z; {Add constant for standard EOF }
 
   {Protocol status start/end flags}
   apFirstCall          = $01; {Indicates the first call to status}
@@ -386,12 +385,17 @@ const
 
 type
   {Convenient types used by protocols}
-  TNameCharArray = array[0..fsFileName ] of Char;  // --sm ansi
-  TExtCharArray  = array[0..fsExtension] of Char;
+  TNameCharArray = array[0..fsFileName ] of AnsiChar; //SZ used by protocols --> Ansi
+  TExtCharArray  = array[0..fsExtension] of AnsiChar;
   TPathCharArray = array[0..fsPathName ] of Char;
-  TDirCharArray  = array[0..fsDirectory] of Char;
-  TChar20Array   = array[0..20] of ansiChar;
-  TCharArray = array[0..255] of ansiChar;
+  TPathCharArrayA = array[0..fsPathName ] of AnsiChar;  //SZ FIXME can this be changed to Char??
+  TDirCharArray  = array[0..fsDirectory] of AnsiChar;
+  TChar20Array   = array[0..20] of AnsiChar;
+  TCharArray = array[0..255] of AnsiChar;
+
+  {For generic buffer typecasts}
+  PByteBuffer = ^TByteBuffer;
+  TByteBuffer = array[1..65535] of Byte;
 
   {Port characteristic constants}
   TDatabits = 5..DontChangeDatabits;
@@ -1245,7 +1249,7 @@ type
     piElapsedTicks     : LongInt;
     piFlags            : LongInt;
     piBlockCheck       : Cardinal;
-    piFileName         : TPathCharArray;
+    piFileName         : TPathCharArrayA;
     piError            : Integer;
     piStatus           : Cardinal;
   end;
@@ -1486,7 +1490,7 @@ type
                  GotSpace, GotQuestionMark, GotQuestionParam);
 
   {Array used for internal queue}
-  TApQueue = Array[1..MaxQueue] of ansiChar;                                    // SWB // --sm ansi
+  TApQueue = Array[1..MaxQueue] of AnsiChar;                                    // SWB
 
   {Emulator for PC ANSI codes}
   PAnsiEmulator = ^TAnsiEmulator;
@@ -1733,7 +1737,7 @@ const
   zfWriteProtect     = 7;          {Transfer only if new}
 
   {Convenient protocol string constants}
-  ProtocolString : array[NoProtocol..BPlus] of array[0..9] of ansiChar= (
+  ProtocolString : array[NoProtocol..BPlus] of array[0..9] of AnsiChar= (
     'None', 'Xmodem', 'XmodemCRC', 'Xmodem1K', 'Xmodem1KG',
     'Ymodem', 'YmodemG', 'Zmodem', 'Kermit', 'Ascii', 'B+');
 
@@ -1815,8 +1819,8 @@ type
   end;
 
   {For storing station IDs}
-//  Str20 = string[20];
-  Str20 = ansistring;
+  Str20 = string[20];
+//  Str20 = ansistring;
 
   {Stores information about our fonts}
   TFontRecord = record
@@ -1925,7 +1929,7 @@ type
   PAbsFaxCvt = ^TAbsFaxCvt;
 
   {callback function to open a converter input file}
-  TOpenFileCallback = function(Cvt : PAbsFaxCvt; FileName : PansiChar) : Integer;
+  TOpenFileCallback = function(Cvt : PAbsFaxCvt; FileName : string) : Integer;
 
   {callback function to close a converter input file}
   TCloseFileCallback = procedure(Cvt : PAbsFaxCvt);
@@ -1970,10 +1974,10 @@ type
     CloseCall   : TCloseFileCallback; {To close the input file, if any}
     StatusFunc  : TCvtStatusCallback; {Callback for status display}
     StatusWnd   : HWnd;               {Handle of window receiving status msgs}
-    DefExt      : array[0..3] of ansiChar;
-    InFileName  : array[0..255] of ansiChar;
-    OutFileName : array[0..255] of ansiChar;
-    StationID   : array[0..20] of ansiChar;
+    DefExt      : string; // array[0..3] of AnsiChar;
+    InFileName  : string; // array[0..255] of AnsiChar;
+    OutFileName : string; // array[0..255] of AnsiChar;
+    StationID   : AnsiString; //array[0..20] of AnsiChar;
     MainHeader  : TFaxHeaderRec;      {main header of fax output file}
     PageHeader  : TPageHeaderRec;     {header for current output page}
     OutFile     : PBufferedOutputFile;{Output file}
@@ -2135,7 +2139,7 @@ const
 type
   TLineReader = class
     protected
-      Buffer : array[0..LineBufferSize] of ansichar;
+      Buffer : array[0..LineBufferSize] of Ansichar;
       fEOLF : Boolean;
       ReadPtr : PAnsiChar;
       fStream : TStream;
@@ -2148,13 +2152,392 @@ type
       destructor Destroy; override;
       property EOLF : Boolean read fEOLF;
       property FileSize : LongInt read fFileSize;
-      function NextLine : ansistring;
+      function NextLine : AnsiString;
   end;
 
+  {String handling class, only used by the TApdPager}
+type
+  TAdStr = class
+  private
+    FMaxLen: Integer;
+    FLen: Integer;
+    FString: PChar;
+    FCur: PChar;
+
+  protected
+    procedure SetLen(NewLen: Integer);
+    function GetLen: Integer;
+
+    procedure SetMaxLen(NewMaxLen: Integer);
+    function GetMaxLen: Integer;
+
+    function GetBuffLen: Integer;
+
+    procedure SetChar(Index: Cardinal; Value: Char);
+    function GetChar(Index: Cardinal): Char;
+
+    function GetCurChar: Char;
+
+  public
+    constructor Create(AMaxLen: Cardinal);
+    destructor Destroy; override;
+    procedure Assign(Source: TAdStr);
+
+    property Len: Integer
+      read GetLen write SetLen;
+    property MaxLen: Integer
+      read GetMaxLen write SetMaxLen;
+    property BuffLen: Integer
+      read GetBuffLen;
+    property Chars[Index: Cardinal]: Char
+      read GetChar write SetChar; default;
+    property CurChar: Char
+      read GetCurChar;
+    property Str: PChar
+      read FString;
+    property Cur: PChar
+      read FCur;
+
+    procedure First;
+    procedure GotoPos(Index: Cardinal);
+    procedure Last;
+    procedure MoveBy(IndexBy: LongInt);
+    procedure Next;
+    procedure Prev;
+
+    procedure Append(const Text: string);
+    procedure AppendTAdStr(TS: TAdStr);
+    procedure AppendBuff(Buff: PChar);
+    procedure Clear;
+    function Copy(Index, SegLen: Integer): string;
+    procedure Delete(Index, SegLen: Integer);
+    procedure Insert(const Text: string; Index: Integer);
+    function Pos(const SubStr: string): Cardinal;
+    function PosIdx(const SubStr: string; Index: Integer): Cardinal;
+    procedure Prepend(const Text: string);
+    procedure Resize(NewLen: Integer);
+  end;
 
   TAdStrCur = class
   private
   public
+  end;
+
+  {text converter data}
+  PTextFaxData = ^TTextFaxData;
+  TTextFaxData = record
+    IsExtended : Boolean;                      {Using extended text option?}
+    ReadBuffer : PByteArray;                   {Input buffer}
+    TabStop    : Cardinal;                     {Number of spaces per tab character}
+    LineCount  : Cardinal;                     {Number of text lines between page}
+    InFile     : TLineReader;                  {Input file}
+    OnLine     : DWORD;                        {Number of current input line}
+    CurRow     : Cardinal;                     {Current raster row of CurStr}
+    CurStr     : array[0..255] of Ansichar;
+    Pending    : string;
+    FFPending  : Boolean;                      {TRUE if formfeed pending}
+    FontRec    : TFontRecord;                  {Holds current font info}
+    case Integer of
+      0: (FontLoaded : Bool;                   {False until font loaded}
+          FontPtr    : PByteArray);            {Pointer to the loaded font table}
+      1: (Bitmap     : Graphics.TBitmap;       {Memory bitmap for rendering text}
+          LineBytes  : Cardinal;               {Bytes per raster line}
+          Offset     : Cardinal;               {Current offset in the bitmap}
+          ImageSize  : LongInt;                {Size of image structure}
+          ImageData  : Pointer);               {Image data}
+  end;
+
+
+  {TIFF strip information}
+  PStripRecord = ^TStripRecord;
+  TStripRecord = packed record
+    Offset : LongInt;
+    Length : LongInt;
+  end;
+
+  PStripInfo = ^TStripInfo;
+  TStripInfo = array[1..(65521 div SizeOf(TStripRecord))] of TStripRecord;
+
+  {TIFF converter data}
+  PTiffFaxData = ^TTiffFaxData;
+  TTiffFaxData = record
+    Intel       : Bool;                {TRUE if file is in Intel byte order}
+    LastBitMask : Word;                {Last decode bit mask}
+    CurrRBSize  : Cardinal;            {Amount of data in read buffer}
+    CurrRBOfs   : Cardinal;            {Current offset in ReadBuffer}
+    OnStrip     : Cardinal;            {Current strip being processed}
+    OnRaster    : Cardinal;            {Current raster line being processed}
+    Version     : Word;                {Version number from file preable}
+    SubFile     : Word;                {TIFF tag field values for image:}
+    ImgWidth    : Word;                {image width}
+    ImgLen      : Word;                {length of image}
+    ImgBytes    : Word;                {bytes per raster line}
+    NumLines    : Word;                {image length (height)}
+    CompMethod  : Word;                {compression type}
+    PhotoMet    : Word;                {photometric conversion type}
+    RowStrip    : DWORD;               {raster lines per image strip}
+    StripOfs    : LongInt;             {offset in file to first strip}
+    StripCnt    : DWORD;               {number of strips}
+    StripInfo   : PStripInfo;          {strip offsets/lengths}
+    ByteCntOfs  : LongInt;             {offset to byte count list}
+    ImgStart    : LongInt;             {start of image data in file}
+    ReadBuffer  : PByteArray;          {buffer for reads}
+    InFile      : File;                {input file}
+  end;
+
+  PDcxFaxData = ^TDcxFaxData;
+  TDcxFaxData = record
+    DcxHeader : TDcxHeaderRec;         {Offsets to DCX pages}
+    DcxPgSz   : TDcxOfsArray;          {Number of bytes per PCX image}
+    DcxNumPag : Cardinal;              {Number of pages (PCX images) in file}
+    OnPage    : Cardinal;              {Current page being converted}
+  end;
+
+  PPcxFaxData = ^TPcxFaxData;
+  TPcxFaxData = record
+    CurrRBSize   : Cardinal;           {Read buffer size}
+    CurrRBOfs    : Cardinal;           {Offset into read buffer}
+    ActBytesLine : Cardinal;           {Actual number of bytes per line}
+    ReadBuffer   : PByteArray;         {Read buffer}
+    PcxHeader    : TPcxHeaderRec;      {Header from PCX image}
+    PcxBytes     : DWORD;              {Number of bytes in PCX image}
+    InFile       : File;               {Input file}
+    PcxWidth     : Word;               {Width of raster line in pixels}
+    DcxData      : PDcxFaxData;        {Optional DCX conversion data}
+  end;
+
+const
+  DMSize = 32;
+
+type
+  PBitmapFaxData = ^TBitmapFaxData;
+  TBitmapFaxData = record
+    BmpHandle       : HBitmap;
+    DataBitmap      : Graphics.TBitmap;
+    BytesPerLine    : Cardinal;
+    Width           : Cardinal;
+    NumLines        : Cardinal;
+    OnLine          : Cardinal;
+    Offset          : LongInt;
+    BitmapBufHandle : THandle;
+    BitmapBuf       : Pointer;
+    NeedsDithering  : Boolean;
+    DM              : array[0..Pred(DMSize),0..Pred(DMSize)] of Integer;
+  end;
+
+{Fax unpacking}
+
+{options passed to unpacker callback}
+const
+  upStarting = $0001;
+  upEnding   = $0002;
+
+{flags passed to unpacker status}
+const
+  usStarting = $0001;
+  usEnding   = $0002;
+
+const
+  {unpacker options}
+  ufYield            = $0001;
+  ufAutoDoubleHeight = $0002;
+  ufAutoHalfWidth    = $0004;
+  ufAbort            = $0008;
+
+  DefUnpackOptions = ufYield or ufAutoDoubleHeight;
+  BadUnpackOptions = Cardinal(0);
+
+  {const number of raster lines per allocated page}
+  RasterBufferPageSize = Cardinal(1024);
+
+type
+  {settings for horizontal and vertical scaling}
+  PScaleSettings = ^TScaleSettings;
+  TScaleSettings = record
+    HMult : Cardinal;
+    HDiv  : Cardinal;
+    VMult : Cardinal;
+    VDiv  : Cardinal;
+  end;
+
+  PUnpackFax = ^TUnpackFax;
+
+  {callback for outputting unpacked data}
+  TUnpackLineCallback = function(Unpack : PUnpackFax; plFlags : Word;
+    var Data; Len, PageNum : Cardinal) : Integer;
+
+  {callback for outputting status information}
+  TUnpackStatusCallback = procedure(Unpack : PUnpackFax; FaxFile : string;
+    PageNum : Cardinal; BytesUnpacked, BytesToUnpack : LongInt);
+
+  {memory bitmap descriptor}
+  PMemoryBitmapDesc = ^TMemoryBitmapDesc;
+  TMemoryBitmapDesc = record
+    Width  : Cardinal;
+    Height : Cardinal;
+    Bitmap : HBitmap;
+  end;
+
+  TUnpackFax = record
+    {basic unpacker data}
+    CurCode    : Cardinal;
+    CurSig     : Cardinal;
+    LineOfs    : Cardinal;            {Current offset in line}
+    LineBit    : Cardinal;            {Current offset in byte}
+    CurrPage   : Cardinal;            {Current page}
+    CurrLine   : Cardinal;            {Current line}
+    Flags      : Cardinal;            {Option flags}
+    BadCodes   : Cardinal;            {Number of bad codes unpacked}
+    WSFrom     : Cardinal;            {Whitespace comp - size of run to comp}
+    WSTo       : Cardinal;            {Number of lines to compress to}
+    WhiteCount : Cardinal;            {Count of white lines unpacked}
+    TreeLast   : Integer;
+    TreeNext   : Integer;
+    Match      : Integer;
+    ImgBytes   : LongInt;
+    ImgRead    : LongInt;
+    WhiteTree  : PTreeArray;          {Tree of white runlength codes}
+    BlackTree  : PTreeArray;          {Tree of black runlength codes}
+    LineBuffer : PByteArray;          {Buffer for decompression}
+    TmpBuffer  : PByteArray;
+    FileBuffer : PByteArray;          {File I/O buffer}
+    FaxHeader  : TFaxHeaderRec;
+    PageHeader : TPageHeaderRec;
+    OutputLine : TUnpackLineCallback; {Output a decompressed raster line}
+    Status     : TUnpackStatusCallback;
+    UserData   : Pointer;             {Data needed by higher level unpackers}
+
+    {scaling data}
+    Height     : Cardinal;            {height of bitmap}
+    Width      : Cardinal;            {width of bitmap}
+    Handle     : THandle;             {handle to memory block}
+    Pages      : Cardinal;            {pages allocate in handle}
+    MaxWid     : Cardinal;            {maximum width of line}
+    Lines      : Pointer;             {raster lines}
+    Scale      : TScaleSettings;      {scale settings}
+    MemBmp     : TMemoryBitmapDesc;   {memory bitmap}
+    SaveHook   : TUnpackLineCallback; {saved output line hook}
+    ToBuffer   : Bool;                {unpack to memory buffer?}
+    Inverted   : Bool;                {TRUE if bitmap data should be inverted}
+  end;
+
+  {data for unpacking to PCX file}
+  PUnpackToPcxData = ^TUnpackToPcxData;
+  TUnpackToPcxData = record
+    PBOfs       : Cardinal;
+    Lines       : Cardinal;
+    LastPage    : Cardinal;
+    PCXOfs      : LongInt;
+    FileOpen    : Bool;
+    DcxUnpack   : Bool;
+    OutFile     : File;
+    OutName     : array[0..255] of AnsiChar;
+    PackBuffer  : array[0..511] of Byte;
+    DcxHead     : TDcxHeaderRec;
+  end;
+
+{image converters}
+const
+  DCXHeaderID = 987654321;
+
+{Fax viewer}
+
+const
+  {fax viewer window Cardinal}
+  gwl_Viewer = 0;
+
+const
+  {special styles}
+  vws_DragDrop  = $0001;
+
+  {default colors}
+  DefViewerBG = $FFFFFF;
+  DefViewerFG = $000000;
+
+  {default scrolling parameters}
+  DefVScrollInc = 8;
+  DefHScrollInc = 8;
+
+{Abstract fax send/receive}
+const
+  {Constants used to initialize object fields}
+  DefConnectAttempts : Cardinal = 1;   {Default one connect attempt}
+  DefMaxRetries : Integer       = 2;   {Max times to retry sending a page}
+  DefStatusTimeout : Integer    = 1;   {Seconds between status updates}
+
+  {Constants used directly}
+  DefNormalInit        : string = 'ATE0Q0V1X4S0=0S2=43';                 {!!.04}
+  DefBlindInit         : string = 'ATE0Q0V1X3S0=0S2=43';                 {!!.04}
+  DefNoDetectBusyInit  : string = 'ATE0Q0V1X2S0=0S2=43';                 {!!.04}
+  DefX1Init            : string = 'ATE0Q0V1X1S0=0S2=43';                 {!!.04}
+  DefTapiInit          : string = 'ATE0Q0V1S0=0S2=43';                   {!!.04}
+  {DefInit                      = DefNormalInit;}                        {!!.04}
+  DefStatusBytes : Cardinal        = 10000;   {Force periodic exit}
+  MaxBadPercent : Cardinal         = 10;      {Error if this % bad training}
+  FlushWait : Cardinal             = 500;     {Msec before/after DTR drop}
+  FrameWait : Cardinal             = 20;      {Msec delay before HDLC frame}
+
+  {Fax send/receive options}
+  afAbortNoConnect      = $0001;   {Abort if no connect}
+  afExitOnError         = $0002;   {Exit FaxTransmit/Receive on error}
+  afCASSubmitUseControl = $0004;   {SubmitSingleFile uses control file}
+  afSoftwareFlow        = $0008;   {Use software flow control in C1/2}
+
+  DefFaxOptions : Cardinal = 0;
+  BadFaxOptions = Cardinal(0);
+
+  {Fax types (for specifying different send/receive state machines}
+  ftNone              = 0;   {None specified}
+  ftClass12           = 1;   {Class 1/2/2.0}
+
+type
+  ClassType = (ctUnknown, ctDetect, ctClass1, ctClass2, ctClass2_0);
+
+  {Logging codes}
+  TFaxLogCode = (
+    lfaxNone,
+    lfaxTransmitStart,
+    lfaxTransmitOk,
+    lfaxTransmitFail,
+    lfaxReceiveStart,
+    lfaxReceiveOk,
+    lfaxReceiveSkip,
+    lfaxReceiveFail);
+  { APRO components now use the TFaxLogCode exclusively, TLogFaxCode defined }
+  { here for backwards compatibility }
+  TLogFaxCode = TFaxLogCode;                                             {!!.04}
+  {Logging codes for TApdFaxServer}
+  TFaxServerLogCode = (
+    fslNone,
+    fslPollingEnabled,
+    fslPollingDisabled,
+    fslMonitoringEnabled,
+    fslMonitoringDisabled);
+
+  {General fax states}
+  FaxStateType = (
+    faxReady,           {State machine ready immediately}
+    faxWaiting,         {State machine waiting}
+    faxCritical,        {State machine in critical state}
+    faxFinished);       {State machine is finished}
+
+type
+  {A list of files/numbers to fax}
+  TFaxNumber = String[40];
+  PFaxEntry = ^TFaxEntry;
+  TFaxEntry = record
+    fNumber : TFaxNumber;
+    fFName  : ShortString;
+    fCover  : ShortString;
+    fNext   : PFaxEntry;
+  end;
+
+  {A general (Pascal and C++) structure for returning the next fax to send}
+  PSendFax = ^TSendFax;
+  TSendFax = record
+    sfNumber : array[0..40] of AnsiChar;
+    sfFName  : array[0..255] of AnsiChar;
+    sfCover  : array[0..255] of AnsiChar;
   end;
 
 const
@@ -2182,7 +2565,7 @@ type
      dtTriggerAlloc, dtTriggerDispose, dtTriggerHandlerAlloc,
      dtTriggerHandlerDispose, dtTriggerDataChange, dtTelnet, dtFax,
      dtXModem, dtYModem, dtZModem, dtKermit, dtAscii, dtBPlus,
-     dtPacket, dtUser, dtScript);                                      
+     dtPacket, dtUser, dtScript);
   TDispatchSubType =
     (dstNone,
      dstReadCom, dstWriteCom, dstLineStatus, dstModemStatus,
@@ -2245,7 +2628,7 @@ type
      dsttkEofReply, dsttkCollectEof, dsttkSendBreak, dsttkBreakReply,
      dsttkCollectBreak, dsttkComplete, dsttkWaitCancel, dsttkError,
      dsttkDone, dstrkInit, dstrkGetInit, dstrkCollectInit,
-     dstrkGetFile, dstrkCollectFile, dstrkGetData, dstrkCollectData,   
+     dstrkGetFile, dstrkCollectFile, dstrkGetData, dstrkCollectData,
      dstrkComplete, dstrkWaitCancel, dstrkError, dstrkDone,
      dsttaInitial, dsttaGetBlock, dsttaWaitFreeSpace, dsttaSendBlock,
      dsttaSendDelay, dsttaFinishDrain, dsttaFinished, dsttaDone,
@@ -2255,7 +2638,7 @@ type
      dstIdle, dstWaiting, dstCollecting, dstThreadStatusQueued,             // SWB
      dstThreadDataQueued, dstThreadDataWritten, dsttzSinit,                 // SWB
      dsttzCheckSInit                                                        // SWB
-     );         
+     );
 
   {For holding trace entries}
   TTraceRecord = record
@@ -2267,13 +2650,13 @@ type
 
   {DispatchBuffer type}
   PDBuffer = ^TDBuffer;
-  TDBuffer = array[0..65527] of ansiChar;
+  TDBuffer = array[0..65527] of AnsiChar;
 
   POBuffer = ^TOBuffer;
   TOBuffer = array[0..pred(High(Integer))] of AnsiChar;
 
   {For storing com name}
-  TComName = array[0..5] of ansiChar;
+  TComName = array[0..5] of Char;
 
   {Trigger types}
   TTriggerType = (ttNone, ttAvail, ttTimer, ttData, ttStatus);
@@ -2317,7 +2700,7 @@ type
     tsLenTrigger     : Cardinal;
     tsTimerTriggers  : Tlist;
     tsDataTriggers   : TList;
-    tsStatusTriggers : TList;                                         
+    tsStatusTriggers : TList;
   end;
 
   {Trigger handler records}
@@ -2376,24 +2759,37 @@ function ElapsedTimeInSecs(ET : EventTimer) : LongInt;
 function RemainingTime(ET : EventTimer) : LongInt;
 function RemainingTimeInSecs(ET : EventTimer) : LongInt;
 function DelayTicks(Ticks: LongInt; Yield : Bool) : Longint;
-function StrStCopy(Dest : PansiChar; S : PansiChar; Pos, Count : Cardinal) : PansiChar; // --sm ansi
-function AddBackSlashZ(Dest : PansiChar; DirName : PansiChar) : PansiChar;
-function ExistFileZ(FName : PansiChar) : Bool;
-function ForceExtensionZ(Dest : PansiChar; Name, Ext : PansiChar) : PansiChar;
-function DefaultExtensionZ(Dest : PansiChar; Name, Ext : PansiChar) : PansiChar;
+function JustPathnameZ(out Dest : string; PathName : string) : string; overload;
+function JustPathnameZ(Dest : PAnsiChar; PathName : PAnsiChar) : PAnsiChar; overload;
+function JustFilenameZ(Dest : PAnsiChar; PathName : PAnsiChar) : PAnsiChar;
+{$IFNDEF PrnDrv}
+function JustExtensionZ(out Dest : string; Name : string) : string; overload;
+{$ENDIF}
+function StrStCopy(Dest : PWideChar; S : PWideChar; Pos, Count : Cardinal) : PWideChar; overload;
+function StrStCopy(Dest : PAnsiChar; S : PAnsiChar; Pos, Count : Cardinal) : PAnsiChar; overload;
+function AddBackSlashZ(Dest : PAnsiChar; DirName : PAnsiChar) : PAnsiChar; overload;
+function AddBackSlashZ(out Dest : string; DirName : string) : string; overload;
+{$IFNDEF PrnDrv}
+function ExistFileZ(FName : string) : Bool; overload;
+{$ENDIF}
+function ForceExtensionZ(out Dest : string; Name, Ext : string) : string; overload;
+function DefaultExtensionZ(out Dest : string; Name, Ext : string) : string; overload;
 function GetPtr(P : Pointer; O : LongInt) : Pointer;
 procedure NotBuffer(var Buf; Len : Cardinal);
 
+{$IFNDEF Win32}
+function Trim(const S : string) : string;
+{$ENDIF}
 
 function DelayMS(MS : Cardinal) : Cardinal;
 
 function SafeYield : LongInt;
 
-
-function JustName(PathName : ansiString) : ansiString;
+{$IFNDEF PrnDrv}
+function JustName(PathName : String) : String;
   {-Return just the name (no extension, no path) of a pathname}
 
-function AddBackSlash(const DirName : ansiString) : ansiString;
+function AddBackSlash(const DirName : String) : String;
   {-Add a default backslash to a directory name}
 
 function IsWin2000 : Boolean;
@@ -2407,10 +2803,10 @@ function IsWinNT : Boolean;
 type
   TApdBaseComponent = class(TComponent)
   protected
-    function GetVersion : ansistring;
-    procedure SetVersion(const Value : ansistring);
+    function GetVersion : string;
+    procedure SetVersion(const Value : string);
   published
-    property Version : ansistring
+    property Version : string
       read GetVersion
       write SetVersion
       stored False;
@@ -2418,10 +2814,10 @@ type
 
   TApdBaseWinControl = class(TWinControl)
   protected
-    function GetVersion : ansistring;
-    procedure SetVersion(const Value : ansistring);
+    function GetVersion : string;
+    procedure SetVersion(const Value : string);
   published
-    property Version : ansistring
+    property Version : string
       read GetVersion
       write SetVersion
       stored False;
@@ -2429,10 +2825,10 @@ type
 
   TApdBaseOleControl = class(TOleControl)
   protected
-    function GetVersion : ansistring;
-    procedure SetVersion (const Value : ansistring);
+    function GetVersion : string;
+    procedure SetVersion (const Value : string);
   published
-    property Version : ansistring
+    property Version : string
       read GetVersion
       write SetVersion
       stored False;
@@ -2440,10 +2836,10 @@ type
 
   TApdBaseGraphicControl = class(TGraphicControl)
   protected
-    function GetVersion : ansistring;
-    procedure SetVersion (const Value : ansistring);
+    function GetVersion : string;
+    procedure SetVersion (const Value : string);
   published
-    property Version : ansistring
+    property Version : string
       read GetVersion
       write SetVersion
       stored False;
@@ -2451,10 +2847,10 @@ type
 
   TApdBaseScrollingWinControl = class(TScrollingWinControl)
   protected
-    function GetVersion : ansistring;
-    procedure SetVersion (const Value : ansistring);
+    function GetVersion : string;
+    procedure SetVersion (const Value : string);
   published
-    property Version : ansistring
+    property Version : string
       read GetVersion
       write SetVersion
       stored False;
@@ -2463,21 +2859,23 @@ type
 {$ENDIF}
 
 
-function ApWinExecAndWait32(FileName : PansiChar; CommandLine : PansiChar;
+{$IFDEF Win32}
+function ApWinExecAndWait32(FileName : PChar; CommandLine : PChar;
                             Visibility : Integer) : Integer;
+{$ENDIF}
 
 {$IFDEF Apax}
-procedure WriteDebug(const S : ansistring);
+procedure WriteDebug(const S : string);
 {$ENDIF}
 
 
 implementation
 
 {$IFDEF APAX}
-procedure WriteDebug(const S : ansistring);
+procedure WriteDebug(const S : Ansistring);
 var
   LogStream : TFileStream;
-  TimeStamp : ansistring;
+  TimeStamp : Ansistring;
 begin
   LogStream := nil;
   try
@@ -2487,7 +2885,9 @@ begin
       LogStream := TFileStream.Create('APAXDBG.TXT', fmCreate or fmShareDenyNone);
     LogStream.Seek(0, soFromEnd);
     TimeStamp := FormatDateTime('dd/mm/yy : hh:mm:ss - ', Now) + S + #13#10;
-    LogStream.WriteBuffer(TimeStamp[1], PayloadLengthInBytes(TimeStamp))
+    LogStream.WriteBuffer(TimeStamp[1], Length(TimeStamp));
+    OutputDebugStringA(PAnsiChar(S)); // WriteLn(S);
+
   finally
     LogStream.Free;
   end;
@@ -2519,7 +2919,7 @@ begin
   inherited Destroy;
 end;
 
-function TLineReader.NextLine : ansistring;
+function TLineReader.NextLine : AnsiString;
 var
   EOL : PAnsiChar;
   Done : Boolean;
@@ -2567,6 +2967,300 @@ begin
   end;
 end;                                                                        // SWB
 
+{ TAdStr }
+
+constructor TAdStr.Create(AMaxLen: Cardinal);
+begin
+  inherited Create;
+  FMaxLen := 0;
+  FLen := 0;
+  FString := nil;
+  SetMaxLen(AMaxLen);
+end;
+
+destructor TAdStr.Destroy;
+begin
+  if Assigned(FString) then
+    FreeMem(FString, FMaxLen + 1);
+  inherited Destroy;
+end;
+
+procedure TAdStr.Append(const Text: string);
+var
+  NewLen: Integer;
+  Buff: PChar;
+begin
+  if Text = '' then Exit;         { nothing to append }
+
+  NewLen := Length(Text) + FLen;
+  if NewLen > FMaxLen then         { if new text will be longer than allocated }
+    Resize(NewLen);              { reallocate }
+
+  Buff := StrAlloc(Length(Text) + 1);
+  StrPCopy(Buff,Text);
+  StrCat(FString, Buff);
+  StrDispose(Buff);
+  FLen := StrLen(FString);
+end;
+
+procedure TAdStr.AppendBuff(Buff: PChar);
+var
+  BuffLen: Integer;
+begin
+  BuffLen := StrLen(Buff);
+  if BuffLen = 0 then Exit;
+
+  if BuffLen + FLen > FMaxLen then
+    Resize(BuffLen + FLen);
+
+  StrCat(FString, Buff);
+  FLen := StrLen(FString);
+end;
+
+procedure TAdStr.AppendTAdStr(TS: TAdStr);
+begin
+  AppendBuff(TS.Str);
+end;
+
+procedure TAdStr.Assign(Source: TAdStr);
+begin
+  if not Assigned(Source) then Exit;
+
+  if Source.MaxLen <> MaxLen then
+    Resize(Source.MaxLen);
+
+  FMaxLen := Source.MaxLen;
+
+  StrCopy(FString, Source.Str);
+  FLen    := StrLen(FString);
+
+  GotoPos(Source.Cur - Source.Str);
+end;
+
+procedure TAdStr.Clear;
+begin
+  FString[0] := #0;
+  FLen := 0;
+  FCur := FString;
+end;
+
+function TAdStr.Copy(Index, SegLen: Integer): string;
+var
+  P:PChar;
+  NewLen: Integer;
+begin
+  if (Index = 0) or (SegLen = 0) or (Index > FLen) then begin
+    Result := '';
+    Exit;
+  end;
+
+  NewLen := SegLen;
+  if Index + (SegLen - 1) > FLen then  { requested segment runs past end of string }
+    NewLen := FLen - Index;  { just return up to end of string }
+
+{$ifndef WIN32 }
+  if NewLen > 255 then  { old Pascal strings can contain no more than 255 chars }
+    NewLen := 255;
+{$endif }
+  GotoPos(Index);
+
+  P := StrAlloc(NewLen + 1);
+  StrLCopy(P, FCur, NewLen);
+  Result := StrPas(P);
+  StrDispose(P);
+end;
+
+procedure TAdStr.Delete(Index, SegLen: Integer);
+var
+  Src: PChar;
+  SrcLen: Cardinal;
+begin
+  if (Index = 0) or (SegLen = 0) or (Index > FLen) then Exit;
+
+  GotoPos(Index);             { locate starting point }
+  if Index + (SegLen - 1) > FLen then  { delete rest of string }
+    FCur[0] := #0
+  else begin                  { remove chunk }
+    Src := FCur + SegLen;     { find start of remain post chunk string }
+    SrcLen := StrLen(Src);
+    StrLCopy(FCur, Src, SrcLen);
+  end;
+  FLen := StrLen(FString);
+end;
+
+procedure TAdStr.First;
+begin
+  FCur := FString;
+end;
+
+function TAdStr.GetBuffLen: Integer;
+begin
+  Result := FMaxLen + 1;
+end;
+
+function TAdStr.GetChar(Index: Cardinal): Char;
+begin
+  Result := FString[Index];
+end;
+
+function TAdStr.GetCurChar: Char;
+begin
+  Result := FCur[0];
+end;
+
+function TAdStr.GetLen: Integer;
+begin
+  Result := FLen;
+end;
+
+function TAdStr.GetMaxLen: Integer;
+begin
+  Result := FMaxLen;
+end;
+
+procedure TAdStr.GotoPos(Index: Cardinal);
+begin
+  FCur := FString;
+  Inc(FCur, Index-1);
+end;
+
+procedure TAdStr.Insert(const Text: string; Index: Integer);
+var
+  Buff: PChar;
+  NewLen: Integer;
+begin
+  if (Index = 0) or (Index > FLen) or (Text = '') then Exit;
+
+  NewLen := Length(Text) + FLen;
+  if NewLen > FMaxLen then         { if new text will be longer than allocated }
+    Resize(NewLen);              { reallocate }
+
+  GotoPos(Index);                  { find insertion point }
+  Buff := StrNew(FCur);            { make copy of rest of string }
+  StrPCopy(FCur, Text);            { append Text at insertion point }
+  StrCat(FString, Buff);           { add rest of string back on }
+  StrDispose(Buff);
+  FLen := StrLen(FString);
+end;
+
+procedure TAdStr.Last;
+begin
+  FCur := StrEnd(FString) - 1;
+end;
+
+procedure TAdStr.Resize(NewLen: Integer);
+var
+  Temp: PChar;
+  TempLen: Cardinal;
+begin
+  Temp := StrNew(FString);
+  if (NewLen - 1) < FLen then
+    TempLen := NewLen - 1
+  else
+    TempLen := FLen;
+  SetMaxLen(NewLen);
+  StrLCopy(FString, Temp, TempLen);
+  StrDispose(Temp);
+  FLen := StrLen(FString)
+end;
+
+procedure TAdStr.MoveBy(IndexBy: LongInt);
+begin
+  if IndexBy < 0 then
+    Dec(FCur, IndexBy)
+  else
+  if IndexBy > 0 then
+    Inc(FCur, IndexBy)
+  else
+    {no change};
+end;
+
+procedure TAdStr.Next;
+begin
+  Inc(FCur, 1);
+end;
+
+function TAdStr.Pos(const SubStr: string): Cardinal;
+var
+  Buff: PChar;
+begin
+  Buff := StrAlloc(Length(SubStr) + 1);
+  StrPCopy(Buff,SubStr);
+  FCur := StrPos(FString, Buff);
+  StrDispose(Buff);
+
+  if FCur = nil then
+    Result := 0
+  else
+    Result := FCur - FString + 1;
+end;
+
+function TAdStr.PosIdx(const SubStr: string; Index: Integer): Cardinal;
+var
+  Buff: PChar;
+begin
+  if (Index = 0) or (Index > FLen) then begin
+    Result := 0 ;
+    Exit ;
+  end;
+
+  GetMem(Buff, Length(SubStr) + 5);
+  GotoPos(Index);
+  FCur := StrPos(FCur, StrPCopy(Buff,SubStr));
+  StrDispose(Buff);
+
+  if FCur = nil then
+    Result := 0
+  else
+    Result := FCur - FString + 1;
+end;
+
+procedure TAdStr.Prepend(const Text: string);
+begin
+  Insert(Text,1);
+end;
+
+procedure TAdStr.Prev;
+begin
+  Dec(FCur,1);
+end;
+
+procedure TAdStr.SetChar(Index: Cardinal; Value: Char);
+begin
+  if FString[Index] <> Value then
+    FString[Index] := Value;
+end;
+
+procedure TAdStr.SetLen(NewLen: Integer);
+begin
+  if NewLen <= FLen then
+    FString[NewLen] := #0;
+end;
+
+procedure TAdStr.SetMaxLen(NewMaxLen: Integer);
+begin
+  if FMaxLen <> NewMaxLen then begin
+    if Assigned(FString) then
+      FreeMem(FString, FMaxLen + 5);
+    FMaxLen := NewMaxLen;
+    if FMaxLen = 0 then
+      FString := nil
+    else
+      GetMem(FString, FMaxLen + 5);
+  end;
+
+  if Assigned(FString) then
+    FString[0] := #0;
+  FLen := 0;
+end;
+
+function MinWord(A, B : Cardinal) : Cardinal;
+begin
+  if A < B then
+    Result := A
+  else
+    Result := B;
+end;
 
 function FlagIsSet(Flags : Cardinal; FlagMask : Cardinal) : Bool;
 begin
@@ -2604,7 +3298,7 @@ asm
 end;
 
 const
-  DosDelimSet : set of ansichar = ['\', ':', #0];
+  DosDelimSet : set of AnsiChar = ['\', ':', #0];
 
   MaxPCharLen = $7FFFFFFF;
 
@@ -2659,7 +3353,7 @@ const
       Ticks := MaxTicks;
 
     with ET do begin
-      StartTicks := AdTimeGetTime div 55;                             
+      StartTicks := AdTimeGetTime div 55;
       ExpireTicks := StartTicks + Ticks;
     end;
   end;
@@ -2677,7 +3371,7 @@ const
   begin
     with ET do begin
       {Get current Ticks; assume timer has expired}
-      CurTicks := AdTimeGetTime div 55;                                
+      CurTicks := AdTimeGetTime div 55;
       TimerExpired := True;
       {Check normal expiration}
       if CurTicks > ExpireTicks then
@@ -2698,7 +3392,7 @@ const
     CurTicks : LongInt;
   begin
     with ET do begin
-      CurTicks := AdTimeGetTime div 55;                              
+      CurTicks := AdTimeGetTime div 55;
       if CurTicks >= StartTicks then
         {No wrap yet}
         ElapsedTime := CurTicks - StartTicks
@@ -2721,7 +3415,7 @@ const
     RemainingTicks : LongInt;
   begin
     with ET do begin
-      CurTicks := AdTimeGetTime div 55;                               
+      CurTicks := AdTimeGetTime div 55;
       if CurTicks >= StartTicks then
         {No wrap yet}
         RemainingTicks := ExpireTicks - CurTicks
@@ -2769,7 +3463,82 @@ const
 type
   TSmallArray = Array[0..MaxLen-1] of Char;
 
-  function StrStCopy(Dest : PansiChar; S : PansiChar; Pos, Count : Cardinal) : PansiChar;
+  {$IFNDEF PrnDrv}
+  function Str2LongZ(S : PChar; var I : LongInt) : Bool;
+    {-Convert a string to a longint, returning true if successful}
+  var
+    Err : Integer;
+  begin
+    Val(StrPas(S),I,Err);
+    Result := Err = 0;
+  end;
+  {$ENDIF}
+
+  function JustPathnameZ(out Dest : string; PathName : string) : string;
+    {-Return just the drive:directory portion of a pathname}
+  begin
+    Result := ExtractFileDir(PathName);
+    Dest := Result;
+  end;
+
+  function JustPathnameZ(Dest : PAnsiChar; PathName : PAnsiChar) : PAnsiChar; overload;
+    {-Return just the drive:directory portion of a pathname}
+  var
+    I : Integer;
+
+  begin
+    I := StrLen(PathName);
+    repeat
+      Dec(I);
+    until (I = -1) or (PathName[I] in DosDelimSet);
+
+    if I = -1 then
+      {Had no drive or directory name}
+      Dest[0] := #0
+    else if I = 0 then begin
+      {Either the root directory of default drive or invalid pathname}
+      Dest[0] := PathName[0];
+      Dest[1] := #0;
+    end else if (PathName[I] = '\') then begin
+      if PathName[Pred(I)] = ':' then
+        {Root directory of a drive, leave trailing backslash}
+        Dest := StrStCopy(Dest, PathName, 0, Succ(I))
+      else
+        {Subdirectory, remove the trailing backslash}
+        Dest := StrStCopy(Dest, PathName, 0, I);
+    end else
+      {Either the default directory of a drive or invalid pathname}
+      Dest:= StrStCopy(Dest, PathName, 0, Succ(I));
+    Result := Dest;
+  end;
+
+  function JustFilenameZ(Dest : PAnsiChar; PathName : PAnsiChar) : PAnsiChar;
+    {-Return just the filename of a pathname}
+  var
+    I : Cardinal;
+  begin
+    I := StrLen(PathName);
+    while (I > 0) and (not (PathName[I-1] in DosDelimSet)) do
+      Dec(I);
+    Dest := StrStCopy(Dest, PathName, I, MaxLen);
+    Result := Dest;
+  end;
+
+  {$IFNDEF PrnDrv}
+  function JustExtensionZ(out Dest : string; Name : string) : string;
+  var
+    X : string;
+  begin
+    X := ExtractFileExt(Name);
+    if X = '' then
+      Dest := ''
+    else
+      Dest := Copy(X, 2, 255);
+    Result := Dest;
+  end;
+  {$ENDIF}
+
+  function StrStCopy(Dest : PAnsiChar; S : PAnsiChar; Pos, Count : Cardinal) : PAnsiChar;
   var
     Len : Cardinal;
 
@@ -2778,14 +3547,37 @@ type
     if Pos < Len then begin
       if (Len-Pos) < Count then
         Count := Len-Pos;
-      Move(S[Pos], Dest^, Count * SizeOf( Char));  // --sm check sizeof
+      Move(S[Pos], Dest^, Count);
+      Dest[Count] := #0;
+    end else
+      Dest[0] := #0;
+    Result := Dest;
+  end;
+
+  function StrStCopy(Dest : PWideChar; S : PWideChar; Pos, Count : Cardinal) : PWideChar;
+  var
+    Len : Cardinal;
+  begin
+    Len := StrLen(S);
+    if Pos < Len then begin
+      if (Len-Pos) < Count then
+        Count := Len-Pos;
+      Move(S[Pos], Dest^, Count * SizeOf(WideChar));
       Dest[Count] := #0;
     end else
       Dest[0] := #0;
     StrStCopy := Dest;
   end;
 
-  function AddBackSlashZ(Dest : PansiChar; DirName : PansiChar) : PansiChar;
+
+  function AddBackSlashZ(out Dest : string; DirName : string) : string; overload;
+    {-Add a default backslash to a directory name}
+  begin
+    Result := IncludeTrailingPathDelimiter(DirName);
+    Dest := Result;
+  end;
+
+  function AddBackSlashZ(Dest : PAnsiChar; DirName : PAnsiChar) : PAnsiChar;
     {-Add a default backslash to a directory name}
   var
     L : Cardinal;
@@ -2800,25 +3592,27 @@ type
   end;
 
   {$IFNDEF PrnDrv}
-  function ExistFileZ(FName : PansiChar) : Bool;
+  function ExistFileZ(FName : string) : Bool;
   begin
-    Result := FileExists(StrPas(FName));
+    Result := FileExists(FName);
   end;
   {$ENDIF}
 
-  function ForceExtensionZ(Dest : PansiChar; Name, Ext : PansiChar) : PansiChar;
+  function ForceExtensionZ(out Dest : string; Name, Ext : string) : string; overload;
   begin
-    Result := StrPCopy(Dest,ChangeFileExt(StrPas(Name),'.'+StrPas(Ext)));
+    Result := ChangeFileExt(Name,'.'+Ext);
+    Dest := Result;
   end;
 
-  function DefaultExtensionZ(Dest : PansiChar; Name, Ext : PansiChar) : PansiChar;
+  function DefaultExtensionZ(out Dest : string; Name, Ext : string) : string;
   var
-    S : ansistring;
+    S : string;
   begin
-    S := StrPas(Name);
+    S := Name;
     if ExtractFileExt(S) = '' then
-      S := ChangeFileExt(S,'.'+StrPas(Ext));
-    Result := StrPCopy(Dest,S);
+      S := ChangeFileExt(S,'.'+Ext);
+    Dest := S;
+    Result := S;
   end;
 
   function GetPtr(P : Pointer; O : LongInt) : Pointer; assembler; register;
@@ -2827,6 +3621,7 @@ type
   end;
 
 { length of the string for all delphi version }
+//SZ note: nice try, but doesn't work as expected
 function PayloadLengthInBytes( const s: string): integer;
   begin
   {$IFDEF CompilerVersion >= 210}
@@ -2886,7 +3681,7 @@ function PayloadLengthInBytes( const s: string): integer;
     end;
   end;
 
-  function JustName(PathName : ansiString) : ansiString;
+  function JustName(PathName : string) : string;
     {-Return just the name (no extension, no path) of a pathname}
   var
     DotPos : Byte;
@@ -2898,32 +3693,33 @@ function PayloadLengthInBytes( const s: string): integer;
     Result := PathName;
   end;
 
-  function AddBackSlash(const DirName : ansiString) : ansiString;
+  function AddBackSlash(const DirName : String) : String;
     {-Add a default backslash to a directory name}
   var
     IsQuoted : Boolean;
   begin
     Result := DirName;
     if DirName = '' then Exit;
-    IsQuoted := DirName[PayloadLengthInBytes(DirName)] = '"';
+    IsQuoted := DirName[Length(DirName)] = '"';
     if IsQuoted then
-      Result := Copy(DirName, 1, (PayloadLengthInBytes(DirName)) - 1);
-    if not(Result[PayloadLengthInBytes(Result)*StringElementSize(Result)] in DosDelimSet) then
-      Result := Result+'\';
-    if IsQuoted then
-      Result := Result + '"';
+      Result := Copy(DirName, 1, Length(DirName) - 1);
+    if not(Result[Length(Result)] in DosDelimSet) then
+      Result := Result+'\';                                            
+    if IsQuoted then                                                   
+      Result := Result + '"';                                          
   end;
 
-function IsWin2000 : Boolean;
-var
- Osi : TOSVersionInfo;
+function IsWin2000 : Boolean;                                          
+//var
+// Osi : TOSVersionInfo;
 begin
-  Result := False;
-  Osi.dwOSVersionInfoSize := sizeof(Osi);
-  GetVersionEx(Osi);
-  if (Osi.dwPlatformID = Ver_Platform_Win32_NT) then
-    if Osi.dwMinorVersion = 0 then                                       {!!.04}
-      Result := True;
+//  Result := False;
+//  Osi.dwOSVersionInfoSize := sizeof(Osi);
+//  GetVersionEx(Osi);
+//  if (Osi.dwPlatformID = Ver_Platform_Win32_NT) then
+//    if Osi.dwMinorVersion = 0 then                                       {!!.04}
+//      Result := True;    //SZ: was false on Windows XP, Win7
+  Result := CheckWin32Version(5, 0);
 end;
 
 function IsWinNT : Boolean;
@@ -2936,83 +3732,78 @@ begin
 end;
 
 { TApdBaseComponent }
-function TApdBaseComponent.GetVersion : ansistring;
+function TApdBaseComponent.GetVersion : string;
 begin
   Result := ApVersionStr;
 end;
 
-procedure TApdBaseComponent.SetVersion(const Value : ansistring);
+procedure TApdBaseComponent.SetVersion(const Value : string);
 begin
 end;
 
 { TApdBaseWinControl }
-function TApdBaseWinControl.GetVersion : ansistring;
+function TApdBaseWinControl.GetVersion : string;
 begin
   Result := ApVersionStr;
 end;
 
-procedure TApdBaseWinControl.SetVersion(const Value : ansistring);
+procedure TApdBaseWinControl.SetVersion(const Value : string);
 begin
 end;
 
 { TApdBaseOleControl }
-function TApdBaseOleControl.GetVersion : ansistring;
+function TApdBaseOleControl.GetVersion : string;
 begin
   Result := ApVersionStr;
 end;
 
-procedure TApdBaseOleControl.SetVersion(const Value : ansistring);
+procedure TApdBaseOleControl.SetVersion(const Value : string);
 begin
 end;
 
 { TApdBaseGraphicControl }
-function TApdBaseGraphicControl.GetVersion: ansistring;
+function TApdBaseGraphicControl.GetVersion: string;
 begin
   Result := ApVersionStr;
 end;
 
-procedure TApdBaseGraphicControl.SetVersion(const Value: ansistring);
+procedure TApdBaseGraphicControl.SetVersion(const Value: string);
 begin
 end;
 
 { TApdBaseScrollingWinControl }
-function TApdBaseScrollingWinControl.GetVersion: ansistring;
+function TApdBaseScrollingWinControl.GetVersion: string;
 begin
   Result := ApVersionStr;
 end;
 
-procedure TApdBaseScrollingWinControl.SetVersion(const Value: ansistring);
+procedure TApdBaseScrollingWinControl.SetVersion(const Value: string);
 begin                    
 end;
 
-function ApWinExecAndWait32(FileName : PansiChar; CommandLine : PansiChar;
+function ApWinExecAndWait32(FileName : PChar; CommandLine : PChar;
                             Visibility : Integer) : Integer;
  { returns -1 if the Exec failed, otherwise returns the process' exit }
  { code when the process terminates }
 var
-  zAppName: array[0..512] of ansichar;
-//  zCurDir:array[0..255] of PAnsiChar;
-  zCurDir:PAnsiChar;
-  WorkDir:AnsiString;
+  CmdLine: string;
   StartupInfo:TStartupInfo;
   ProcessInfo:TProcessInformation;
   Temp : DWORD;
 begin
-  StrCopy(zAppName, FileName);
-  if assigned(CommandLine) then
-    StrCat(zAppName, CommandLine);
-  GetDir(0, WorkDir);
-  StrPCopy(zCurDir, WorkDir);
+  CmdLine := FileName;
+  if Assigned(CommandLine) then
+    CmdLine := CmdLine + ' ' + CommandLine;
   FillChar(StartupInfo, Sizeof(StartupInfo),#0);
   StartupInfo.cb := Sizeof(StartupInfo);
-  StartupInfo.dwFlags := STARTF_USESHOWWINDOW;
-  StartupInfo.wShowWindow := Visibility;
-  if not CreateProcess(nil,
-      zAppName,              { pointer to command line string }
+  StartupInfo.dwFlags := STARTF_USESHOWWINDOW;                         
+  StartupInfo.wShowWindow := Visibility;                               
+  if not CreateProcess(nil,                                            
+      PChar(CmdLine),        { pointer to command line string }
       nil,                   { pointer to process security attributes }
-      nil,                   { pointer to thread security attributes }
-      false,                 { handle inheritance flag }
-      CREATE_NEW_CONSOLE or  { creation flags }
+      nil,                   { pointer to thread security attributes } 
+      false,                 { handle inheritance flag }               
+      CREATE_NEW_CONSOLE or  { creation flags }                        
       NORMAL_PRIORITY_CLASS,
       nil,                   { pointer to new environment block }
       nil,                   { pointer to current directory name }     
@@ -3028,6 +3819,7 @@ begin
   end;                                                                 
 end;
 
+{ SZ - what is this????     removed because of Loader Lock problem FIXME
 var                                                                         // SWB
     tc          : TTimeCaps;                                                // SWB
 
@@ -3040,7 +3832,9 @@ end;                                                                        // S
 finalization                                                                // SWB
 begin                                                                       // SWB
     timeEndPeriod(tc.wPeriodMin);                                           // SWB
-end;                                                                        // SWB
+end;
+
+}                                                                       // SWB
 
 
 end.
