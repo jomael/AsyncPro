@@ -22,6 +22,7 @@
  * Contributor(s):
  *  Sulaiman Mah
  *  Sean B. Durkin
+ *  Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -73,8 +74,8 @@ type
     function GetComEventMask(EvtMask : Integer) : Cardinal; override;
     function GetComState(var DCB: TDCB): Integer; override;
     function SetComState(var DCB : TDCB) : Integer; override;
-    function ReadCom(Buf : PansiChar; Size: Integer) : Integer; override;
-    function WriteCom(Buf : PansiChar; Size: Integer) : Integer; override;
+    function ReadCom(Buf : PAnsiChar; Size: Integer) : Integer; override;
+    function WriteCom(Buf : PAnsiChar; Size: Integer) : Integer; override;
     function SetupCom(InSize, OutSize : Integer) : Boolean; override;
     procedure StartDispatcher; override;
     procedure StopDispatcher; override;
@@ -83,19 +84,56 @@ type
     function OutBufUsed: Cardinal; override;                                // SWB
   public
     function CloseCom : Integer; override;
-    function OpenCom(ComName: PansiChar; InQueue,     // --sm wide
+    function OpenCom(ComName: PChar; InQueue,
       OutQueue : Cardinal) : Integer; override;
     function ProcessCommunications : Integer; override;
+    function CheckPort(ComName: PChar): Boolean; override;
   end;
 
   TApdTAPI32Dispatcher = class(TApdWin32Dispatcher)
   public
     constructor Create(Owner : TObject; InCid : Integer);
-    function OpenCom(ComName: PansiChar; InQueue,
-      OutQueue : Cardinal) : Integer; override;                      
+    function OpenCom(ComName: PChar; InQueue,
+      OutQueue : Cardinal) : Integer; override;
   end;
 
 implementation
+
+uses
+  StrUtils;
+
+function TApdWin32Dispatcher.CheckPort(ComName: PChar): Boolean; //SZ
+// Returns true if a port exists
+var
+  Tmp: string;
+  CC: PCommConfig;
+  Len: Cardinal;
+begin
+  Tmp := ComName;
+  if AnsiStartsText('\\.\', Tmp) then
+    Delete(Tmp, 1, 4);
+
+  New(CC);
+  try
+    FillChar(CC^, SizeOf(CC^), 0);
+    CC^.dwSize := SizeOf(CC^);
+    Len := SizeOf(CC^);
+    Result := GetDefaultCommConfig(PChar(Tmp), CC^, Len);
+  finally
+    Dispose(CC);
+  end;
+  if (not Result) and (GetLastError = ERROR_INSUFFICIENT_BUFFER) then
+  begin
+    GetMem(CC, Len);
+    try
+      FillChar(CC^, SizeOf(CC^), 0);
+      CC^.dwSize := SizeOf(CC^);
+      Result := GetDefaultCommConfig(PChar(Tmp), CC^, Len);
+    finally
+      FreeMem(CC);
+    end;
+  end;
+end;
 
   function TApdWin32Dispatcher.CloseCom : Integer;
     {-Close the comport and cleanup}
@@ -184,7 +222,7 @@ implementation
     if Result = 1 then
       Result := 0
     else
-      Result := -Integer(GetLastError);                             
+      Result := -Integer(GetLastError);
   end;
 
   function TApdWin32Dispatcher.GetComError(var Stat: TComStat): Integer;
@@ -216,11 +254,11 @@ implementation
       Result := -1;
   end;
 
-  function TApdWin32Dispatcher.OpenCom(ComName: PansiChar; InQueue, OutQueue: Cardinal): Integer;
+  function TApdWin32Dispatcher.OpenCom(ComName: PChar; InQueue, OutQueue: Cardinal): Integer;
     {-Open the comport specified by ComName}
   begin
     {Open the device}
-    Result := CreateFile(Pwidechar(ComName),                       {name}    // --zer0 PwideChar
+    Result := CreateFile(ComName,                       {name}
                          GENERIC_READ or GENERIC_WRITE, {access attributes}
                          0,                             {no sharing}
                          nil,                           {no security}
@@ -248,7 +286,7 @@ implementation
       Result := -1;
   end;
 
-  function TApdWin32Dispatcher.ReadCom(Buf: PansiChar; Size: Integer): Integer;
+  function TApdWin32Dispatcher.ReadCom(Buf: PAnsiChar; Size: Integer): Integer;
     {-Read Size bytes from the comport specified by Cid}
   var
     OK  : Bool;
@@ -258,7 +296,7 @@ implementation
     OK := ReadFile(CidEx,                       {handle}
                    Buf^,                        {buffer}
                    Size,                        {bytes to read}
-                   Temp,                        {bytes read}         
+                   Temp,                        {bytes read}
                    @ReadOL);                    {overlap record}
 
     {...and see what happened}
@@ -267,14 +305,14 @@ implementation
         {Waiting for data}
         if GetOverLappedResult(CidEx,           {handle}
                                ReadOL,          {overlapped structure}
-                               Temp,            {bytes written}        
+                               Temp,            {bytes written}
                                True) then begin {wait for completion}
           {Read complete, reset event}
           ResetEvent(ReadOL.hEvent);
         end;
       end;
     end;
-    Result := Integer(Temp);                                       
+    Result := Integer(Temp);
   end;
 
   function TApdWin32Dispatcher.SetComState(var DCB: TDCB): Integer;
@@ -283,10 +321,10 @@ implementation
     if SetCommState(CidEx, DCB) then
       Result := 0
     else
-      Result := -Integer(GetLastError);                               
+      Result := -Integer(GetLastError);
   end;
 
-  function TApdWin32Dispatcher.WriteCom(Buf: PansiChar; Size: Integer): Integer;
+  function TApdWin32Dispatcher.WriteCom(Buf: PAnsiChar; Size: Integer): Integer;
     {-Write data to the comport}
   var
     SizeAtEnd : Integer;
@@ -316,7 +354,7 @@ implementation
       end;
     finally
       LeaveCriticalSection(OutputSection);
-    end;                                                            
+    end;
 
     {...finally, wake up the output thread to send the data}
     SetEvent(OutputEvent);
@@ -333,7 +371,7 @@ implementation
                               lpOverlapped : POverlapped) : Boolean;
   begin
     Result := WaitCommEvent(CidEx, EvtMask, lpOverlapped);
-  end;                                                               
+  end;
 
   procedure TApdWin32Dispatcher.StartDispatcher;
   begin
@@ -471,17 +509,17 @@ implementation
   function TApdWin32Dispatcher.ProcessCommunications : Integer;
     {-Communications are running in separate threads -- give them a chance}
   begin
-    Sleep(0);                                                         
+    Sleep(0);
     Result := 0;
   end;
 
   constructor TApdTAPI32Dispatcher.Create(Owner : TObject; InCid : Integer);
   begin
-    CidEx := InCid;                                                   
+    CidEx := InCid;
     inherited Create(Owner);
   end;
 
-  function TApdTAPI32Dispatcher.OpenCom(ComName: PAnsiChar; InQueue, OutQueue : Cardinal) : Integer;
+  function TApdTAPI32Dispatcher.OpenCom(ComName: PChar; InQueue, OutQueue : Cardinal) : Integer;
   begin
     ReadOL.hEvent := CreateEvent(nil, True, False, nil);
     WriteOL.hEvent := CreateEvent(nil, True, False, nil);

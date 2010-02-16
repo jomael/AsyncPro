@@ -28,6 +28,7 @@
  *                                August 2005.
  *  Sulaiman Mah
  *  Sean B. Durkin
+ *  Sebastian Zierer
  * ***** END LICENSE BLOCK ***** *)
 {*********************************************************}
 {*                   LNSWIN32.PAS 4.06                   *}
@@ -113,7 +114,7 @@ type
   TReadThread = class(TApdWin32Thread)
   protected
     procedure Execute; override;
-    function  ReadSerial(Buf : PansiChar;
+    function  ReadSerial(Buf : PAnsiChar;
                          Size: Integer;
                          ovl : POverlapped) : Integer;
   end;
@@ -152,32 +153,33 @@ type
     function  GetComState(var DCB: TDCB): Integer; override;
     function  InQueueUsed : Cardinal; override;
     function  OutBufUsed: Cardinal; override;
-    function  ReadCom(Buf : PansiChar; Size: Integer) : Integer; override;
+    function  ReadCom(Buf : PAnsiChar; Size: Integer) : Integer; override;
     function  SetComState(var DCB : TDCB) : Integer; override;
     function  SetupCom(InSize, OutSize : Integer) : Boolean; override;
     procedure StartDispatcher; override;
     procedure StopDispatcher; override;
     function  WaitComEvent(var EvtMask : DWORD;
                            lpOverlapped : POverlapped) : Boolean; override;
-    function  WriteCom(Buf : PansiChar; Size: Integer) : Integer; override;
+    function  WriteCom(Buf : PAnsiChar; Size: Integer) : Integer; override;
   public
     constructor Create(Owner : TObject);
     destructor  Destroy; override;
     function  CloseCom : Integer; override;
-    function  OpenCom(ComName: PansiChar; InQueue, OutQueue : Cardinal) : Integer; override;
+    function  OpenCom(ComName: PChar; InQueue, OutQueue : Cardinal) : Integer; override;
     function  ProcessCommunications : Integer; override;
+    function CheckPort(ComName: PChar): Boolean; override;
   end;
 
   TApdTAPI32Dispatcher = class(TApdWin32Dispatcher)
   public
     constructor Create(Owner : TObject; InCid : Integer);
-    function OpenCom(ComName: PansiChar; InQueue,
+    function OpenCom(ComName: PChar; InQueue,
       OutQueue : Cardinal) : Integer; override;
   end;
 
 implementation
 
-uses  Math;
+uses  Math, StrUtils;
 
 //  TApdWin32Dispatcher methods
 //
@@ -193,6 +195,40 @@ begin
         FSerialEvent.Free;
     inherited Destroy;
 end;
+
+function TApdWin32Dispatcher.CheckPort(ComName: PChar): Boolean;
+// Returns true if a port exists
+var
+  Tmp: string;
+  CC: PCommConfig;
+  Len: Cardinal;
+begin
+  Tmp := ComName;
+  if AnsiStartsText('\\.\', Tmp) then
+    Delete(Tmp, 1, 4);
+
+  New(CC);
+  try
+    FillChar(CC^, SizeOf(CC^), 0);
+    CC^.dwSize := SizeOf(CC^);
+    Len := SizeOf(CC^);
+    Result := GetDefaultCommConfig(PChar(Tmp), CC^, Len);
+  finally
+    Dispose(CC);
+  end;
+  if (not Result) and (GetLastError = ERROR_INSUFFICIENT_BUFFER) then
+  begin
+    GetMem(CC, Len);
+    try
+      FillChar(CC^, SizeOf(CC^), 0);
+      CC^.dwSize := SizeOf(CC^);
+      Result := GetDefaultCommConfig(PChar(Tmp), CC^, Len);
+    finally
+      FreeMem(CC);
+    end;
+  end;
+end;
+
 // Close the comport and wait for the I/O threads to terminate
 function TApdWin32Dispatcher.CloseCom : Integer;
 var
@@ -358,10 +394,10 @@ else
     Result := -1;
 end;
 // Open the COM port specified by ComName
-function TApdWin32Dispatcher.OpenCom(ComName: PansiChar; InQueue, OutQueue: Cardinal): Integer;
+function TApdWin32Dispatcher.OpenCom(ComName: PChar; InQueue, OutQueue: Cardinal): Integer;
 begin
     {Open the device}
-    Result := CreateFile(PWideChar(ComName),         {name}  // --zer0 PWideChar
+    Result := CreateFile(ComName,                       {name}
                          GENERIC_READ or GENERIC_WRITE, {access attributes}
                          0,                             {no sharing}
                          nil,                           {no security}
@@ -771,7 +807,7 @@ end;
 //  Read up to Size bytes from the serial port into Buf.  Return the number of
 //  bytes read or a negative error number.  An error code of ERROR_OPERATION_ABORTED
 //  is caused by flushing the com port so we just ignore it.
-function  TReadThread.ReadSerial(Buf : PansiChar;
+function  TReadThread.ReadSerial(Buf : PAnsiChar;
                                  Size : Integer;
                                  ovl : POverlapped) : Integer;
 var
@@ -832,7 +868,7 @@ begin
         while ((not Terminated) and (not KillThreads)) do
         begin
             // Wait for output to appear in the queue or for a flush request
-            stat := WaitForMultipleObjects(length(outEvents), // --sm check
+            stat := WaitForMultipleObjects(Length(outEvents),
                                            @outEvents[0],
                                            False,
                                            100);
@@ -1010,7 +1046,7 @@ begin
     waitEvents[0] := ovl.hEvent;
     waitEvents[1] := OutFlushEvent;
     repeat
-        stat := WaitForMultipleObjects(length(waitEvents),  // --sm check
+        stat := WaitForMultipleObjects(Length(waitEvents),
                                        @waitEvents[0],
                                        False,
                                        100);
@@ -1146,7 +1182,7 @@ begin
     inherited Create(Owner);
 end;
 
-function TApdTAPI32Dispatcher.OpenCom(ComName: PansiChar; InQueue, OutQueue : Cardinal) : Integer;
+function TApdTAPI32Dispatcher.OpenCom(ComName: PChar; InQueue, OutQueue : Cardinal) : Integer;
 begin
     if CidEx <> 0 then
         Result := CidEx
