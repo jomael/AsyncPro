@@ -271,6 +271,7 @@ type
       function CheckStatusTriggers : Boolean;
       function CheckTimerTriggers : Boolean;
       function CheckTriggers : Boolean;
+      procedure CreateDispatcherWindow;
       procedure DonePortPrim; virtual;
       function DumpDispatchLogPrim(
                                   FName : string;
@@ -347,6 +348,7 @@ type
                                   InHex, AllHex : Boolean) : Integer;
       function AppendTrace(FName : string;
                             InHex, AllHEx : Boolean) : Integer;
+      procedure BufferSizes(var InSize, OutSize : Cardinal);
       function ChangeBaud(NewBaud : LongInt) : Integer;
       procedure ChangeLengthTrigger(Length : Cardinal);
       function CheckCTS : Boolean;
@@ -444,6 +446,8 @@ type
       procedure UpdateHandlerFlags(FlagUpdate : TApHandlerFlagUpdate); virtual;
   end;
 
+function GetTComRecPtr(Cid : Integer; DeviceLayerClass : TApdDispatcherClass) : Pointer;
+
 var
   PortList : TList;
 
@@ -491,6 +495,33 @@ const
   LastCID : Integer = -1;
   LastDispatcher : TApdBaseDispatcher = nil;
 
+//SZ: this was removed, but it is needed by AWWNSOCK.pas
+function GetTComRecPtr(Cid : Integer; DeviceLayerClass : TApdDispatcherClass) : Pointer;
+  {-Find the entry into the port array which has the specified Cid}
+var
+  i : Integer;
+begin
+  LockPortList;
+  try
+    {find the correct com port record}
+    if (LastCID = Cid) and (LastDispatcher <> nil) then
+      Result := LastDispatcher
+    else begin
+      for i := 0 to pred(PortList.Count) do
+        if PortList[i] <> nil then
+          with TApdBaseDispatcher(PortList[i]) do
+            if (CidEx = Cid) and (TObject(PortList[i]) is DeviceLayerClass) then begin
+              Result := TApdBaseDispatcher(PortList[i]);
+              LastCID := Cid;
+              LastDispatcher := Result;
+              exit;
+            end;
+      Result := nil;
+    end;
+  finally
+    UnlockPortList;
+  end;
+end;
 
 {$IFDEF DebugThreadConsole}
   type
@@ -1877,6 +1908,13 @@ const
     end;
   end;
 
+  procedure TApdBaseDispatcher.BufferSizes(var InSize, OutSize : Cardinal);
+    {-Return buffer sizes}
+  begin
+    InSize := InQue;
+    OutSize := OutQue;
+  end;
+
   function TApdBaseDispatcher.HWFlowOptions(
                          BufferFull, BufferResume : Cardinal;
                          Options : Cardinal) : Integer;
@@ -2672,6 +2710,25 @@ const
     Result := False;
   end;
 
+  procedure TApdBaseDispatcher.CreateDispatcherWindow;
+    {-Create dispatcher window element}
+    {-Only used by the Winsock dispatcher}
+  begin
+    fDispatcherWindow :=
+      CreateWindow(DispatcherClassName,    {window class name}
+                   '',                     {caption}
+                   ws_Overlapped,          {window style}
+                   0,                      {X}
+                   0,                      {Y}
+                   10,                     {width}
+                   10,                     {height}
+                   0,                      {parent}
+                   0,                      {menu}
+                   HInstance,              {instance}
+                   nil);                   {parameter}
+
+    ShowWindow(fDispatcherWindow, sw_Hide);
+  end;
 
 {Trigger functions}
 

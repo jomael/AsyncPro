@@ -415,7 +415,7 @@ type
 
   TApdLibModem = class (TComponent)
     private
-      FLibModemPath : ansistring;
+      FLibModemPath : string;
       FCompleteDbs : Boolean;
       FReadingAttributes : Boolean;
 
@@ -434,7 +434,7 @@ type
       FLastSeq : Integer;
 
     protected
-      procedure SetLibModemPath (v : ansistring);
+      procedure SetLibModemPath (v : string);
       procedure LoadModemListAttribute (oOwner     : TObject;
                                         sName,
                                         sValue     : DOMString;
@@ -532,7 +532,7 @@ type
       property Modem : TList read FModem write FModem;
 
     published
-      property LibModemPath : ansistring read FLibModemPath write SetLibModemPath;
+      property LibModemPath : string read FLibModemPath write SetLibModemPath;
       property CompleteDbs : Boolean read FCompleteDbs;
 
       property OnLoadModemRecord : TApdLoadModemRecord
@@ -608,7 +608,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TApdLibModem.SetLibModemPath (v : ansistring);
+procedure TApdLibModem.SetLibModemPath (v : string);
 begin
   if v <> FLibModemPath then
     FLibModemPath := v;
@@ -620,7 +620,7 @@ var
 begin
   for i := 0 to FModemList.Count - 1 do
     if assigned (FModemList[i]) then
-      FreeMem (FModemList[i]);
+      Dispose(PLmModemName(FModemList[i]));
   FModemList.Clear;
 end;
 
@@ -645,12 +645,14 @@ procedure TApdLibModem.LoadModemListElementStart (oOwner : TObject;
                                                   sValue : DOMString);
 var
   CanLoad : Boolean;
+  tmp: PLmModemName;
 begin
   if (sValue = 'ModemRecord') or (sValue = 'ModemCap') then begin
 
     // Create new record
 
-    FModemList.Add (AllocMem (SizeOf (TLmModemName))); // --sm check sizeof
+    New(tmp);
+    FModemList.Add(tmp);
     FCurIndex := FModemList.Count - 1;
 
     // There are some strange things that go on in the parsing of the file.
@@ -1121,7 +1123,7 @@ end;
 
 function TApdLibModem.CreateModem : PLmModem;
 begin
-  Result := AllocMem (Sizeof (TLmModem)); // --sm check AllocMem and Sizeof functions
+  New(Result);
   if not Assigned (Result) then
     Exit;
 
@@ -2106,7 +2108,7 @@ begin
       ModemFile := Dialog.SelectedModemFile;
       ModemManufacturer := Dialog.SelectedModemManufacturer;
       ModemName := Dialog.SelectedModemName;
-      Move(PLmModem(FModem[0])^, LmModem, SizeOf(TLmModem));     // --sm check
+      lmModem := PLmModem(FModem[0])^; // --sz Move(PLmModem(FModem[0])^, LmModem, SizeOf(TLmModem));  // --sz this will not work because it would be moving the memory content of an AnsiString, let Delphi copy the record // --sm check
       Result := True;
     end else
       Result := False;
@@ -2233,7 +2235,7 @@ begin
   for I := 0 to pred(FModem.Count) do begin
     if PLmModem(FModem[I])^.FriendlyName = ModemName then begin
       { oops, we assumed wrong... }
-      Move(PLmModem(FModem[I])^, Modem, SizeOf(TLmModem));       // --sm check
+      Modem := PLmModem(FModem[I])^; // --sz Move(PLmModem(FModem[I])^, Modem, SizeOf(TLmModem));       // --sm check
       Result := ecOK;
       Break;
     end;
@@ -2254,7 +2256,7 @@ begin
   LoadModem(ModemDetailFile, False);
   for I := 0 to pred(FModem.Count) do begin
     ModemDetail := TLmModemClass.Create;
-    Move(PLmModem(FModem[I])^, LmModem, SizeOf(TLmModem));          // --sm check
+    lmModem := PLmModem(FModem[I])^; // --sz  Move(PLmModem(FModem[I])^, LmModem, SizeOf(TLmModem));
     ModemDetail.LmModem := LmModem;
     Res.AddObject(ModemDetail.LmModem.FriendlyName, ModemDetail);
   end;
