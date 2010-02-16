@@ -20,6 +20,7 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *   Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -67,8 +68,7 @@ unit AdTapi;
 interface
 
 uses
-  WinTypes,
-  WinProcs,
+  Windows,
   Registry,
   Classes,
   Messages,
@@ -182,7 +182,7 @@ const
   DefChannels         = 1;
   DefBitsPerSample    = 16;
   DefSamplesPerSecond = 8000;
-  DefMonitorRecording = False;                                     
+  DefMonitorRecording = False;
 
   {Wave Error Types}
   WaveInError   = 1;
@@ -284,7 +284,7 @@ type
     FTrimSeconds    : Byte;               {Trim silence after x seconds}
     FSilenceThreshold : Integer;          {Silence threshold for trimming}
     FMonitorRecording : Boolean;          {Echo wave recording to sound card}
-    FFailCode         : Integer;          {Failure code}               
+    FFailCode         : Integer;          {Failure code}
     FFilterUnsupportedDevices: Boolean;   {Display only supported devices}
     FWaitingForCall: Boolean;             {True if in AutoAnswer mode}   {!!.04}
 
@@ -317,7 +317,7 @@ type
     function HangupCall(AbortRetries : Boolean) : Boolean;
     procedure UpdateCallInfo(Device : LongInt);
     function WaitForCallState(DesiredCallState : LongInt) : LongInt;
-    function WaitForReply(ID : LongInt) : LongInt;                  
+    function WaitForReply(ID : LongInt) : LongInt;
 
     {Property access methods}
     procedure SetOpen(NewOpen : Boolean);
@@ -325,9 +325,9 @@ type
     {Private methods}
     procedure AssureTapiReady;
     function  CidFromTapiDevice : LongInt;
-    procedure CheckVoiceCapable;                                       
-    procedure CheckWaveException(ErrorCode : Integer; Mode : Integer); 
-    procedure CheckWaveInSilence;                                      
+    procedure CheckVoiceCapable;
+    procedure CheckWaveException(ErrorCode : Integer; Mode : Integer);
+    procedure CheckWaveInSilence;
     function  CloseTapiPort : Boolean;
     procedure CloseWaveFile;
     procedure CreateDialTimer;
@@ -336,7 +336,7 @@ type
     procedure EnumLineDevices;
     procedure FreeWaveInBuffers;
     procedure FreeWaveOutBuffer;
-    function  GetSelectedLine : Integer;                            
+    function  GetSelectedLine : Integer;
     function  GetWaveDeviceId(const Play : Boolean) : DWORD;
     procedure LoadWaveOutBuffer;
     procedure MonitorDTMF(var CallHandle: LongInt;
@@ -354,19 +354,19 @@ type
     {Property access methods}
     function GetBPSRate : DWORD;
     function GetCalledID: string;
-    function GetCalledIDName: string;
-    function GetCallerID : string;
-    function GetCallerIDName : string;
+    function GetCalledIDName: AnsiString;
+    function GetCallerID : Ansistring;
+    function GetCallerIDName : Ansistring;
     function GetComNumber : Integer;
     function GetParentHWnd : HWnd;
-    function GetTapiState : TTapiState;                       
+    function GetTapiState : TTapiState;
     procedure SetStatusDisplay(const NewDisplay : TApdAbstractTapiStatus);
     procedure SetTapiLog(const NewLog : TApdTapiLog);
     procedure SetTapiDevices(const Values : TStrings);
     procedure SetSelectedDevice(const NewDevice : string);
     procedure SetEnableVoice(Value: Boolean);
     procedure SetMonitorRecording(const Value : Boolean);
-    procedure SetFilterUnsupportedDevices(const Value: Boolean);       
+    procedure SetFilterUnsupportedDevices(const Value: Boolean);
 
     {Private properties}
     property Open : Boolean
@@ -413,19 +413,19 @@ type
       {-Gets configuration string that can be used with SetDevConfig}
     function MontorTones(const Tones : array of TLineMonitorTones) : LongInt;
       {-Monitor for specific tones }
-    procedure SetDevConfig(const Config : TTapiConfigRec);           
+    procedure SetDevConfig(const Config : TTapiConfigRec);
       {-Sets config, requires string from GetDevConfig or ShowConfigDialogEdit }
-    procedure PlayWaveFile(FileName : ansistring);
+    procedure PlayWaveFile(FileName : string);
       {-Play a wave file over the TAPI wave out device }
-    procedure StopWaveFile;                                            
+    procedure StopWaveFile;
       {-Stop the wave file from playing }
     procedure StartWaveRecord;
       {-Start recording a wave data }
-    procedure StopWaveRecord;                                          
+    procedure StopWaveRecord;
       {-Stop recording a wave data }
-    procedure SaveWaveFile(FileName : string; Overwrite : Boolean);    
+    procedure SaveWaveFile(FileName : string; Overwrite : Boolean);
       {-Save the recorded wave data to a file }
-    procedure SetRecordingParams(NumChannels : Byte;                   
+    procedure SetRecordingParams(NumChannels : Byte;
                                  NumSamplesPerSecond : Integer;
                                  NumBitsPerSample : Byte);
       {-Set the parameters used for wave recording. }
@@ -443,15 +443,15 @@ type
     procedure Transfer(aNumber : string);                                {!!.06}
     procedure HoldCall;                                                  {!!.06}
     procedure UnHoldCall;                                                {!!.06}
-    
+
     procedure AutomatedVoicetoComms;
     function  TapiStatusMsg(const Message, State, Reason : DWORD) : string;
-    function  FailureCodeMsg(const FailureCode : Integer) : string;    
-    function  TranslateAddress(CanonicalAddr : string) : string;
-    function  TranslateAddressEx(CanonicalAddr : string;
+    function  FailureCodeMsg(const FailureCode : Integer) : string;
+    function  TranslateAddress(CanonicalAddr : AnsiString) : AnsiString;
+    function  TranslateAddressEx(CanonicalAddr : Ansistring;
                                  Flags : LongInt;
-                                 var DialableStr : string;
-                                 var DisplayableStr : string;
+                                 var DialableStr : Ansistring;
+                                 var DisplayableStr : Ansistring;
                                  var CurrentCountry : LongInt;
                                  var DestCountry : LongInt;
                                  var TranslateResults : LongInt) : LongInt;
@@ -467,11 +467,11 @@ type
       read GetBPSRate;
     property CalledID : string                                           {!!.04}
       read GetCalledID;                                                  {!!.04}
-    property CalledIDName : string                                       {!!.04}
+    property CalledIDName : Ansistring                                       {!!.04}
       read GetCalledIDName;                                              {!!.04}
-    property CallerID : string
+    property CallerID : Ansistring
       read GetCallerID;
-    property CallerIDName : string
+    property CallerIDName : Ansistring
       read GetCallerIDName;
     property Cancelled : Boolean
       read FCancelled;
@@ -479,7 +479,7 @@ type
       read GetComNumber;
     property Dialing : Boolean
       read FDialing;
-    property FailureCode : Integer                                     
+    property FailureCode : Integer
       read FFailCode;
     property WaitingForCall : Boolean                                    {!!.04}
       read FWaitingForCall;                                              {!!.04}
@@ -529,16 +529,16 @@ type
     property DeviceCount : DWORD
       read FDeviceCount;
     property TapiState : TTapiState
-      read GetTapiState;                                        
-    property WaveFileName : TFileName                                  
-      read FWaveFileName;                                              
-    property MaxMessageLength : LongInt                                
-      read FMaxMessageLength write FMaxMessageLength                   
-      default DefMaxMessageLength;                                     
-    property WaveState : TWaveState                                    
+      read GetTapiState;
+    property WaveFileName : TFileName
+      read FWaveFileName;
+    property MaxMessageLength : LongInt
+      read FMaxMessageLength write FMaxMessageLength
+      default DefMaxMessageLength;
+    property WaveState : TWaveState
       read FWaveState;
-    property AvgWaveInAmplitude : Integer                              
-      read FAvgWaveInAmplitude;                                        
+    property AvgWaveInAmplitude : Integer
+      read FAvgWaveInAmplitude;
 
     {events}
     property OnTapiStatus : TTapiStatusEvent
@@ -553,9 +553,9 @@ type
       read FOnTapiConnect write FOnTapiConnect;
     property OnTapiFail : TNotifyEvent
       read FOnTapiFail write FOnTapiFail;
-    property OnTapiDTMF : TTapiDTMFEvent                               
-      read FOnTapiDTMF write FOnTapiDTMF;                              
-    property OnTapiCallerID : TTapiCallerIDEvent                       
+    property OnTapiDTMF : TTapiDTMFEvent
+      read FOnTapiDTMF write FOnTapiDTMF;
+    property OnTapiCallerID : TTapiCallerIDEvent
       read FOnTapiCallerID write FOnTapiCallerID;
     property OnTapiWaveNotify : TTapiWaveNotify
       read FOnTapiWaveNotify write FOnTapiWaveNotify;
@@ -593,7 +593,7 @@ type
   protected {private}
     {.Z+}
     FAnswering       : Boolean;
-    FCaption         : TCaption;                                       
+    FCaption         : TCaption;
     FCtl3D           : Boolean;
     FDisplay         : TForm;
     FPosition        : TPosition;
@@ -627,7 +627,7 @@ type
       {-Destroy the status display}
 
     property Answering : Boolean
-      read FAnswering write FAnswering;                            
+      read FAnswering write FAnswering;
     property Display : TForm
       read FDisplay write FDisplay;
   published
@@ -640,7 +640,7 @@ type
     property TapiDevice : TApdCustomTapiDevice
       read FTapiDevice write FTapiDevice;
     property Caption : TCaption
-      read FCaption write SetCaption;                                  
+      read FCaption write SetCaption;
   end;
 
   {TAPI component}
@@ -655,9 +655,9 @@ type
     property RetryWait;
     property MaxAttempts;
     property ShowTapiDevices;
-    property ShowPorts;                                                
+    property ShowPorts;
     property EnableVoice;
-    property FilterUnsupportedDevices;                                 
+    property FilterUnsupportedDevices;
 
     {events}
     property OnTapiStatus;
@@ -666,21 +666,21 @@ type
     property OnTapiPortClose;
     property OnTapiConnect;
     property OnTapiFail;
-    property OnTapiDTMF;                                               
-    property OnTapiCallerID;                                           
+    property OnTapiDTMF;
+    property OnTapiCallerID;
     property OnTapiWaveNotify;
     property OnTapiWaveSilence;
   end;
 
 implementation
 
-const                                                                  
+const
   {event types}
-  etTapiConnect    = 0;                                                
+  etTapiConnect    = 0;
   etTapiPortOpen   = 1;
-  etTapiPortClose  = 2;                                                
-  etTapiFail       = 3;                                                
-  etTapiLineCreate = 4;                                                
+  etTapiPortClose  = 2;
+  etTapiFail       = 3;
+  etTapiLineCreate = 4;
 
 
 var
@@ -773,7 +773,7 @@ var
         ltapiDial :
           WriteLn(HisFile, DateTimeToStr(Now), ' : ',  '  dialing ', Number);
         ltapiAccept :
-          WriteLn(HisFile, DateTimeToStr(Now), ' : ',  '  accepting'); 
+          WriteLn(HisFile, DateTimeToStr(Now), ' : ',  '  accepting');
         ltapiAnswer :
           WriteLn(HisFile, DateTimeToStr(Now), ' : ',  '  answering');
         ltapiConnect :
@@ -786,7 +786,7 @@ var
           WriteLn(HisFile, DateTimeToStr(Now), ' : ',  '  busy');
         ltapiDialFail :
           WriteLn(HisFile, DateTimeToStr(Now), ' : ',  '  dial failed');
-        ltapiReceivedDigit :                                                
+        ltapiReceivedDigit :
           WriteLn(HisFile, DateTimeToStr(Now), ' : ',  '  received digit');
       end;
     end;
@@ -839,14 +839,14 @@ var
   end;
 
   procedure TApdAbstractTapiStatus.SetCaption(const NewCaption : TCaption);
-    {-Pass through the Caption property}                               
-  begin                                                                
-    if NewCaption <> FCaption then begin                               
-      FCaption := NewCaption;                                          
-      if Assigned(FDisplay) then                                       
-        FDisplay.Caption := NewCaption;                                
-    end;                                                               
-  end;                                                                 
+    {-Pass through the Caption property}
+  begin
+    if NewCaption <> FCaption then begin
+      FCaption := NewCaption;
+      if Assigned(FDisplay) then
+        FDisplay.Caption := NewCaption;
+    end;
+  end;
 
   procedure TApdAbstractTapiStatus.GetProperties;
     {-Get the properties from the status form}
@@ -855,7 +855,7 @@ var
       Position := FDisplay.Position;
       Ctl3D    := FDisplay.Ctl3D;
       Visible  := FDisplay.Visible;
-      Caption  := FDisplay.Caption;                                    
+      Caption  := FDisplay.Caption;
     end;
   end;
 
@@ -863,7 +863,7 @@ var
     {-Create the status form}
   begin
     inherited Create(AOwner);
-    Caption := 'Call Progress';                                        
+    Caption := 'Call Progress';
     CreateDisplay;
     GetProperties;
   end;
@@ -888,7 +888,7 @@ var
 
 {$IFDEF TapiDebug}
 const
-  Digits : array[0..$F] of Char = '0123456789ABCDEF';
+  Digits : array[0..$F] of AnsiChar = '0123456789ABCDEF';
 type
   Long =
     record
@@ -945,8 +945,8 @@ type
       Line_Remove             : WriteLn(Dbg,'  Line_Remove message');    {!!.02}
       Phone_Create            : WriteLn(Dbg,'  Phone_Create message');
     end;
-    WriteLn(Dbg, '--TapiStatusMsg=', TP.TapiStatusMsg(                 
-      Message, Param1, Param2));                                       
+    WriteLn(Dbg, '--TapiStatusMsg=', TP.TapiStatusMsg(
+      Message, Param1, Param2));
     {$ENDIF}
 
     if Message = Line_Create then
@@ -1058,7 +1058,7 @@ type
     end;
 
     { generate the OnTapiStatus event }
-    TapiStatus(False, False, Device, Line_CallInfo, P1, P2, P3);         {!!.04}    
+    TapiStatus(False, False, Device, Line_CallInfo, P1, P2, P3);         {!!.04}
   end;
 
   procedure TApdCustomTapiDevice.DoLineCallState(Device, P1, P2, P3 : LongInt);
@@ -1118,7 +1118,7 @@ type
 
       LineCallState_Disconnected :
         begin
-          FFailCode := P2;                                             
+          FFailCode := P2;
           TapiStatus(False, False, Device, Line_CallState, P1, P2, P3);
           if P2 = LineDisconnectMode_Busy then
             TapiLogging(ltapiBusy);
@@ -1191,7 +1191,7 @@ type
           PostMessage(FHandle, apw_TapiEventMessage, etTapiConnect, 0);
           TapiLogging(ltapiConnect);
         end;
-        
+
         LineCallState_OnHold :                                           {!!.06}
           begin                                                          {!!.06}
             TapiStatus(False, False, Device, Line_CallState, P1, P2, P3);{!!.06}
@@ -1217,8 +1217,8 @@ type
   procedure TApdCustomTapiDevice.DoLineDevState(Device, P1, P2, P3 : LongInt);
   begin
     case P1 of
-      LineDevState_Ringing : begin                                     
-          {Show status}                             
+      LineDevState_Ringing : begin
+          {Show status}
           TapiStatus(False, False, Device, Line_LineDevState, P1, P2, P3);
           if (P3 >= FAnsRings) then begin
             {Answer the call}
@@ -1321,19 +1321,19 @@ type
   procedure TApdCustomTapiDevice.DoLineMonitorMedia(Device, P1, P2, P3 : LongInt);
   begin
     { Generate the OnTapiStatus event }
-    TapiStatus(False, False, Device, Line_MonitorMedia, P1, P2, P3);   
+    TapiStatus(False, False, Device, Line_MonitorMedia, P1, P2, P3);
   end;
 
   procedure TApdCustomTapiDevice.DoLineMonitorTone(Device, P1, P2, P3 : LongInt);
   begin
     { Generate the OnTapiStatus event }
-    TapiStatus(False, False, Device, Line_MonitorTone, P1, P2, P3);    
+    TapiStatus(False, False, Device, Line_MonitorTone, P1, P2, P3);
   end;
 
   procedure TApdCustomTapiDevice.DoLineRequest(Device, P1, P2, P3 : LongInt);
   begin
     { Generate the OnTapiStatus event }
-    TapiStatus(False, False, Device, Line_Request, P1, P2, P3);        
+    TapiStatus(False, False, Device, Line_Request, P1, P2, P3);
   end;
 
   function TApdCustomTapiDevice.HandleLineErr(LineErr : LongInt): Boolean;
@@ -1466,7 +1466,7 @@ type
 
         { Fire port close event if appropriate }
         if CloseEventPending then
-          {TapiPortClose;}                                             
+          {TapiPortClose;}
           PostMessage(FHandle, apw_TapiEventMessage, etTapiPortClose, 0);
 
         TapiLogging(ltapiDrop);
@@ -1497,7 +1497,7 @@ type
           { Log failure and fire OnTapiFail if applicable }
           if Failure then begin
             TapiLogging(ltapiDialFail);
-            PostMessage(FHandle, apw_TapiEventMessage, etTapiFail, 0); 
+            PostMessage(FHandle, apw_TapiEventMessage, etTapiFail, 0);
           end;
         end;
         StoppingCall := False;
@@ -1519,7 +1519,7 @@ type
         end;
       end;
 
-      if TapiHasOpened then                                          
+      if TapiHasOpened then
         if FinalRetry and not PassThruMode then begin
           { Get rid of status display }
           TapiStatus(False, True, 0, 0, 0, 0, 0);
@@ -1587,13 +1587,13 @@ type
 
   function TApdCustomTapiDevice.WaitForReply(ID : LongInt) : LongInt;
   var
-    TimeStart : DWORD;                                                 
+    TimeStart : DWORD;
   begin
     if ReplyWait then begin
       Result := WaitErr_WaitAborted;
       Exit;
     end;
-    TimeStart := GetTickCount;                                         
+    TimeStart := GetTickCount;
     ReplyWait := True;
     try
       if (ID > Success) then begin
@@ -1606,10 +1606,10 @@ type
             Result := WaitErr_WaitAborted;
             Exit;
           end;
-          if (GetTickCount - TimeStart) > WaitTimeout then begin       
-            Result := WaitErr_WaitTimedout;                            
-            Exit;                                                      
-          end;                                                         
+          if (GetTickCount - TimeStart) > WaitTimeout then begin
+            Result := WaitErr_WaitTimedout;
+            Exit;
+          end;
         end;
         Result := AsyncReply;
         Exit;
@@ -1834,7 +1834,7 @@ type
       {Get the list of TAPI line devices}
       EnumLineDevices;
     end;
-    FHandle := AllocateHWnd(WndProc);                                  
+    FHandle := AllocateHWnd(WndProc);
   end;
 
   destructor TApdCustomTapiDevice.Destroy;
@@ -1890,7 +1890,7 @@ type
         FreeMem(FCallInfo, FCallInfo^.TotalSize);
         FCallInfo := nil;
       end;
-      SourceTapi.CopyCallInfo(FCallInfo);                            
+      SourceTapi.CopyCallInfo(FCallInfo);
     end;
   end;
 
@@ -1954,7 +1954,7 @@ type
     FTapiDevices.Clear;
 
     {Enumerate all line devices and build a list of names}
-    for I := 1 to FTrueDeviceCount do begin                            
+    for I := 1 to FTrueDeviceCount do begin
       {Negotiate the API version to use for this device}
       if tuLineNegotiateApiVersion(LineApp, I-1, TapiLowVer,
         TapiHighVer, FApiVersion, LineExt) = 0 then begin
@@ -2019,7 +2019,7 @@ type
     {-Initialize TAPI}
   var
     lResult : LongInt;
-    AppName : array[0..255] of Char;
+    AppName : array[0..255] of AnsiChar;
     TimeStart : DWORD;
     TryReInit : Boolean;
     TmpRegistry : TRegIniFile;
@@ -2189,7 +2189,7 @@ type
   var
     I         : Integer;
     LineCaps  : PLineDevCaps;
-    S         : string;
+    S         : AnsiString;
   begin
     StartTapi;
     
@@ -2221,7 +2221,7 @@ type
           with LineCaps^ do begin
             {$IFOPT H+}
             SetLength(S, LineNameSize-1);
-            Move(LineCaps^.Data[LineNameOffset], PChar(S)^, LineNameSize);
+            Move(LineCaps^.Data[LineNameOffset], PAnsiChar(S)^, LineNameSize);
             {$ELSE}
             Move(LineCaps^.Data[LineNameOffset], S[1], LineNameSize);
             S[0] := Char(LineNameSize-1);
@@ -2337,7 +2337,7 @@ type
       Result := '';
   end;
 
-  function TApdCustomTapiDevice.GetCalledIDName: string;
+  function TApdCustomTapiDevice.GetCalledIDName: AnsiString;
   begin
     if Assigned(FCallInfo) then begin
       with FCallInfo^ do begin
@@ -2368,7 +2368,7 @@ type
 
   end;
 
-  function TApdCustomTapiDevice.GetCallerID : string;
+  function TApdCustomTapiDevice.GetCallerID : AnsiString;
     {-Return the caller ID of the current call}
   begin
     if Assigned(FCallInfo) then begin
@@ -2401,7 +2401,7 @@ type
       Result := '';
   end;
 
-  function TApdCustomTapiDevice.GetCallerIDName : string;
+  function TApdCustomTapiDevice.GetCallerIDName : Ansistring;
     {-Return the caller ID name of the current call}
   begin
     if Assigned(FCallInfo) then begin
@@ -2447,7 +2447,7 @@ type
 
     {Call the user's event handler}
     if Assigned(FOnTapiStatus) and not((Message = 0) and (Param1 = 0)
-      and (Param2 = 0) and (Param3 = 0)) then                        
+      and (Param2 = 0) and (Param3 = 0)) then
         FOnTapiStatus(Self, First, Last, Device, Message, Param1, Param2, Param3);
   end;
 
@@ -2475,7 +2475,7 @@ type
     TapiException(Self, tuLineConfigDialog(GetSelectedLine,
       ParentHWnd, 'comm/datamodem'));
 
-    Open := SaveOpen;                                                 
+    Open := SaveOpen;
   end;
 
   function TApdCustomTapiDevice.ShowConfigDialogEdit
@@ -2658,15 +2658,15 @@ type
       (LINEBEARERMODE_VOICE, LINEBEARERMODE_PASSTHROUGH);
   var
     CallParams : TLineCallParams;
-    NumZ       : array[0..255] of Char;
-    ReplyResult: Integer;                                              
+    NumZ       : array[0..255] of AnsiChar;
+    ReplyResult: Integer;
   begin
     { Call already in progress, exit to avoid reentry }
     if TapiInUse then
       Exit;
-    {$IFDEF TapiDebug}                                                 
-    WriteLn(Dbg, Self.Name + '.DialPrim');                             
-    {$ENDIF}                                                           
+    {$IFDEF TapiDebug}
+    WriteLn(Dbg, Self.Name + '.DialPrim');
+    {$ENDIF}
 
     StartTapi;
 
@@ -2690,13 +2690,13 @@ type
     end;
 
     {Make the call}
-    TapiFailFired := False;                                            
+    TapiFailFired := False;
     TapiLogging(ltapiDial);
-    ReplyResult := WaitForReply(tuLineMakeCall(LineHandle, CallHandle, 
+    ReplyResult := WaitForReply(tuLineMakeCall(LineHandle, CallHandle,
       StrPCopy(NumZ, Number), 0, @CallParams));
-    if ReplyResult < 0 then begin                                      
+    if ReplyResult < 0 then begin
       {Line is not available. Log failure and clean up...}
-      FFailCode := ReplyResult;                                        
+      FFailCode := ReplyResult;
       TapiLogging(ltapiDialFail);
       RetryPending := False;
       HangupCall(True);
@@ -2714,9 +2714,9 @@ type
   procedure TApdCustomTapiDevice.Dial(ANumber : string);
     {-Dial ANumber}
   begin
-    {$IFDEF TapiDebug}                                                
-    WriteLn(Dbg, Self.Name + '.Dial');                                
-    {$ENDIF}                                                          
+    {$IFDEF TapiDebug}
+    WriteLn(Dbg, Self.Name + '.Dial');
+    {$ENDIF}
 
     {Raise exception if not ready}
     AssureTapiReady;
@@ -2759,9 +2759,9 @@ type
   procedure TApdCustomTapiDevice.ConfigAndOpen;
     {-Open the TAPI port in passthru mode}
   begin
-    {$IFDEF TapiDebug}                                                
-    WriteLn(Dbg, Self.Name + '.ConfigAndOpen');                       
-    {$ENDIF}                                                          
+    {$IFDEF TapiDebug}
+    WriteLn(Dbg, Self.Name + '.ConfigAndOpen');
+    {$ENDIF}
 
     {Raise exception if not ready}
     AssureTapiReady;
@@ -2785,9 +2785,9 @@ type
   function TApdCustomTapiDevice.CancelCall : Boolean;
     {-Cancel the current call, always returns True}
   begin
-    {$IFDEF TapiDebug}                                                
-    WriteLn(Dbg, Self.Name + '.CancelCall');                          
-    {$ENDIF}                                                          
+    {$IFDEF TapiDebug}
+    WriteLn(Dbg, Self.Name + '.CancelCall');
+    {$ENDIF}
     { Kill wave device if playing }
     if FWaveState = wsPlaying then
       StopWaveFile;
@@ -2803,7 +2803,7 @@ type
     if Assigned(FCallInfo) then begin
       {Allocate a new buffer}
       CallInfo := AllocMem(FCallInfo^.TotalSize);
-      Move(FCallInfo^, CallInfo^, FCallInfo^.TotalSize);               
+      Move(FCallInfo^, CallInfo^, FCallInfo^.TotalSize);
     end else
       CallInfo := nil;
   end;
@@ -2888,7 +2888,7 @@ type
       ltapiBusy          : Result := 'Called number was busy';
       ltapiDialFail      : Result := 'Dial failed';
       ltapiReceivedDigit : Result := 'Received a DTMF tone';
-    end;     
+    end;
   end;
 
   procedure TApdCustomTapiDevice.MonitorDTMF(var CallHandle : LongInt;
@@ -2906,7 +2906,7 @@ type
     end;
   end;
 
-  function TApdCustomTapiDevice.MontorTones(                          
+  function TApdCustomTapiDevice.MontorTones(
     const Tones: array of TLineMonitorTones) : LongInt;
     { monitors for specific tones, see the TAPI.HLP file for details}
     { returns 0 if successful }
@@ -2946,7 +2946,7 @@ type
         Result := 0;
     end else
       Result := 0;
-    Open := SaveOpen;                                                
+    Open := SaveOpen;
   end;
 
   function TApdCustomTapiDevice.GetParentHWnd : HWnd;
@@ -3008,7 +3008,7 @@ type
     end;
   end;
 
-  procedure TApdCustomTapiDevice.PlayWaveFile(FileName : ansistring);
+  procedure TApdCustomTapiDevice.PlayWaveFile(FileName : string);
     { Play a wave file through the TAPI device or through the sound card. }
   var
     MmCkInfoParent   : TMMCkInfo;
@@ -3019,7 +3019,7 @@ type
     WaveOutDevCaps   : TWaveOutCaps;
     DeviceId         : DWORD;
     Temp             : TPathCharArray;
-    Flags            : LongInt;                                      
+    Flags            : LongInt;
   begin
     if FWaveState = wsRecording then
       raise ETapiWaveFail.Create(ecTapiWaveDeviceInUse, True);
@@ -3042,10 +3042,10 @@ type
     if FUseSoundCard then
       DeviceId := WAVE_MAPPER
     else
-      DeviceId := GetWaveDeviceId(True);                               
+      DeviceId := GetWaveDeviceId(True);
 
     { Open the wave file }
-    MmioOutHandle := mmioOpen(StrPCopy(Temp, FileName),
+    MmioOutHandle := mmioOpen(PChar(FileName),
       nil, MMIO_READ or MMIO_ALLOCBUF);
 
     { Look for the 'WAVE' chunk to be sure it's a .WAV file.}
@@ -3069,7 +3069,7 @@ type
     GetMem(WaveFormat, FormatSize);
 
     { Read the format chunk. }
-    Res := mmioRead(MmioOutHandle, PansiChar(WaveFormat), FormatSize);
+    Res := mmioRead(MmioOutHandle, PAnsiChar(WaveFormat), FormatSize);
     if Res = -1 then
        raise ETapiWaveFail.Create(ecTapiWaveReadError, True);
 
@@ -3135,7 +3135,7 @@ type
     FWaveState := wsPlaying;
   end;
 
-  procedure TApdCustomTapiDevice.LoadWaveOutBuffer;                    
+  procedure TApdCustomTapiDevice.LoadWaveOutBuffer;
   var
     Res   : LongInt;
   begin
@@ -3158,7 +3158,7 @@ type
        raise ETapiWaveFail.Create(ecTapiWaveReadError, True);
   end;
 
-  procedure TApdCustomTapiDevice.PlayWaveOutBuffer;                    
+  procedure TApdCustomTapiDevice.PlayWaveOutBuffer;
   var
     Res   : LongInt;
   begin
@@ -3251,14 +3251,14 @@ type
     Result := 0;
     FillChar(VS, SizeOf(TVarString), 0);
     VS.TotalSize := SizeOf(TVarString);
-    if Play then                                                       
+    if Play then
       Res := tuLineGetID(LineHandle, 0, CallHandle,
                    LINECALLSELECT_CALL,
                    VS, 'wave/out')
-    else                                                               
-      Res := tuLineGetID(LineHandle, 0, CallHandle,                    
-                   LINECALLSELECT_CALL,                                
-                   VS, 'wave/in');                                     
+    else
+      Res := tuLineGetID(LineHandle, 0, CallHandle,
+                   LINECALLSELECT_CALL,
+                   VS, 'wave/in');
     if Res <> 0 then
       raise ETapiWaveFail.Create(ecTapiWaveFail, True)
     else with VS do
@@ -3461,7 +3461,7 @@ type
     end;
   end;
 
-  procedure TApdCustomTapiDevice.OpenWaveFile;                         
+  procedure TApdCustomTapiDevice.OpenWaveFile;
     { Open the temp wave file in preparation for recording. }
   var
     SubChunk   : TMMCkInfo;
@@ -3471,7 +3471,7 @@ type
     TempDir    : TPathCharArray;
   begin
     { Create a temp file in the temp directory. }
-    GetTempPath(SizeOf(TempDir), TempDir);
+    GetTempPath(SizeOf(TempDir) div SizeOf(Char), TempDir);
     GetTempFileName(TempDir, '~AP', 0, Temp);
     TempFileName := StrPas(Temp);
 
@@ -3515,7 +3515,7 @@ type
     CheckWaveException(Res, MMioError);
   end;
 
-  procedure TApdCustomTapiDevice.WriteWaveBuffer;                      
+  procedure TApdCustomTapiDevice.WriteWaveBuffer;
     { Write a wave buffer to the temp file. }
   var
     Res : Integer;
@@ -3548,19 +3548,19 @@ type
     end;
   end;
 
-  procedure TApdCustomTapiDevice.CloseWaveFile;                        
+  procedure TApdCustomTapiDevice.CloseWaveFile;
     { Close the temp wave file after recording. }
   var
     Res : Integer;
   begin
     mmioAscend(MmioInHandle, @DataChunk, 0);
-    { Ascend out of the root chunk so the chunk info gets updated. }  
+    { Ascend out of the root chunk so the chunk info gets updated. }
     mmioAscend(MmioInHandle, @RootChunk, 0);
     Res := mmioClose(MmioInHandle, 0);
     CheckWaveException(Res, MMioError);
   end;
 
-  procedure TApdCustomTapiDevice.FreeWaveOutBuffer;                    
+  procedure TApdCustomTapiDevice.FreeWaveOutBuffer;
     { Free the memory for the wave out buffer and WaveOutHeader. }
   begin
     WaveOutHandle := 0;
@@ -3575,7 +3575,7 @@ type
     end;
   end;
 
-  procedure TApdCustomTapiDevice.FreeWaveInBuffers;                    
+  procedure TApdCustomTapiDevice.FreeWaveInBuffers;
     { Free the memory for the wave in buffers. }
   begin
     WaveInHandle := 0;
@@ -3603,24 +3603,24 @@ type
     end;
   end;
 
-  procedure TApdCustomTapiDevice.CheckWaveException(ErrorCode : Integer;  
+  procedure TApdCustomTapiDevice.CheckWaveException(ErrorCode : Integer;
                                                     Mode : Integer);
     { Checks to see if a wave or mmio exception was raised. }
   var
     ErrorText : array [0..MAXERRORLENGTH] of Char;
-    ErrorString : string;                                             
+    ErrorString : string;
   begin
     if (ErrorCode = 0) then Exit;
     case Mode of
       WaveInError  :
         begin
           waveInGetErrorText(ErrorCode, ErrorText, SizeOf(ErrorText));
-          ErrorString := StrPas(ErrorText);                           
+          ErrorString := StrPas(ErrorText);
         end;
       WaveOutError :
         begin
           waveOutGetErrorText(ErrorCode, ErrorText, SizeOf(ErrorText));
-          ErrorString := StrPas(ErrorText);                           
+          ErrorString := StrPas(ErrorText);
         end;
       MMioError    :
         ErrorString := AproLoadStr(ecTapiWaveFail);
@@ -3629,10 +3629,10 @@ type
       FreeWaveInBuffers;
       FWaveState := wsIdle;
     end;
-    raise ETapiWaveFail.CreateUnknown(ErrorString, 0);               
+    raise ETapiWaveFail.CreateUnknown(ErrorString, 0);
   end;
 
-  procedure TApdCustomTapiDevice.WndProc(var Message: TMessage);       
+  procedure TApdCustomTapiDevice.WndProc(var Message: TMessage);
     { WndProc to handle wave messages. }
   var
     WaveMsg : Integer;
@@ -3662,7 +3662,7 @@ type
           { manually stopped. }
           if (TotalBytesRecorded >=
              (FMaxMessageLength * (SamplesPerSecond * (BitsPerSample div 8))))
-             or (BytesRecorded < WaveInBufferSize - 7) then begin      
+             or (BytesRecorded < WaveInBufferSize - 7) then begin
             { Write the buffer to disk. }
             WriteWaveBuffer;
             { Close the wave device and clean up the memory. }
@@ -3714,7 +3714,7 @@ type
               if WaveOutHandle <> 0 then begin
                 waveOutClose(WaveOutHandle);
                 mmioClose(mmioOutHandle, 0);
-                FWaveState := wsIdle;                              
+                FWaveState := wsIdle;
                 FreeWaveOutBuffer;
               end;
               WaveMsg := Integer(waPlayDone);
@@ -3730,11 +3730,11 @@ type
             etTapiPortOpen   : TapiPortOpen;
             etTapiPortClose  : TapiPortClose;
             etTapiFail       : TapiFail;
-            etTapiLineCreate : DoLineCreate(0, Message.LParam, 0, 0);  
-          end;                                                         
-        except                                                         
-          Application.HandleException(nil);                            
-        end;                                                           
+            etTapiLineCreate : DoLineCreate(0, Message.LParam, 0, 0);
+          end;
+        except
+          Application.HandleException(nil);
+        end;
     end;
 
     { Fire OnTapiWave event if necessary. }
@@ -3742,14 +3742,14 @@ type
       TapiWave(TWaveMessage(WaveMsg));
     try
       Dispatch(Message);
-      if Message.Msg = WM_QUERYENDSESSION then                        
-        Message.Result := 1;                                          
+      if Message.Msg = WM_QUERYENDSESSION then
+        Message.Result := 1;
     except
       Application.HandleException(Self);
     end;
   end;
 
-  procedure TApdCustomTapiDevice.CheckWaveInSilence;                   
+  procedure TApdCustomTapiDevice.CheckWaveInSilence;
   { Check for silence in the last buffer recorded. }
   type
     TSmallIntArray = array[0..2] of SmallInt;
@@ -3776,10 +3776,10 @@ type
       { Average the data for the buffer. }
       for J := 0 to Pred(SamplesPerSecond) do
         Total := Total + Abs(Buffer^[I + J]);
-      FAvgWaveInAmplitude := Total div SamplesPerSecond;           
+      FAvgWaveInAmplitude := Total div SamplesPerSecond;
 
-      { If the average is under the silence threshold then add one to the count. }   
-      if FAvgWaveInAmplitude < FSilenceThreshold then begin            
+      { If the average is under the silence threshold then add one to the count. }
+      if FAvgWaveInAmplitude < FSilenceThreshold then begin
         Inc(Count);
 
         { If the count has exceeded TrimSeconds then fire the OnTapiWaveSilence }
@@ -3804,7 +3804,7 @@ type
     end;
   end;
 
-  function TApdCustomTapiDevice.TranslateAddress(CanonicalAddr : string) : string;
+  function TApdCustomTapiDevice.TranslateAddress(CanonicalAddr : Ansistring) : Ansistring;
   var
     Res : Integer;
     TranslateOutput : PLineTranslateOutput;
@@ -3817,7 +3817,7 @@ type
     with TranslateOutput^ do begin
       {$IFOPT H+}
       SetLength(Result, pred(DialableStringSize));                       {!!.02}
-      Move(Data[DialableStringOffset], PChar(Result)^, DialableStringSize);
+      Move(Data[DialableStringOffset], PAnsiChar(Result)^, DialableStringSize);
       {$ELSE}
       Move(Data[DialableStringOffset], Result[1], DialableStringSize);
       Result[0] := Char(pred(DialableStringSize));                       {!!.02}
@@ -3826,8 +3826,8 @@ type
     FreeMem(TranslateOutput, TranslateOutput^.TotalSize);
   end;
 
-  function TApdCustomTapiDevice.TranslateAddressEx(CanonicalAddr : string;
-    Flags : LongInt; var DialableStr, DisplayableStr : string;
+  function TApdCustomTapiDevice.TranslateAddressEx(CanonicalAddr : Ansistring;
+    Flags : LongInt; var DialableStr, DisplayableStr : Ansistring;
     var CurrentCountry, DestCountry, TranslateResults : LongInt) : LongInt;
   var
     TranslateOutput : PLineTranslateOutput;
@@ -3840,12 +3840,12 @@ type
       with TranslateOutput^ do begin
         {$IFOPT H+}
         SetLength(DialableStr, DialableStringSize);
-        Move(Data[DialableStringOffset], PChar(DialableStr)^, DialableStringSize);
+        Move(Data[DialableStringOffset], PAnsiChar(DialableStr)^, DialableStringSize);
         SetLength(DisplayableStr, DisplayableStringSize);
-        Move(Data[DisplayableStringOffset], PChar(DisplayableStr)^, DisplayableStringSize);
+        Move(Data[DisplayableStringOffset], PAnsiChar(DisplayableStr)^, DisplayableStringSize);
         {$ELSE}
         Move(Data[DialableStringOffset], DialableStr[1], DialableStringSize);
-        DialableStr[0] := Char(DialableStringSize);
+        DialableStr[0] := AnsiChar(DialableStringSize);
         Move(Data[DisplayableStringOffset], DisplayableStr[1], DisplayableStringSize);
         DisplayableStr[0] := Char(DisplayableStringSize);
         {$ENDIF}

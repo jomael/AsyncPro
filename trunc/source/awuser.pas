@@ -38,6 +38,7 @@
  *
  *  Sulaiman Mah
  *  Sean B. Durkin
+ *  Sebastian Zierer
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
@@ -96,8 +97,7 @@ unit AwUser;
 interface
 
 uses
-  WinTypes,
-  WinProcs,
+  Windows,
   Messages,
   SysUtils,
   Classes,
@@ -177,13 +177,13 @@ type
 
       {Trigger stuff}
       PortHandlerInstalled : Boolean; {True if any of the comport's trigger handlers <> nil}
-      HandlerServiceNeeded : Boolean; {True if handlers need to be serviced}                 
+      HandlerServiceNeeded : Boolean; {True if handlers need to be serviced}
       WndTriggerHandlers   : TList;
       ProcTriggerHandlers  : TList;
       EventTriggerHandlers : TList;
       TimerTriggers  : TList;         {Timer triggers}
       DataTriggers   : TList;         {Data triggers}
-      StatusTriggers : TList;         {Status triggers}             
+      StatusTriggers : TList;         {Status triggers}
       LastTailData   : Cardinal;      {Tail of last data checked for data}
       LastTailLen    : Cardinal;      {Tail of last data sent in len msg}
       LenTrigger     : Cardinal;      {Number of bytes before length trigger}
@@ -259,7 +259,7 @@ type
       function GetComError(var Stat : TComStat) : Integer; virtual; abstract;
       function GetComEventMask(EvtMask : Integer) : Cardinal; virtual; abstract;
       function GetComState(var DCB: TDCB): Integer; virtual; abstract;
-      function ReadCom(Buf : PansiChar; Size: Integer) : Integer; virtual; abstract;
+      function ReadCom(Buf : PAnsiChar; Size: Integer) : Integer; virtual; abstract;
       function SetComState(var DCB : TDCB) : Integer; virtual; abstract;
       function WriteCom(Buf : PansiChar; Size: Integer) : Integer; virtual; abstract; // --sm check
       function WaitComEvent(var EvtMask : DWORD;
@@ -273,9 +273,9 @@ type
       function CheckTriggers : Boolean;
       procedure DonePortPrim; virtual;
       function DumpDispatchLogPrim(
-                                  FName : PansiChar;
+                                  FName : string;
                                   AppendFile, InHex, AllHex : Boolean) : Integer;
-      function DumpTracePrim(FName : PansiChar;
+      function DumpTracePrim(FName : string;
                           AppendFile, InHex, AllHex : Boolean) : Integer;
       function ExtractData : Boolean;
       function FindTriggerFromHandle(TriggerHandle : Cardinal; Delete : Boolean;
@@ -290,7 +290,7 @@ type
                             Offset : Cardinal;
                             Len : Cardinal;
                             var NewTail : Cardinal) : Integer;
-      function PeekCharPrim(var C : ansiChar; Count : Cardinal) : Integer;
+      function PeekCharPrim(var C : AnsiChar; Count : Cardinal) : Integer;
       procedure RefreshStatus;
       procedure ResetStatusHits;
       procedure ResetDataTriggers;
@@ -316,12 +316,13 @@ type
                                  Data : Cardinal;
                                  Buffer : Pointer;
                                  BufferLen : Cardinal);
-      procedure AddStringToLog(S : string);
+      procedure AddStringToLog(S : Ansistring);
       property ComHandle : Integer read CidEx;
       {Public virtual dispatcher functions:}
-      function OpenCom(ComName: PansiChar; InQueue,
+      function OpenCom(ComName: PChar; InQueue,
         OutQueue : Cardinal) : Integer; virtual; abstract;
       function CloseCom : Integer; virtual; abstract;
+      function CheckPort(ComName: PChar): Boolean; virtual; abstract;  //SZ
 
       property DispatcherWindow : Cardinal read fDispatcherWindow;
       property DispThread : TDispThread read fDispThread;
@@ -334,17 +335,17 @@ type
 
       procedure AbortDispatchLogging;
       procedure AbortTracing;
-      function AddDataTrigger(Data : PansiChar; // --sm PansiChar
+      function AddDataTrigger(Data : PAnsiChar; // --sm PansiChar
                                IgnoreCase : Boolean) : Integer;
-      function AddDataTriggerLen(Data : PansiChar;  // --sm Pansichar
+      function AddDataTriggerLen(Data : PAnsiChar;  // --sm Pansichar
                               IgnoreCase : Boolean;
                               Len : Cardinal) : Integer;
       function AddStatusTrigger(SType : Cardinal) : Integer;
       function AddTimerTrigger : Integer;
-      procedure AddTraceEntry(CurEntry : ansiChar; CurCh : ansiChar);
-      function AppendDispatchLog(FName : PansiChar;   // --sm wide to ansi
+      procedure AddTraceEntry(CurEntry : AnsiChar; CurCh : AnsiChar);
+      function AppendDispatchLog(FName : string;
                                   InHex, AllHex : Boolean) : Integer;
-      function AppendTrace(FName : PansiChar;
+      function AppendTrace(FName : string;
                             InHex, AllHEx : Boolean) : Integer;
       function ChangeBaud(NewBaud : LongInt) : Integer;
       procedure ChangeLengthTrigger(Length : Cardinal);
@@ -365,8 +366,8 @@ type
       procedure DeregisterProcTriggerHandler(NP : TApdNotifyProc);
       procedure DeregisterEventTriggerHandler(NP : TApdNotifyEvent);
       procedure DonePort;
-      function DumpDispatchLog(FName : PansiChar; InHex, AllHex : Boolean) : Integer;
-      function DumpTrace(FName : PansiChar; InHex, AllHex : Boolean) : Integer;
+      function DumpDispatchLog(FName : string; InHex, AllHex : Boolean) : Integer;
+      function DumpTrace(FName : string; InHex, AllHex : Boolean) : Integer;
       function ExtendTimer(TriggerHandle : Cardinal;
         Ticks : LongInt) : Integer;
       function FlushInBuffer : Integer;
@@ -374,10 +375,10 @@ type
       function CharReady : Boolean;
       function GetBaseAddress : Word;
       function GetBlock(Block : PAnsiChar; Len : Cardinal) : Integer;
-      function GetChar(var C : ansiChar) : Integer;
+      function GetChar(var C : AnsiChar) : Integer;
       function GetDataPointer(var P : Pointer; Index : Cardinal) : Integer;
       function GetFlowOptions(var HWOpts, SWOpts, BufferFull,
-        BufferResume : Cardinal; var OnChar, OffChar : ansiChar): Integer;
+        BufferResume : Cardinal; var OnChar, OffChar : AnsiChar): Integer;
       procedure GetLine(var Baud : LongInt; var Parity : Word;
         var DataBits : TDatabits; var StopBits : TStopbits);
       function GetLineError : Integer;
@@ -388,7 +389,7 @@ type
       function InBuffUsed : Cardinal;
       function InBuffFree : Cardinal;
       procedure InitDispatchLogging(QueueSize : Cardinal);
-      function InitPort(AComName : PansiChar; Baud : LongInt;
+      function InitPort(AComName : PChar; Baud : LongInt;
         Parity : Cardinal; DataBits : TDatabits; StopBits : TStopbits;
         InSize, OutSize : Cardinal; FlowOpts : DWORD) : Integer;
       function InitSocket(InSize, OutSize : Cardinal) : Integer;
@@ -399,11 +400,11 @@ type
       function OutBuffUsed : Cardinal;
       function OutBuffFree : Cardinal;
       function PeekBlock(Block : PAnsiChar; Len : Cardinal) : Integer;
-      function PeekChar(var C : ansiChar; Count : Cardinal) : Integer;
+      function PeekChar(var C : AnsiChar; Count : Cardinal) : Integer;
       function ProcessCommunications : Integer; virtual; abstract;
       function PutBlock(const Block; Len : Cardinal) : Integer;
-      function PutChar(C : ansiChar) : Integer; // --sm ansi
-      function PutString(S : String) : Integer;
+      function PutChar(C : AnsiChar) : Integer; // --sm ansi
+      function PutString(S : AnsiString) : Integer;
       procedure RegisterWndTriggerHandler(HW : TApdHwnd);
       procedure RegisterProcTriggerHandler(NP : TApdNotifyProc);
       procedure RegisterSyncEventTriggerHandler(NP : TApdNotifyEvent);
@@ -840,7 +841,7 @@ const
   end;
 
   function TApdBaseDispatcher.InitPort(
-                         AComName : PansiChar;
+                         AComName : PChar;
                          Baud : LongInt;
                          Parity : Cardinal;
                          DataBits : TDatabits;
@@ -869,7 +870,7 @@ const
     GeneralEvent := CreateEvent(nil, False, False, nil);
     OutputEvent := CreateEvent(nil, False, False, nil);
     SentEvent := CreateEvent(nil, True, False, nil);
-    OutFlushEvent := CreateEvent(nil, False, False, nil);               
+    OutFlushEvent := CreateEvent(nil, False, False, nil);
     {wake up xmit thread when it's waiting for data}
     OutWaitObjects1[0] := OutputEvent;
     OutWaitObjects1[1] := OutFlushEvent;
@@ -1012,7 +1013,7 @@ const
     {Get initial status}
     RefreshStatus;
 
-    TimeBase := AdTimeGetTime;                                      
+    TimeBase := AdTimeGetTime;
 
     {Start the dispatcher}
     StartDispatcher;
@@ -1059,7 +1060,7 @@ const
     if CidEx >= 0 then begin
       {Flush the output queue}
       FlushOutBuffer;
-      FlushInBuffer;                                                
+      FlushInBuffer;
 
       CloseCom;
     end;
@@ -1079,7 +1080,7 @@ const
        0,      0,      0,      128000,  0,       0,       0,       256000);
   var
     Index : Cardinal;
-    Baud : LongInt;                                                
+    Baud : LongInt;
   begin
     if BaudCode = $FEFF then
       {COMM.DRV's 115200 hack}
@@ -1284,9 +1285,9 @@ const
     end;
 
     if (OnOff = True) then
-      Result := EscapeComFunction(WinTypes.SETDTR)
+      Result := EscapeComFunction(Windows.SETDTR)
     else
-      Result := EscapeComFunction(WinTypes.CLRDTR);
+      Result := EscapeComFunction(Windows.CLRDTR);
 
     if (Result < ecOK) then
       Result := ecBadArgument;
@@ -1303,9 +1304,9 @@ const
     end;
 
     if (OnOff = True) then
-      Result := EscapeComFunction(WinTypes.SETRTS)
+      Result := EscapeComFunction(Windows.SETRTS)
     else
-      Result := EscapeComFunction(WinTypes.CLRRTS);
+      Result := EscapeComFunction(Windows.CLRRTS);
 
     if (Result < ecOK) then
       Result := ecBadArgument;
@@ -1495,7 +1496,7 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.PeekCharPrim(var C : ansiChar; Count : Cardinal) : Integer;
+  function TApdBaseDispatcher.PeekCharPrim(var C : AnsiChar; Count : Cardinal) : Integer;
     {-Return the Count'th character but don't remove it from the buffer}
   var
     NewTail : Cardinal;
@@ -1541,7 +1542,7 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.GetChar(var C : ansiChar) : Integer;
+  function TApdBaseDispatcher.GetChar(var C : AnsiChar) : Integer;
     {-Return next char and remove it from buffer}
   begin
     EnterCriticalSection(DispSection);
@@ -1650,7 +1651,7 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.GetBlock(Block : PansiChar; Len : Cardinal) : Integer;
+  function TApdBaseDispatcher.GetBlock(Block : PAnsiChar; Len : Cardinal) : Integer;
     {-Get Block from ComPort and set new tail}
   var
     Tail : Cardinal;
@@ -1688,22 +1689,22 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.PutChar(C : ansiChar) : Integer;
+  function TApdBaseDispatcher.PutChar(C : AnsiChar) : Integer;
     {-Route through PutBlock to transmit a single character}
   begin
     Result := PutBlock(C, 1);
   end;
 
-  function TApdBaseDispatcher.PutString(S : String) : Integer;
+  function TApdBaseDispatcher.PutString(S : AnsiString) : Integer;
     {-Send as a block}
   begin
-    Result := PutBlock(S[1], PayloadLengthInBytes(S));    // --sm ok
+    Result := PutBlock(S[1], Length(S));
   end;
 
-  procedure TApdBaseDispatcher.AddStringToLog(S : string);
+  procedure TApdBaseDispatcher.AddStringToLog(S : Ansistring);
   begin
     if DLoggingOn then
-      AddDispatchEntry(dtUser, dstNone, 0, @S[1], PayloadLengthInBytes(S)) // --sm OK
+      AddDispatchEntry(dtUser, dstNone, 0, @S[1], length(S) * SizeOf(AnsiChar))
   end;
 
   function TApdBaseDispatcher.PutBlock(const Block; Len : Cardinal) : Integer;
@@ -1747,7 +1748,7 @@ const
         end;
 
       {Send the data}
-      CharsOut := WriteCom(PansiChar(@Block), Len);
+      CharsOut := WriteCom(PAnsiChar(@Block), Len);
       if CharsOut <= 0 then begin
         CharsOut := Abs(CharsOut);
         Result := ecPutBlockFail;
@@ -1767,7 +1768,7 @@ const
           AddDispatchEntry(dtDispatch, dstWriteCom, 0, nil, 0)
         else
           AddDispatchEntry(dtDispatch, dstWriteCom, CharsOut,
-                            PChar(@Block), CharsOut);
+                            PAnsiChar(@Block), CharsOut);
 
       if TracingOn and (CharsOut <> 0) then
         for I := 0 to CharsOut-1 do
@@ -2088,7 +2089,7 @@ const
   function TApdBaseDispatcher.SendNotify(Msg, Trigger, Data: Cardinal) : Boolean;
     {-Send trigger messages, return False to stop checking triggers}
   var
-    lParam : DWORD;                                                  
+    lParam : DWORD;
     Res    : DWORD;
     i      : Integer;
   begin
@@ -2245,7 +2246,7 @@ const
       {Check another index?}
       if Check then begin
         {Compare this index...}
-        if C = P[Indexes[I]] then       // -- sm wants to modified this => if C = P[Indexes[I]*PayloadLengthInBytes(P)] then
+        if C = P[Indexes[I]] then       // -- sm wants to modified this (SZ disagrees)  => if C = P[Indexes[I]*PayloadLengthInBytes(P)] then
           {Got match, was it complete?}
           if Indexes[I] = Len-1 then begin
             Indexes[I] := 0;
@@ -2344,7 +2345,7 @@ const
             tSActive := False;
 
             {Prevent status trigger re-entrancy issues}
-            GlobalStatHit := True;                                  
+            GlobalStatHit := True;
             StatusHit := True;
 
             if DLoggingOn then
@@ -2395,7 +2396,7 @@ const
     {Assume triggers need to be re-checked}
     Result := True;
 
-    I := LastTailData;                                               
+    I := LastTailData;
     {Check data triggers}
     if LastTailData <> DBufHead then begin
       {Prepare}
@@ -2483,7 +2484,7 @@ const
 
       Result :=
         SendNotify(apw_TriggerAvail, BufCnt, 0);
-      NotifyTail := I;                                                
+      NotifyTail := I;
       Exit;
     end;
 
@@ -2529,12 +2530,12 @@ const
     try
       {Nothing to do if dispatch buffer is already full}
       if DispatchFull then begin
-        if (DLoggingOn) then                                             // SWB
-            AddDispatchEntry(dtDispatch,                                 // SWB
-                             dstStatus,                                  // SWB
-                             0,                                          // SWB
-                             PChar('Dispatch buffer full.'),             // SWB
-                             21);                                        // SWB
+        if (DLoggingOn) then                                                // SWB
+            AddDispatchEntry(dtDispatch,                                    // SWB
+                             dstStatus,                                     // SWB
+                             0,                                             // SWB
+                             PAnsiChar('Dispatch buffer full.'),                // SWB
+                             21);                                           // SWB
         Result := True;
         Exit;
       end;
@@ -2895,7 +2896,7 @@ const
           inc(Result,(1 shl 3));
       until Good;
       if Result > MaxTriggerHandle then
-        Result := 0;                    
+        Result := 0;
     end;
   end;
 
@@ -3004,7 +3005,7 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.AddDataTriggerLen(Data : PansiChar;
+  function TApdBaseDispatcher.AddDataTriggerLen(Data : PAnsiChar;
                               IgnoreCase : Boolean; Len : Cardinal) : Integer;
     {-Add a data trigger, data is any ASCIIZ string so no embedded zeros}
   var
@@ -3039,7 +3040,7 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.AddDataTrigger(Data : PansiChar;
+  function TApdBaseDispatcher.AddDataTrigger(Data : PAnsiChar;
                            IgnoreCase : Boolean) : Integer;
     {-Add a data trigger, data is any ASCIIZ string so no embedded nulls}
   begin
@@ -3550,7 +3551,7 @@ const
     end;
   end;
 
-  procedure TApdBaseDispatcher.AddTraceEntry(CurEntry : ansiChar; CurCh : ansiChar);
+  procedure TApdBaseDispatcher.AddTraceEntry(CurEntry : AnsiChar; CurCh : AnsiChar);
     {-Add a trace event to the global TraceQueue}
   begin
     EnterCriticalSection(DataSection);
@@ -3569,16 +3570,16 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.DumpTracePrim(FName : PansiChar;
+  function TApdBaseDispatcher.DumpTracePrim(FName : string;
                           AppendFile, InHex, AllHex : Boolean) : Integer;
     {-Write the TraceQueue to FName}
   const
-    Digits : array[0..$F] of Char = '0123456789ABCDEF';
+    Digits : array[0..$F] of AnsiChar = '0123456789ABCDEF';
     LowChar : array[Boolean] of Byte = (32, 33);
   var
     Start, Len : Cardinal;
     TraceFile : Text;
-    TraceFileBuffer : array[1..512] of Char;
+    TraceFileBuffer : array[1..512] of AnsiChar;
     LastEventType : AnsiChar;
     First : Boolean;
     Col : Cardinal;
@@ -3595,7 +3596,7 @@ const
       end;
     end;
 
-    function HexB(B : Byte) : string;
+    function HexB(B : Byte) : AnsiString;
       {-Return hex string for byte}
     begin
       {$IFDEF HugeStr}
@@ -3658,6 +3659,7 @@ const
           with TraceQueue^[Start] do begin
             if EventType <> LastEventType then begin
               if not First then begin
+                WriteLn(TraceFile,^M^J);
                 Col := 0;
               end;
               {First := False;}
@@ -3713,14 +3715,14 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.DumpTrace(FName : PansiChar;
+  function TApdBaseDispatcher.DumpTrace(FName : string;
                       InHex, AllHex : Boolean) : Integer;
     {-Write the TraceQueue to FName}
   begin
     Result := DumpTracePrim(FName, False, InHex, AllHex);
   end;
 
-  function TApdBaseDispatcher.AppendTrace(FName : PansiChar;
+  function TApdBaseDispatcher.AppendTrace(FName : string;
                         InHex, AllHex : Boolean) : Integer;
     {-Append the TraceQueue to FName}
   begin
@@ -3793,7 +3795,7 @@ const
     TelnetBase    = 15700;
     MSTagBase     = 15601;
 
-  function GetDTStr(drType : TDispatchType) : ansistring;   // --sm ansi
+  function GetDTStr(drType : TDispatchType) : string;
   begin
     Result := AproLoadStr(drTypeBase + ord(drType));
   end;
@@ -3809,16 +3811,16 @@ const
   function GetTimeStr(drTime : DWORD) : string;
   begin
     Result := Format('%07.7d', [drTime]);
-    Insert('.', Result, Length(Result) - 2);                              {!!.04}
+    Insert('.', Result, Length(Result) - 2);                             {!!.04}
   end;
 
-  function TApdBaseDispatcher.DumpDispatchLogPrim(FName : PansiChar; // --sm wide to ansi
+  function TApdBaseDispatcher.DumpDispatchLogPrim(FName : string;
                                                   AppendFile, InHex, AllHex : Boolean) : Integer;
 
     {-Dump the dispatch log}
   const
-    StartColumn = 45;                                              
-    Digits : array[0..$F] of Char = '0123456789ABCDEF';
+    StartColumn = 45;
+    Digits : array[0..$F] of AnsiChar = '0123456789ABCDEF';
     LowChar : array[Boolean] of Byte = (32, 33);
   var
     I, J : Cardinal;
@@ -3826,7 +3828,7 @@ const
     Res : Integer;
     DumpFile : Text;
     C : AnsiChar;     // --sm ansi
-    LogFileBuffer : array[1..512] of Char;
+    LogFileBuffer : array[1..512] of AnsiChar;
     S : string[80];
     logBfr      : TLogBuffer;                                               // SWB
 
@@ -3877,9 +3879,9 @@ const
                 end;                                                     {!!.04}
             else Result := 'WinNT ';                                     {!!.04}
           end;                                                           {!!.04}
-        end                                                              {!!.04}
+        end;                                                             {!!.04}
         else Result := 'Unknown';
-       end;
+      end;
       Result := Result + IntToStr(OSVersion.dwMajorVersion) + '.' +
         IntToStr(OSVersion.dwMinorVersion) + ' ' + SerPack;              {!!.04}
     end;
@@ -3947,11 +3949,11 @@ const
         {$IFDEF VER150}
         S := 'Delphi 7';                                     {!!.06}
         {$ENDIF}
-        {$IFDEF VER180}	   			                              // KGM
-        S := 'Delphi 2006';                                   // KGM
+        {$IFDEF VER180}	   					                                // KGM
+        S := 'Delphi 2006';                                                 // KGM
         {$ENDIF}							                                // KGM
-        {$IFDEF VER190}	   			                              // KGM
-        S := 'Delphi 2007';                                   // KGM
+        {$IFDEF VER190}	   					                                // KGM
+        S := 'Delphi 2007';                                                 // KGM
         {$ENDIF}							                                // KGM
         {$IFDEF VER200}                                       // --sm
         S := 'Delphi 2009';
@@ -4091,7 +4093,7 @@ const
   end;
 
   function TApdBaseDispatcher.DumpDispatchLog(
-                            FName : PansiChar;
+                            FName : string;
                             InHex, AllHex : Boolean) : Integer;
 
     {-Dump the dispatch log}
@@ -4100,7 +4102,7 @@ const
   end;
 
   function TApdBaseDispatcher.AppendDispatchLog(
-                              FName : PansiChar;  // --sm wide to ansi
+                              FName : string;
                               InHex, AllHex : Boolean) : Integer;
     {-Append the dispatch log}
   begin
@@ -4110,7 +4112,7 @@ const
   function TApdBaseDispatcher.GetDispatchTime : DWORD;
     {-Return elapsed time}
   begin
-    Result := (AdTimeGetTime - TimeBase);                          
+    Result := (AdTimeGetTime - TimeBase);
   end;
 
   procedure TApdBaseDispatcher.AddDispatchEntry(
@@ -4138,7 +4140,7 @@ const
                                     DST,                                    // SWB
                                     GetDispatchTime,                        // SWB
                                     Data,                                   // SWB
-                                    PansiChar(Buffer),                          // SWB
+                                    PAnsiChar(Buffer),                          // SWB
                                     BufferLen);                             // SWB
         DLoggingQueue.Push(logBuf);                                         // SWB
     end;                                                                    // SWB
@@ -4786,7 +4788,7 @@ begin
   InitializeCriticalSection(PortListSection);
 end;
 
-initialization
+initialization            // SZ FIXME loader lock
   InitializeUnit;
 
 finalization

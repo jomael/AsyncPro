@@ -30,6 +30,7 @@
  *                            Logging := tlOn.  This also closes a timing window
  *                            where log entries could be lost between setting
  *                            Logging to tlAppend and then tlOn.
+ *  Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -63,8 +64,7 @@ unit AdPort;
 interface
 
 uses
-  WinTypes,
-  WinProcs,
+  Windows,
   SysUtils,
   Classes,
   Messages,
@@ -387,8 +387,8 @@ type
 
     {Tracing}
     procedure InitTracing(const NumEntries : Cardinal);
-    procedure DumpTrace(const FName : ansistring; const InHex : Boolean);        // --sm check shortstring to sting
-    procedure AppendTrace(const FName : ansistring;                        // SWB// --sm check shortstring to sting
+    procedure DumpTrace(const FName : string; const InHex : Boolean);        // --sm check shortstring to sting
+    procedure AppendTrace(const FName : string;                             // SWB// --sm check shortstring to sting
                           const InHex : Boolean;                            // SWB
                           const NewState : TTraceLogState);                 // SWB
     procedure ClearTracing;
@@ -398,8 +398,8 @@ type
 
     {DispatchLogging}
     procedure InitLogging(const Size : Cardinal);
-    procedure DumpLog(const FName : ansistring; const InHex : Boolean);// --sm check shortstring to sting
-    procedure AppendLog(const FName : ansistring;  // --sm check shortstring to sting                        // SWB
+    procedure DumpLog(const FName : string; const InHex : Boolean);// --sm check shortstring to sting
+    procedure AppendLog(const FName : string;  // --sm check shortstring to sting                        // SWB
                         const InHex : Boolean;                              // SWB
                         const NewState : TTraceLogState);                   // SWB
     procedure ClearLogging;
@@ -483,16 +483,16 @@ type
 
     procedure GetBlock(var Block; const Len : Word);
       {-Return the next block of data}
-    procedure PutChar(const C : ansiChar);
+    procedure PutChar(const C : AnsiChar);
       {-Add C to the output buffer}
-    procedure PutString(const S : ansistring);
+    procedure PutString(const S : AnsiString);
       {-Add S to the output buffer}
     function PutBlock(const Block; const Len : Word) : Integer;
       {-Add Block to the output buffer}
 
     {Waits}
-    function CheckForString(var Index : Byte; C : ansiChar;
-                            const S : ansistring;
+    function CheckForString(var Index : Byte; C : AnsiChar;
+                            const S : AnsiString;
                             IgnoreCase : Boolean) : Boolean;
       {-Compare C against a sequence of chars, looking for S}
     function WaitForString(const S : AnsiString;
@@ -606,7 +606,7 @@ type
     {Tracing}
     procedure AddTraceEntry(const CurEntry, CurCh : AnsiChar);
       {-Add an entry to the trace buffer}
-    procedure AddStringToLog(S : ansistring);
+    procedure AddStringToLog(S : Ansistring);
       {-Add a string to the current LOG file}
 
     {Trigger events}
@@ -646,7 +646,7 @@ type
       read FOnWaitchar write FOnWaitChar;
 
     {I/O properties}
-    property Output : ansistring
+    property Output : AnsiString
       write PutString;
 
     {TComHandle, read only}
@@ -837,8 +837,8 @@ const
         end;
       end;
     finally
-      UnlockPortList
-    end
+      UnlockPortList;
+    end;
   end;
 
 {Misc}
@@ -871,7 +871,7 @@ const
       lpszMenuName  := nil;
       lpszClassName := ComWindowClass;
     end;
-    WinProcs.RegisterClass(XClass)
+    Windows.RegisterClass(XClass);
   end;
 
   function TApdCustomComPort.ValidDispatcher : TApdBaseDispatcher;
@@ -1612,10 +1612,10 @@ const
 
   function TApdCustomComPort.InitializePort : Integer;
   var
-    Temp : array[0..12] of AnsiChar;
+    Temp : array[0..12] of Char;
     FlowFlags : DWORD;
 
-    function MakeComName(const ComNum : Word) : PansiChar;
+    function MakeComName(const ComNum : Word) : PChar;
       {-Return a string like 'COMXX'}
     begin
       if TapiMode <> tmOn then begin
@@ -2368,11 +2368,11 @@ const
     FTracing := tlOn;
   end;
 
-  procedure TApdCustomComPort.DumpTrace(const FName : ansistring;// --sm check shortstring to sting
+  procedure TApdCustomComPort.DumpTrace(const FName : string;
                                         const InHex : Boolean);
     {-Dump the trace file}
   var
-    Dest : array[0..255] of ansiChar; // --zer0 ansichar
+    Dest : array[0..255] of Char;
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self, Dispatcher.DumpTrace(StrPCopy(Dest, FName),
@@ -2380,12 +2380,12 @@ const
     FTracing := tlOff;
   end;
 
-  procedure TApdCustomComPort.AppendTrace(const FName : ansistring;// --sm check shortstring to sting
+  procedure TApdCustomComPort.AppendTrace(const FName : string;
                                           const InHex : Boolean;
                                           const NewState : TTraceLogState); // SWB
     {-Append the trace file}
   var
-    Dest : array[0..255] of AnsiChar;
+    Dest : array[0..255] of Char;
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self,
@@ -2415,7 +2415,7 @@ const
     Dispatcher.AddTraceEntry(CurEntry, CurCh);
   end;
 
-  procedure TApdCustomComPort.AddStringToLog(S : ansistring);
+  procedure TApdCustomComPort.AddStringToLog(S : AnsiString);
   begin
     if (PortState = psShuttingDown) then Exit;
     ValidDispatcher.AddStringToLog(S);
@@ -2468,11 +2468,11 @@ const
     FLogging := tlOn;
   end;
 
-  procedure TApdCustomComPort.DumpLog(const FName : ansistring;// --sm check shortstring to sting
+  procedure TApdCustomComPort.DumpLog(const FName : string;
                                       const InHex : Boolean);
     {-Dump the dispatch log}
   var
-    Dest : array[0..255] of ansiChar;
+    Dest : array[0..255] of Char;
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self,
@@ -2480,12 +2480,12 @@ const
     FLogging := tlOff;
   end;
 
-  procedure TApdCustomComPort.AppendLog(const FName : AnsiString;// --sm check shortstring to sting
+  procedure TApdCustomComPort.AppendLog(const FName : string;
                                         const InHex : Boolean;
                                         const NewState : TTraceLogState);   // SWB
     {-Dump the dispatch log}
   var
-    Dest : array[0..255] of ansiChar;
+    Dest : array[0..255] of Char;
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self,
@@ -2658,14 +2658,14 @@ const
     CheckException(Self, ValidDispatcher.GetBlock(PAnsiChar(@Block), Len));
   end;
 
-  procedure TApdCustomComPort.PutChar(const C : ansiChar);
+  procedure TApdCustomComPort.PutChar(const C : AnsiChar);
     {-Add C to the output buffer}
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self, ValidDispatcher.PutChar(C));
   end;
 
-  procedure TApdCustomComPort.PutString(const S : ansistring);
+  procedure TApdCustomComPort.PutString(const S : AnsiString);
     {-Add S to the output buffer}
   begin
     if (PortState = psShuttingDown) then Exit;
@@ -2686,12 +2686,12 @@ const
 
 {Waits}
 
-  function TApdCustomComPort.CheckForString(var Index : Byte; C : ansiChar;
-                                            const S : ansistring;
+  function TApdCustomComPort.CheckForString(var Index : Byte; C : AnsiChar;
+                                            const S : AnsiString;
                                             IgnoreCase : Boolean) : Boolean;
     {-Compare C against a sequence of chars, looking for S}
   var
-    CurChar : ansiChar;
+    CurChar : AnsiChar;
   begin
     CheckForString := False;
     if (PortState = psShuttingDown) then Exit;
