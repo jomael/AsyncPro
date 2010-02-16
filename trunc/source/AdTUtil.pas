@@ -20,6 +20,7 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *   Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -42,8 +43,7 @@ unit AdTUtil;
 interface
 
 uses
-  WinTypes,
-  WinProcs,
+  Windows,
   SysUtils,
   Classes,
   OoMisc;
@@ -875,7 +875,7 @@ type
           StringFormat  : DWORD;
           StringSize    : DWORD;
           StringOffset  : DWORD);
-      2: (StringData    : array[0..1024] of Char);      // --sm OK
+      2: (StringData    : array[0..1024] of AnsiChar);  //SZ type depends on StringFormat type (using AnsiChar because StringOffset is in bytes from beginning of structure)
   end;
 
   {Line extensions}
@@ -983,13 +983,13 @@ type
           DevSpecificOffset          : DWORD;
           LineFeatures               : DWORD;
           EndMark                    : Integer);
-      1: (Data                       : array[0..65520] of Char);
+      1: (Data                       : array[0..65520] of AnsiChar);
   end;
 
   {Line Address Capabilities}                                        {added .06}
   PLineAddressCaps = ^TLineAddressCaps;                                  {!!.06}
   TLineAddressCaps = record
-   case Integer of                   
+   case Integer of
      0:  (TotalSize                   : DWORD;
          NeededSize                   : DWORD;
          UsedSize                     : DWORD;
@@ -1048,7 +1048,7 @@ type
          OfferingModes                : DWORD;
          AvailableMediaModes          : DWORD;
          EndMark                      : Integer);
-     1: (Data : array[0..65520] of Char);    // --sm
+     1: (Data : array[0..65520] of AnsiChar);
    end;
 
   {Line call parameters}
@@ -1235,7 +1235,7 @@ type
       1 : (Data               : array[0..65520] of Byte);
   end;
 
-  {Structure for LineTranslateAddress results}                      
+  {Structure for LineTranslateAddress results}
   PLineTranslateOutput = ^TLineTranslateOutput;
   TLineTranslateOutput = record
     case Integer of
@@ -1253,7 +1253,7 @@ type
       1 : (Data                     : array[0..65520] of Byte);
   end;
 
-  {Structure for LineTranslateCaps }                                
+  {Structure for LineTranslateCaps }
   PLineTranslateCaps = ^TLineTranslateCaps;
   TLineTranslateCaps = record
     case Integer of
@@ -1272,7 +1272,7 @@ type
       1 : (Data                     : array[0..65520] of Byte);
   end;
 
-  PLineMonitorTone = ^TLineMonitorTone;                             
+  PLineMonitorTone = ^TLineMonitorTone;
   TLineMonitorTone = record
     AppSpecific  : DWORD;
     Duration     : DWORD;
@@ -1281,7 +1281,7 @@ type
     Frequency3   : DWORD;
   end;
 
-  PLineGenerateTone = ^TLineGenerateTone;                           
+  PLineGenerateTone = ^TLineGenerateTone;
   TLineGenerateTone = record
     Frequency   : DWORD;
     CadenceOn   : DWORD;
@@ -1290,11 +1290,11 @@ type
   end;
 
   {Callback procedure type}
-  TLineCallback = procedure(Device   : LongInt;                        
-                            Message  : LongInt;                        
-                            Instance : LongInt;                        
-                            Param1   : LongInt;                        
-                            Param2   : LongInt;                        
+  TLineCallback = procedure(Device   : LongInt;
+                            Message  : LongInt;
+                            Instance : LongInt;
+                            Param1   : LongInt;
+                            Param2   : LongInt;
                             Param3   : LongInt)
                             stdcall;
 
@@ -1302,7 +1302,7 @@ type
   TLineInitialize = function(var LineApp : TLineApp;
                              Instance : THandle;
                              Callback : TLineCallback;
-                             AppName : PChar;
+                             AppName : PAnsiChar; // --SZ OK (must be ANSI for now unless we import the wide functions)
                              var NumDevs : DWORD) : LongInt
                              stdcall;
 
@@ -1336,25 +1336,25 @@ type
 
   TLineMakeCall = function(Line : TLine;
                            var Call : TCall;
-                           DestAddress : PChar;
+                           DestAddress : PAnsiChar; // --SZ OK
                            CountryCode : DWORD;
                            const CallParams : PLineCallParams) : LongInt
                            stdcall;
 
   TLineAccept = function(Call : TCall;
-                         UserUserInfo : PChar;
+                         UserUserInfo : PAnsiChar; // --SZ OK
                          Size : DWORD) : LongInt
                          stdcall;
 
   TLineAnswer = function(Call : TCall;
-                         UserUserInfo : PChar;
+                         UserUserInfo : PAnsiChar;
                          Size : DWORD) : LongInt
                          stdcall;
 
   TLineDeallocateCall = function(Call : TCall) : LongInt
                                 stdcall;
 
-  TLineDrop = function(Call : TCall; UserInfo : PChar; Size : DWORD) : LongInt
+  TLineDrop = function(Call : TCall; UserInfo : PAnsiChar; Size : DWORD) : LongInt
                        stdcall;
 
   TLineClose = function(Line : TLine) : LongInt
@@ -1367,12 +1367,12 @@ type
 
   TLineConfigDialog = function(DeviceID : DWORD;
                                Owner : HWND;
-                               DeviceClass : PChar) : LongInt
+                               DeviceClass : PAnsiChar) : LongInt  // --SZ OK
                                stdcall;
 
   TLineConfigDialogEdit = function(DeviceID : DWORD;
                                    Owner : HWND;
-                                   DeviceClass : PChar;
+                                   DeviceClass : PAnsiChar;
                                    const inDevConfig;
                                    Size : DWORD;
                                    var DevConfig : TVarString) : LongInt
@@ -1383,7 +1383,7 @@ type
                         Call : TCall;
                         Select : DWORD;
                         var DeviceID : TVarString;
-                        DeviceClass : PChar) : LongInt
+                        DeviceClass : PAnsiChar) : LongInt
                         stdcall;
 
   TLineSetStatusMessages = function(Line : TLine;
@@ -1416,13 +1416,13 @@ type
 
   TLineGetDevConfig = function (DeviceID : DWORD;
                                 var DeviceConfig : TVarString;
-                                DeviceClass : PChar) : LongInt
+                                DeviceClass : PAnsiChar) : LongInt
                                 stdcall;
 
   TLineSetDevConfig = function (DeviceID : DWORD;
                                 const DeviceConfig;
                                 Size : DWORD;
-                                DeviceClass : PChar) : LongInt
+                                DeviceClass : PAnsiChar) : LongInt
                                 stdcall;
 
   TLineGetCallInfo = function(Call : TCall;
@@ -1441,24 +1441,24 @@ type
                                  stdcall;
 
   TLineGenerateDigits = function(Call : TCall; DigitModes : DWORD;
-                                 Digits : PChar; Duration : DWORD): LongInt
+                                 Digits : PAnsiChar; Duration : DWORD): LongInt
                                  stdcall;
 
   TLineMonitorMedia = function(Call : TCall; MediaModes : DWORD) : LongInt
                                 stdcall;
 
-  TLineHandoff = function(Call : TCall; FileName: PChar;
+  TLineHandoff = function(Call : TCall; FileName: PAnsiChar;
                           MediaMode : DWORD) : LongInt
                           stdcall;
 
   TLineSetCallParams = function(Call : TCall; BearerMode, MinRate,
                                 MaxRate : DWORD;
                                 DialParams : PLineDialParams) : LongInt
-                                stdcall;          
+                                stdcall;
 
-  TLineTranslateAddress = function(Line : TLine; DeviceID : DWORD;        
+  TLineTranslateAddress = function(Line : TLine; DeviceID : DWORD;
                                    APIVersion : DWORD;
-                                   AddressIn : PChar; Card : DWORD;
+                                   AddressIn : PAnsiChar; Card : DWORD;
                                    TranslateOptions : DWORD;
                                    TranslateOutput : PLineTranslateOutput)
                                    : LongInt
@@ -1466,15 +1466,15 @@ type
 
   TLineTranslateDialog = function(Line : TLine; DeviceID : DWORD;
                                   APIVersion : DWORD; HwndOwner : HWND;
-                                  AddressIn : PChar) : LongInt
+                                  AddressIn : PAnsiChar) : LongInt
                                   stdcall;
 
-  TLineSetCurrentLocation = function(Line : TLine;                       
+  TLineSetCurrentLocation = function(Line : TLine;
                                      Location : DWORD) : LongInt
                                     stdcall;
 
   TLineSetTollList = function (Line : TLine; DeviceID : DWORD;
-                               AddressIn : PChar;
+                               AddressIn : PAnsiChar;
                                TollListOption : DWORD) : LongInt
                                stdcall;
 
@@ -1487,7 +1487,7 @@ type
                                NumEntries : DWORD): LongInt
                                stdcall;
 
-  TLineGenerateTones = function(Call : TCall; ToneMode, Duration,         
+  TLineGenerateTones = function(Call : TCall; ToneMode, Duration,
                                 NumTones : DWORD; const LINEGENERATETONE): LongInt
                                 stdcall;
 
@@ -1497,13 +1497,13 @@ type
   TLineUnhold = function(Call:TCall) : LongInt                           {!!.06}
                            stdcall;
 
-  TLineTransfer = function(Call:TCall; DestAddress:PChar;                {!!.06}
+  TLineTransfer = function(Call:TCall; DestAddress:PAnsiChar;                {!!.06}
                            CountryCode:DWord) : LongInt                  {!!.06}
                            stdcall;                                      {!!.06}
 
 
  {TAPI functions exported by this unit}
-  function tuLineGenerateTones(Call : TCall; ToneMode, Duration,          
+  function tuLineGenerateTones(Call : TCall; ToneMode, Duration,
                                NumTones : DWORD; const LINEGENERATETONE): LongInt;
 
   function tuLineMonitorTones(Call : TCall; const LINEMONITORTONE;
@@ -1513,21 +1513,21 @@ type
                                MaxRate : DWORD;
                                DialParams : PLineDialParams) : LongInt;
 
-  function tuLineHandoff(Call : TCall; FileName: PChar;
+  function tuLineHandoff(Call : TCall; FileName: PAnsiChar;
                           MediaMode : DWORD) : LongInt;
 
   function tuLineMonitorMedia(Call : TCall; MediaModes : DWORD) : LongInt;
 
   function tuLineGenerateDigits(Call : TCall; DigitModes : DWORD;
-                                Digits : PChar; Duration : DWORD): LongInt;
+                                Digits : PAnsiChar; Duration : DWORD): LongInt;
 
   function tuLineMonitorDigits(Call : TCall;
-                               DigitModes : DWORD): LongInt;             
+                               DigitModes : DWORD): LongInt;
 
   function tuLineInitialize(var LineApp : TLineApp;
                             Instance : THandle;
                             Callback : TLineCallback;
-                            AppName : PChar;
+                            AppName : PAnsiChar;
                             var NumDevs : DWORD) : LongInt;
     {-Initialize a line device}
 
@@ -1562,25 +1562,25 @@ type
 
   function tuLineMakeCall(Line : TLine;
                           var Call : TCall;
-                          DestAddress : PChar;
+                          DestAddress : PAnsiChar;
                           CountryCode : DWORD;
                           const CallParams : PLineCallParams) : LongInt;
     {-Make an outgoing call on a line device}
 
-  function tuLineAccept(Call : TCall;                                 
-                        UserUserInfo : PChar;
+  function tuLineAccept(Call : TCall;
+                        UserUserInfo : PAnsiChar;
                         Size : DWORD) : LongInt;
     {-Accept an incoming call}
 
   function tuLineAnswer(Call : TCall;
-                        UserUserInfo : PChar;
+                        UserUserInfo : PAnsiChar;
                         Size : DWORD) : LongInt;
     {-Answer an incoming call}
 
   function tuLineDeallocateCall(Call : TCall) : LongInt;
     {-Deallocate a call}
 
-  function tuLineDrop(Call : TCall; UserInfo : PChar; Size : DWORD) : LongInt;
+  function tuLineDrop(Call : TCall; UserInfo : PAnsiChar; Size : DWORD) : LongInt;
     {-Drop (abort) the call in progress}
 
   function tuLineClose(Line : TLine) : LongInt;
@@ -1593,12 +1593,12 @@ type
 
   function tuLineConfigDialog(DeviceID : DWORD;
                               Owner : HWND;
-                              DeviceClass : PChar) : LongInt;
+                              DeviceClass : PAnsiChar) : LongInt;
     {-Display the line configuration dialog}
 
   function tuLineConfigDialogEdit(DeviceID : DWORD;
                                   Owner : HWND;
-                                  DeviceClass : PChar;
+                                  DeviceClass : PAnsiChar;
                                   const inDevConfig;
                                   Size : DWORD;
                                   var DevConfig : TVarString) : LongInt;
@@ -1609,7 +1609,7 @@ type
                        Call : TCall;
                        Select : DWORD;
                        var DeviceID : TVarString;
-                       DeviceClass : PChar) : LongInt;
+                       DeviceClass : PAnsiChar) : LongInt;
     {-Return the line ID}
 
   function tuLineSetStatusMessages(Line : TLine;
@@ -1628,7 +1628,7 @@ type
                                 ApiVersion : DWORD;
                                 ExtVersion : DWORD;
                                 LineAddressCaps : PLineAddressCaps) : LongInt;
-    {-Get the address capabilities}                                
+    {-Get the address capabilities}
 
 
   function tuLineGetAddressStatus(Line : TLine;
@@ -1643,13 +1643,13 @@ type
 
   function tuLineGetDevConfig(DeviceID : DWORD;
                               var DeviceConfig : TVarString;
-                              DeviceClass : PChar) : LongInt;
+                              DeviceClass : PAnsiChar) : LongInt;
     {-Return the device configuration}
 
   function tuLineSetDevConfig(DeviceID : DWORD;
                               const DeviceConfig;
                               Size : DWORD;
-                              DeviceClass : PChar) : LongInt;
+                              DeviceClass : PAnsiChar) : LongInt;
     {-Set the device configuration}
 
   function tuLineGetCallInfo(Call : TCall; CallInfo : PCallInfo) : LongInt;
@@ -1665,8 +1665,8 @@ type
   function tuLineSetCurrentLocation(Line : TLine;
                                     Location : DWORD) : LongInt;
 
-  function tuLineSetTollList (Line : TLine; DeviceID : DWORD;          
-                              AddressIn : PChar;
+  function tuLineSetTollList (Line : TLine; DeviceID : DWORD;
+                              AddressIn : PAnsiChar;
                               TollListOption : DWORD) : LongInt;
 
 {Memory handling wrappers}
@@ -1712,7 +1712,7 @@ type
     {-Remove the call from hold}
 
   function tuLineTransfer(var Call:TCall;                                {!!.06}
-                          DestAddress:PChar;                             {!!.06}
+                          DestAddress:PAnsiChar;                             {!!.06}
                           CountryCode:DWord) : LongInt;                  {!!.06}
     {-Transfer the call to another line}
 
@@ -1720,6 +1720,8 @@ type
 var
   Dbg : Text;
 {$ENDIF}
+
+procedure UnloadTapiDLL;
 
 implementation
 
@@ -1742,21 +1744,21 @@ var
   tapiLineHandoff             : TLineHandoff;
   tapiLineMonitorMedia        : TLineMonitorMedia;
   tapiLineGenerateDigits      : TLineGenerateDigits;
-  tapiLineMonitorDigits       : TLineMonitorDigits;                 
+  tapiLineMonitorDigits       : TLineMonitorDigits;
   tapiLineInitialize          : TLineInitialize;
   tapiLineShutdown            : TLineShutdown;
   tapiLineNegotiateApiVersion : TLineNegotiateApiVersion;
   tapiLineGetDevCaps          : TLineGetDevCaps;
   tapiLineOpen                : TLineOpen;
   tapiLineMakeCall            : TLineMakeCall;
-  tapiLineAccept              : TLineAccept;                         
+  tapiLineAccept              : TLineAccept;
   tapiLineAnswer              : TLineAnswer;
   tapiLineDeallocateCall      : TLineDeallocateCall;
   tapiLineDrop                : TLineDrop;
   tapiLineClose               : TLineClose;
   tapiLineGetCountry          : TLineGetCountry;
   tapiLineConfigDialog        : TLineConfigDialog;
-  tapiLineConfigDialogEdit    : TLineConfigDialogEdit;              
+  tapiLineConfigDialogEdit    : TLineConfigDialogEdit;
   tapiLineGetID               : TLineGetID;
   tapiLineSetStatusMessages   : TLineSetStatusMessages;
   tapiLineGetStatusMessages   : TLineGetStatusMessages;
@@ -1809,7 +1811,7 @@ var
       @tapiLineGenerateDigits    :=
         GetProcAddress(TapiModule, 'lineGenerateDigits');
       @tapiLineMonitorDigits     :=
-        GetProcAddress(TapiModule, 'lineMonitorDigits');            
+        GetProcAddress(TapiModule, 'lineMonitorDigits');
       @tapiLineInitialize        :=
         GetProcAddress(TapiModule, 'lineInitialize');
       @tapiLineShutdown          :=
@@ -1823,7 +1825,7 @@ var
       @tapiLineMakeCall          :=
         GetProcAddress(TapiModule, 'lineMakeCall');
       @tapiLineAccept            :=
-        GetProcAddress(TapiModule, 'lineAccept');                    
+        GetProcAddress(TapiModule, 'lineAccept');
       @tapiLineAnswer            :=
         GetProcAddress(TapiModule, 'lineAnswer');
       @tapiLineDeallocateCall    :=
@@ -1837,7 +1839,7 @@ var
       @tapiLineConfigDialog      :=
         GetProcAddress(TapiModule, 'lineConfigDialog');
       @tapiLineConfigDialogEdit  :=
-        GetProcAddress(TapiModule, 'lineConfigDialogEdit');          
+        GetProcAddress(TapiModule, 'lineConfigDialogEdit');
       @tapiLineGetID             :=
         GetProcAddress(TapiModule, 'lineGetID');
       @tapiLineSetStatusMessages :=
@@ -1866,9 +1868,9 @@ var
         GetProcAddress(TapiModule, 'lineTranslateDialog');
       @tapiLineSetCurrentLocation:=
         GetProcAddress(TapiModule, 'lineSetCurrentLocation');
-      @tapiLineSetTollList       :=                                  
+      @tapiLineSetTollList       :=
         GetProcAddress(TapiModule, 'lineSetTollList');
-      @tapiLineGetTranslateCaps  :=                                   
+      @tapiLineGetTranslateCaps  :=
         GetProcAddress(TapiModule, 'lineGetTranslateCaps');
 
     end else
@@ -1876,7 +1878,7 @@ var
   end;
 
 {$IFDEF TapiDebug}
-procedure WriteResult(Res : LongInt);                                 
+procedure WriteResult(Res : LongInt);
 
   function ResFunc : string;
   begin
@@ -1968,7 +1970,7 @@ procedure WriteResult(Res : LongInt);
     LineErr_BillingRejected          : Result := 'LineErr_BillingRejected';
     LineErr_InvalFeature             : Result := 'LineErr_InvalFeature';
     LineErr_NoMultipleInstance       : Result := 'LineErr_NoMultipleInstance';
-    LineErr_InvalAgentID             : Result := 'LineErr_InvalAgentID';    
+    LineErr_InvalAgentID             : Result := 'LineErr_InvalAgentID';
     LineErr_InvalAgentGroup          : Result := 'LineErr_InvalAgentGroup';
     LineErr_InvalPassword            : Result := 'LineErr_InvalPassword';
     LineErr_InvalAgentState          : Result := 'LineErr_InvalAgentState';
@@ -1996,7 +1998,7 @@ end;
 
     if @tapiLineGenerateTones <> nil then begin
       Result := tapiLineGenerateTones(Call, ToneMode, Duration,
-                                      NumTones, LINEGENERATETONE);   
+                                      NumTones, LINEGENERATETONE);
       {$IFDEF TapiDebug}
       writeln(Dbg, 'lineGenerateTones');
       writeln(Dbg,format('  In: Call: %08.8x ToneMode %08.8x Duration %08.8x NumTones %08.8x',
@@ -2017,7 +2019,7 @@ end;
 
     if @tapiLineMonitorTones <> nil then begin
       Result := tapiLineMonitorTones(Call, LINEMONITORTONE,
-                                      NumEntries);                   
+                                      NumEntries);
       {$IFDEF TapiDebug}
       writeln(Dbg,'lineMonitorTones');
       writeln(Dbg, format('  In: Call: %08.8x NumEntries %08.8x',
@@ -2039,110 +2041,110 @@ end;
 
     if @tapiLineSetCallParams <> nil then begin
       Result := tapiLineSetCallParams(Call, BearerMode, MinRate,
-                                      MaxRate, DialParams);            
+                                      MaxRate, DialParams);
       {$IFDEF TapiDebug}
       writeln(Dbg,'lineSetCallParams');
       writeln(Dbg, format('  In: Call:%08.8x BearerMode:%08.8x MinRate:%08.8x MaxRate:%08.8x',
         [Call,BearerMode,MinRate,MaxRate]));
       WriteResult(Result);
       {$ENDIF}
-    end else                                                           
-      Result := ecTapiGetAddrFail;                                     
+    end else
+      Result := ecTapiGetAddrFail;
   end;
 
-  function tuLineHandoff(Call : TCall; FileName: PChar;                
-                          MediaMode : DWORD) : LongInt;                
+  function tuLineHandoff(Call : TCall; FileName: PAnsiChar;
+                          MediaMode : DWORD) : LongInt;
   begin
-    if not TapiLoaded then begin                                       
-      Result := ecTapiLoadFail;                                        
-      Exit;                                                            
-    end;                                                               
-                                                                       
-    if @tapiLineHandoff <> nil then begin                              
-      Result := tapiLineHandoff(Call, FileName, MediaMode);            
+    if not TapiLoaded then begin
+      Result := ecTapiLoadFail;
+      Exit;
+    end;
+
+    if @tapiLineHandoff <> nil then begin
+      Result := tapiLineHandoff(Call, FileName, MediaMode);
       {$IFDEF TapiDebug}
       writeln(Dbg,'lineHandoff');
       if FileName = nil then
         writeln(Dbg, format('  In: Call:%08.8x FileName:nil MediaMode:%08.8x',
           [Call,MediaMode]))
-      else                                                            
+      else
       writeln(Dbg, format('  In: Call:%08.8x FileName:%s MediaMode:%08.8x',
         [Call,FileName,MediaMode]));
       WriteResult(Result);
       {$ENDIF}
-    end else                                                           
-      Result := ecTapiGetAddrFail;                                     
+    end else
+      Result := ecTapiGetAddrFail;
   end;
 
   function tuLineMonitorMedia(Call : TCall;
-                              MediaModes : DWORD) : LongInt;           
+                              MediaModes : DWORD) : LongInt;
   begin
-    if not TapiLoaded then begin                                       
-      Result := ecTapiLoadFail;                                        
-      Exit;                                                            
-    end;                                                               
-                                                                       
-    if @tapiLineMonitorMedia <> nil then begin                         
-      Result := tapiLineMonitorMedia(Call, MediaModes);                
+    if not TapiLoaded then begin
+      Result := ecTapiLoadFail;
+      Exit;
+    end;
+
+    if @tapiLineMonitorMedia <> nil then begin
+      Result := tapiLineMonitorMedia(Call, MediaModes);
       {$IFDEF TapiDebug}
       writeln(Dbg,'lineMonitorMedia');
       writeln(Dbg, format('  In: Call:%08.8x MediaModes:%08.8x',
         [Call,MediaModes]));
       WriteResult(Result);
       {$ENDIF}
-    end else                                                           
-      Result := ecTapiGetAddrFail;                                     
+    end else
+      Result := ecTapiGetAddrFail;
   end;
 
-  function tuLineGenerateDigits(Call : TCall; DigitModes : DWORD;          
-                                Digits : PChar; Duration : DWORD): LongInt;
+  function tuLineGenerateDigits(Call : TCall; DigitModes : DWORD;
+                                Digits : PAnsiChar; Duration : DWORD): LongInt;
   begin
-    if not TapiLoaded then begin                                       
-      Result := ecTapiLoadFail;                                        
-      Exit;                                                            
-    end;                                                               
-                                                                       
-    if @tapiLineGenerateDigits <> nil then begin                       
+    if not TapiLoaded then begin
+      Result := ecTapiLoadFail;
+      Exit;
+    end;
+
+    if @tapiLineGenerateDigits <> nil then begin
       Result := tapiLineGenerateDigits(Call, DigitModes,
-                                       Digits, Duration);              
+                                       Digits, Duration);
       {$IFDEF TapiDebug}
       writeln(Dbg,'lineGenerateDigits');
-      if Digits = nil then                                           
+      if Digits = nil then
         writeln(Dbg, format('  In: Call:%08.8x DigitModes:%08.8x Digits:nil Duration:%08.8x',
           [Call,DigitModes,Duration]))
-      else                                                            
+      else
         writeln(Dbg, format('  In: Call:%08.8x DigitModes:%08.8x Digits:%s Duration:%08.8x',
           [Call,DigitModes,Digits,Duration]));
       WriteResult(Result);
       {$ENDIF}
-    end else                                                           
-      Result := ecTapiGetAddrFail;                                     
+    end else
+      Result := ecTapiGetAddrFail;
   end;
 
-  function tuLineMonitorDigits(Call : TCall;                           
-                               DigitModes : DWORD): LongInt;           
-  begin                                                                
-    if not TapiLoaded then begin                                       
-      Result := ecTapiLoadFail;                                        
-      Exit;                                                            
-    end;                                                               
-                                                                       
-    if @tapiLineMonitorDigits <> nil then begin                        
-      Result := tapiLineMonitorDigits(Call, DigitModes);               
+  function tuLineMonitorDigits(Call : TCall;
+                               DigitModes : DWORD): LongInt;
+  begin
+    if not TapiLoaded then begin
+      Result := ecTapiLoadFail;
+      Exit;
+    end;
+
+    if @tapiLineMonitorDigits <> nil then begin
+      Result := tapiLineMonitorDigits(Call, DigitModes);
       {$IFDEF TapiDebug}
       writeln(Dbg,'lineMonitorDigits');
       writeln(Dbg, format('  In: Call:%08.8x DigitModes:%08.8x',
         [Call,DigitModes]));
       WriteResult(Result);
       {$ENDIF}
-    end else                                                           
-      Result := ecTapiGetAddrFail;                                     
-  end;                                                                 
+    end else
+      Result := ecTapiGetAddrFail;
+  end;
 
   function tuLineInitialize(var LineApp : TLineApp;
                             Instance : THandle;
                             Callback : TLineCallback;
-                            AppName : PChar;
+                            AppName : PAnsiChar;
                             var NumDevs : DWORD) : LongInt;
     {-Initialize a line device}
   begin
@@ -2158,7 +2160,7 @@ end;
       writeln(Dbg,'lineInitialize');
       if AppName = nil then
         writeln(Dbg, format('  In : Instance:%08.8x AppName:nil',[Instance]))
-      else                                                            
+      else
         writeln(Dbg, format('  In : Instance:%08.8x AppName:%s',[Instance,AppName]));
       writeln(Dbg, format('  Out: LineApp:%08.8x NumDevs:%08.8x',[LineApp,NumDevs]));
       WriteResult(Result);
@@ -2275,7 +2277,7 @@ end;
 
   function tuLineMakeCall(Line : TLine;
                           var Call : TCall;
-                          DestAddress : PChar;
+                          DestAddress : PAnsiChar;
                           CountryCode : DWORD;
                           const CallParams : PLineCallParams) : LongInt;
     {-Make an outgoing call on a line device}
@@ -2293,7 +2295,7 @@ end;
       if DestAddress = nil then
         writeln(Dbg, format('  In : Line:%08.8x DestAddress:nil CountryCode:%08.8x',
           [Line,CountryCode]))
-      else                                                            
+      else
         writeln(Dbg, format('  In : Line:%08.8x DestAddress:%s CountryCode:%08.8x',
           [Line,DestAddress,CountryCode]));
       writeln(Dbg, format('  Out: Call:%08.8x',
@@ -2304,8 +2306,8 @@ end;
       Result := ecTapiGetAddrFail;
   end;
 
-  function tuLineAccept(Call : TCall;                                  
-                        UserUserInfo : PChar;
+  function tuLineAccept(Call : TCall;
+                        UserUserInfo : PAnsiChar;
                         Size : DWORD) : LongInt;
     {-Accept an incoming call}
   begin
@@ -2321,7 +2323,7 @@ end;
       if UserUserInfo = nil then
         writeln(Dbg, format('  In: Call:%08.8x UserUserInfo:nil Size:%08.8x',
           [Call,Size]))
-      else                                                           
+      else
         writeln(Dbg, format('  In: Call:%08.8x UserUserInfo:%s Size:%08.8x',
           [Call,UserUserInfo,Size]));
       WriteResult(Result);
@@ -2331,7 +2333,7 @@ end;
   end;
 
   function tuLineAnswer(Call : TCall;
-                        UserUserInfo : PChar;
+                        UserUserInfo : PAnsiChar;
                         Size : DWORD) : LongInt;
     {-Answer an incoming call}
   begin
@@ -2347,7 +2349,7 @@ end;
       if UserUserInfo = nil then
         writeln(Dbg, format('  In: Call:%08.8x UserUserInfo:nil Size:%08.8x',
           [Call,Size]))
-      else                                                           
+      else
         writeln(Dbg, format('  In: Call:%08.8x UserUserInfo:%s Size:%08.8x',
           [Call,UserUserInfo,Size]));
       WriteResult(Result);
@@ -2376,7 +2378,7 @@ end;
       Result := ecTapiGetAddrFail;
   end;
 
-  function tuLineDrop(Call : TCall; UserInfo : PChar; Size : DWORD) : LongInt;
+  function tuLineDrop(Call : TCall; UserInfo : PAnsiChar; Size : DWORD) : LongInt;
     {-Drop (abort) the call in progress}
   begin
     if not TapiLoaded then begin
@@ -2440,7 +2442,7 @@ end;
 
   function tuLineConfigDialog(DeviceID : DWORD;
                               Owner : HWND;
-                              DeviceClass : PChar) : LongInt;
+                              DeviceClass : PAnsiChar) : LongInt;
     {-Display the line configuration dialog}
   begin
     if not TapiLoaded then begin
@@ -2455,7 +2457,7 @@ end;
       if DeviceClass = nil then
         writeln(Dbg, format('  In: DeviceID:%08.8x Owner:%08.8x DeviceClass:nil',
           [DeviceID,Owner]))
-      else                                                           
+      else
         writeln(Dbg, format('  In: DeviceID:%08.8x Owner:%08.8x DeviceClass:%s',
           [DeviceID,Owner,DeviceClass]));
       WriteResult(Result);
@@ -2466,7 +2468,7 @@ end;
 
   function tuLineConfigDialogEdit(DeviceID : DWORD;
                                   Owner : HWND;
-                                  DeviceClass : PChar;
+                                  DeviceClass : PAnsiChar;
                                   const inDevConfig;
                                   Size : DWORD;
                                   var DevConfig : TVarString) : LongInt;
@@ -2499,7 +2501,7 @@ end;
                        Call : TCall;
                        Select : DWORD;
                        var DeviceID : TVarString;
-                       DeviceClass : PChar) : LongInt;
+                       DeviceClass : PAnsiChar) : LongInt;
     {-Return the line ID}
   begin
     if not TapiLoaded then begin
@@ -2515,7 +2517,7 @@ end;
       if DeviceClass = nil then
         writeln(Dbg, format('  In: AddressID:%08.8x Call:%08.8x Select:%08.8x DeviceClass:nil',
           [AddressID,Call,Select]))
-      else                                                                   
+      else
         writeln(Dbg, format('  In: AddressID:%08.8x Call:%08.8x Select:%08.8x DeviceClass:%s',
           [AddressID,Call,Select,DeviceClass]));
       WriteResult(Result);
@@ -2643,7 +2645,7 @@ end;
 
   function tuLineGetDevConfig(DeviceID : DWORD;
                               var DeviceConfig : TVarString;
-                              DeviceClass : PChar) : LongInt;
+                              DeviceClass : PAnsiChar) : LongInt;
     {-Return the device configuration}
   begin
     if not TapiLoaded then begin
@@ -2658,7 +2660,7 @@ end;
       if DeviceClass = nil then
         writeln(Dbg, format('  In: DeviceID:%08.8x DeviceClass:nil',
           [DeviceID]))
-      else                                                             
+      else
         writeln(Dbg, format('  In: DeviceID:%08.8x DeviceClass:%s',
           [DeviceID,DeviceClass]));
       WriteResult(Result);
@@ -2670,7 +2672,7 @@ end;
   function tuLineSetDevConfig(DeviceID : DWORD;
                               const DeviceConfig;
                               Size : DWORD;
-                              DeviceClass : PChar) : LongInt;
+                              DeviceClass : PAnsiChar) : LongInt;
     {-Set the device configuration}
   begin
    if not TapiLoaded then begin
@@ -2685,7 +2687,7 @@ end;
       if DeviceClass = nil then
         writeln(Dbg, format('  In: DeviceID:%08.8x Size:%08.8x DeviceClass:nil',
           [DeviceID,Size]))
-      else                                                           
+      else
         writeln(Dbg, format('  In: DeviceID:%08.8x Size:%08.8x DeviceClass:%s',
           [DeviceID,Size,DeviceClass]));
       WriteResult(Result);
@@ -2756,7 +2758,7 @@ end;
       Result := ecTapiGetAddrFail;
   end;
 
-  function tuLineSetCurrentLocation(Line : TLine;                      
+  function tuLineSetCurrentLocation(Line : TLine;
                                     Location : DWORD) : LongInt;
   begin
     if not TapiLoaded then begin
@@ -2775,8 +2777,8 @@ end;
       Result := ecTapiGetAddrFail;
   end;
 
-  function tuLineSetTollList(Line : TLine; DeviceID : DWORD;           
-                             AddressIn : PChar;
+  function tuLineSetTollList(Line : TLine; DeviceID : DWORD;
+                             AddressIn : PAnsiChar;
                              TollListOption : DWORD) : LongInt;
   begin
     if not TapiLoaded then begin
@@ -3035,7 +3037,7 @@ end;
                                      var TranslateOutput : PLineTranslateOutput)
                                      : LongInt;
   var
-    Temp    : array[0..100] of Char;
+    Temp    : array[0..100] of AnsiChar;
     NewSize : Integer;
   begin
 
@@ -3085,7 +3087,7 @@ end;
                                  APIVersion : DWORD; HwndOwner : HWND;
                                  AddressIn : string) : LongInt;
   var
-    Temp : array[0..100] of Char;
+    Temp : array[0..100] of AnsiChar;
   begin
     Result := -1;
     if not TapiLoaded then begin
@@ -3131,7 +3133,7 @@ end;
   end;
 
   function tuLineTransfer(var Call:TCall;
-                          DestAddress:PChar;
+                          DestAddress:PAnsiChar;
                           CountryCode:DWord) : LongInt;
     {-Transfer the call to another line}
    begin
@@ -3174,6 +3176,17 @@ begin
   LineTranslateFixed := LongInt(@LTO^.EndMark) - LongInt(@LTO^.TotalSize);
   TranslateCapsFixed := LongInt(@TC^.EndMark) - LongInt(@TC^.TotalSize);
   DevStatusFixed     := LongInt(@DS^.EndMark) - LongInt(@DS^.TotalSize);
+end;
+
+procedure UnloadTapiDLL;
+//SZ - introduced - call to unload the Tapi dll from memory
+//   call this to avoid handle leak if used in a dll
+//   do not call this in finalization of a dll
+begin
+  if TapiModule <> 0 then begin
+    FreeLibrary(TapiModule);
+    TapiModule := 0;
+  end;
 end;
 
 initialization
@@ -3224,12 +3237,10 @@ initialization
   Rewrite(Dbg);
 {$ENDIF}
 
-finalization
+finalization                      //SZ: bugfix Loader Lock Problem!!
   {Free TAPI if we loaded it}
-  if TapiModule <> 0 then begin
-    FreeLibrary(TapiModule);
-    TapiModule := 0;
-  end;
+  if not IsLibrary then
+    UnloadTapiDLL;
 {$IFDEF TapiDebug}
   CloseFile(Dbg);
 {$ENDIF}
