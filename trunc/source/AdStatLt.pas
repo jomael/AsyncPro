@@ -20,6 +20,7 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *   Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -50,8 +51,7 @@ unit AdStatLt;
 interface
 
 uses
-  WinTypes,
-  WinProcs,
+  Windows,
   SysUtils,
   Classes,
   Controls,
@@ -93,8 +93,8 @@ type
     procedure SetNotLitColor(const NewColor : TColor);
       {-Set the color the light is displayed in when it is not lit}
 
-    function GetVersion : ansistring;
-    procedure SetVersion(const Value : ansistring);
+    function GetVersion : string;
+    procedure SetVersion(const Value : string);                 
 
     procedure Paint; override;
     procedure Loaded; override;
@@ -105,7 +105,7 @@ type
     procedure SetBounds(ALeft, ATop, AWidth, AHeight : Integer); override;
     {.Z-}
 
-    property Version : ansistring
+    property Version : string                                     
       read GetVersion
       write SetVersion
       stored False;
@@ -423,12 +423,12 @@ implementation
     inherited Destroy;
   end;
 
-  function TApdCustomStatusLight.GetVersion : ansistring;
+  function TApdCustomStatusLight.GetVersion : string;
   begin
     Result := ApVersionStr;
   end;
 
-  procedure TApdCustomStatusLight.SetVersion(const Value : ansistring);
+  procedure TApdCustomStatusLight.SetVersion(const Value : string);
   begin
   end;
 

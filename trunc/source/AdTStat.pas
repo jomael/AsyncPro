@@ -20,6 +20,7 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *   Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -42,8 +43,7 @@ interface
 
 uses
   SysUtils,
-  WinTypes,
-  WinProcs,
+  Windows,
   Messages,
   Classes,
   Graphics,

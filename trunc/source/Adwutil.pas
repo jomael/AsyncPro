@@ -22,6 +22,7 @@
  * Contributor(s):
  *  Sulaiman Mah
  *  Sean B. Durkin
+ *  Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -45,8 +46,7 @@ interface
 
 uses
   Classes,
-  WinTypes,
-  WinProcs,
+  Windows,
   SysUtils,
   OOMisc;
 
@@ -758,6 +758,8 @@ function wsaGetSelectError(Param : LongInt) : Word;
 var
   SockFuncs : TSocketFuncs;
 
+procedure WinsockExit; //SZ made public
+
 implementation
 
 const
@@ -967,22 +969,26 @@ begin
   Result := HiWord(Param);
 end;
 
-procedure WinsockExit; far;
+procedure WinsockExit;
+// call to unload the Winsock dll from memory
+//   call this to avoid handle leak if used in a dll
+//   do not call this in finalization of a dll
 begin
-  if SocketModule <> 0 then begin
+  if SocketModule <> 0 then
+  begin
     FreeLibrary(SocketModule);
     SocketModule := 0;
   end;
 end;
 
 initialization
-  AddExitProc(WinsockExit);
-  FillChar(SockFuncs, Sizeof(SockFuncs), #0); // --sm OK
+  FillChar(SockFuncs, Sizeof(SockFuncs), #0);
   SocketModule := 0;
 
-
-finalization
+finalization              //SZ: bugfix Loader Lock Problem!!
   {Free Winsock if we loaded it}
-  WinsockExit;
+  if not IsLibrary then
+    WinsockExit;
 
 end.
+
