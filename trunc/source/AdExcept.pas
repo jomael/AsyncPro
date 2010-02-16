@@ -74,7 +74,7 @@ type
 
   public
     constructor Create(const EC : Integer; PassThru : Boolean);
-    constructor CreateUnknown(const Msg : String; Dummy : Byte);
+    constructor CreateUnknown(const Msg : ansiString; Dummy : Byte);
 
     class function MapCodeToStringID(const Code : Integer) : Word;
       {-Return a string table index for Code}
@@ -318,7 +318,7 @@ type
     public
       { Parameters to the construtor are reversed to prevent problems with
         C++ Builder }
-      constructor Create (const ErrCode : Integer; const Msg : string);
+      constructor Create (const ErrCode : Integer; const Msg : ansistring);
     published
       property ErrorCode : Integer read FErrorCode;
   end;
@@ -330,7 +330,7 @@ type
     public
       { Parameters to the construtor are reversed to prevent problems with
         C++ Builder }
-      constructor Create (const ErrCode : Integer; const Msg : string);
+      constructor Create (const ErrCode : Integer; const Msg : ansistring);
     published
       property ErrorCode : Integer read FErrorCode;
   end;
@@ -374,13 +374,13 @@ type
   function XlatException(const E : Exception) : Integer;
     {-Translate an exception into an error code}
 
-  function AproLoadStr(const ErrorCode : SmallInt) : String;    // --sm check shortstring to sting
+  function AproLoadStr(const ErrorCode : SmallInt) : ansiString;    // --sm ansi
 
-  function AproLoadZ(P : PChar; Code : Integer) : PChar;
+  function AproLoadZ(P : PansiChar; Code : Integer) : PansiChar;    // --sm ansi
 
-  function ErrorMsg(const ErrorCode : SmallInt) : String ; // --sm check shortstring to sting
+  function ErrorMsg(const ErrorCode : SmallInt) : ansiString ; // --sm ansi
   {$IFDEF UseResourceStrings}
-  function MessageNumberToString(MessageNumber : SmallInt) : String;   // --sm check shortstring to sting
+  function MessageNumberToString(MessageNumber : SmallInt) : ansiString;   // --sm ansi
   {$ENDIF}
   {.Z-}
 
@@ -396,7 +396,7 @@ implementation
 uses
   AdStrMap;
 {$ENDIF}
-  function AproLoadZ(P : PChar; Code : Integer) : PChar;
+  function AproLoadZ(P : PansiChar; Code : Integer) : PansiChar;
   begin
     {$IFDEF UseResourceStrings}
     Result := StrPCopy(P, AproLoadStr(Code));
@@ -405,17 +405,17 @@ uses
     {$ENDIF}
   end;
 
-  function AproLoadStr(const ErrorCode : SmallInt) : String;    // --sm check shortstring to sting
+  function AproLoadStr(const ErrorCode : SmallInt) : ansiString;    // --sm ansi
     {-Return an error message for ErrorCode}
   var
     Buffer : array[0..255] of Char;
 
-    function TrimWhite(const S : ShortString) : string;// --sm check shortstring to sting
+    function TrimWhite(const S : ShortString) : ansistring;// --sm ansi
     var
       i : Integer;
     begin
       Result := S;
-      for i := PayloadLengthInBytes(Result) downto 1 do
+      for i := Length(Result) downto 1 do
         if Result[i] < ' ' then
           Result[i] := ' ';
       i := pos('  ',Result);
@@ -440,14 +440,14 @@ uses
   end;
 
   {Alias for function above}
-  function ErrorMsg(const ErrorCode : SmallInt) : string;// --sm check shortstring to sting
+  function ErrorMsg(const ErrorCode : SmallInt) : ansistring;// --sm ansi
     {-Return an error message for ErrorCode}
   begin
     Result := AproLoadStr(ErrorCode);
   end;
 
   {$IFDEF UseResourceStrings}
-  function MessageNumberToString(MessageNumber : SmallInt) : string;// --sm check shortstring to sting
+  function MessageNumberToString(MessageNumber : SmallInt) : ansistring;// --sm ansi
   var
     Middle : integer;
     Min    : integer;
@@ -479,7 +479,7 @@ uses
     inherited Create(AproLoadStr(Abs(EC)));
   end;
 
-  constructor EAPDException.CreateUnknown(const Msg : String; Dummy : Byte);
+  constructor EAPDException.CreateUnknown(const Msg : ansiString; Dummy : Byte);
   begin
     ErrorCode := 0;
 
@@ -494,7 +494,7 @@ uses
   function CheckException(const Ctl : TComponent; const Res : Integer) : Integer;
     {-Check Res, raise appropriate exception if non-zero}
   var
-    ErrorMsg : String;
+    ErrorMsg : ansiString;
     FileIO   : EInOutError;
 
   begin
@@ -772,7 +772,7 @@ end;
 { EApdGSMPhoneException }
 
 constructor EApdGSMPhoneException.Create(const ErrCode: Integer;
-                                         const Msg: string);
+                                         const Msg: ansistring);
 begin
   inherited Create (Msg);
 
@@ -782,7 +782,7 @@ end;
 { EApdPagerException }
 
 constructor EApdPagerException.Create(const ErrCode: Integer;
-                                      const Msg: string);
+                                      const Msg: ansistring);
 begin
   inherited Create (Msg);
 

@@ -49,30 +49,30 @@ type
     function AtEOF : Boolean;
     function ExportDetailXML(Modem : TLmModem) : Integer;
     procedure FixupModemcap(var List : TStringList);
-    function ReadLine : string;
-    procedure WriteLine(const Str : string);
-    procedure WriteXMLStr(const Str, sVal : string);
+    function ReadLine : ansistring;
+    procedure WriteLine(const Str : ansistring);
+    procedure WriteXMLStr(const Str, sVal : ansistring);
 
-    function XMLize(const S : string) : string;
-    function XMLizeInt(I : Integer) : string;
-    function XMLizeBool(B : Boolean) : string;
-    function UnXMLize(const S : string) : string;
+    function XMLize(const S : ansistring) : ansistring;
+    function XMLizeInt(I : Integer) : ansistring;
+    function XMLizeBool(B : Boolean) : ansistring;
+    function UnXMLize(const S : ansistring) : ansistring;
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
     { create a new modem detail file with appropriate headers }
-    function CreateNewDetailFile(const ModemDetailFile : string) : Integer;
+    function CreateNewDetailFile(const ModemDetailFile : ansistring) : Integer;
     { adds a modem to the modem detail file }
-    function AddModem(const ModemDetailFile : string; Modem : TLmModem) : Integer;
+    function AddModem(const ModemDetailFile : ansistring; Modem : TLmModem) : Integer;
     { deletes a modem from the modem detail file }
-    function DeleteModem(const ModemDetailFile, ModemName : string) : Integer;
+    function DeleteModem(const ModemDetailFile, ModemName : ansistring) : Integer;
 
     { these methods manage the modemcap index }
     { add a modem record to modemcap }
-    function AddModemRecord(const ModemCapIndex : string;
+    function AddModemRecord(const ModemCapIndex : ansistring;
       ModemRecord : TLmModemName) : Integer;
     { delete a modem record from modemcap }
-    function DeleteModemRecord(const ModemCapIndex : string;
+    function DeleteModemRecord(const ModemCapIndex : ansistring;
       ModemRecord : TLmModemName) : Integer;
   end;
 
@@ -87,13 +87,13 @@ implementation
     All return values of the public functions are the ecXxx error codes
 }
 
-function TApdModemCapDetail.AddModem(const ModemDetailFile: string;
+function TApdModemCapDetail.AddModem(const ModemDetailFile: ansistring;
   Modem: TLmModem): Integer;
   { adds a modem to the modem detail file }
 var
-  C : Char;
+  C : ansiChar;
   I : Integer;
-  S : string;
+  S : ansistring;
   Found : Boolean;
 begin
   DetailStream := nil;
@@ -107,7 +107,7 @@ begin
       DetailStream.Position := I;
       DetailStream.ReadBuffer(C, 1);
       S := C + S;
-      Found := Pos('</ModemList>', S) > 0;
+      Found := ansiPos('</ModemList>', S) > 0;
     until Found or (I = 0);
     DetailStream.Position := I - 1;
     if not Found then begin
@@ -126,12 +126,12 @@ begin
 end;
 
 function TApdModemCapDetail.AddModemRecord(
-  const ModemCapIndex : string; ModemRecord: TLmModemName): Integer;
+  const ModemCapIndex : ansistring; ModemRecord: TLmModemName): Integer;
   { add a modem record to the master index, for something like this }
   { it's faster to use a TStringList }
 var
   List : TStringList;
-  S : string;
+  S : ansistring;
   I : Integer;
 begin
   Result := ecFileNotFound;
@@ -143,7 +143,7 @@ begin
       List.LoadFromFile(ModemCapIndex);
       I := pred(List.Count);
       { find the last modem record }
-      while (Pos('<ModemRecord ModemName = "', List[I]) = 0) and (I > 0) do begin
+      while (ansiPos('<ModemRecord ModemName = "', List[I]) = 0) and (I > 0) do begin
         List.Delete(I);
         dec(I);
       end;
@@ -176,9 +176,9 @@ begin
 end;
 
 function TApdModemCapDetail.CreateNewDetailFile(
-  const ModemDetailFile: string): Integer;
+  const ModemDetailFile: ansistring): Integer;
 var
-  S : string;
+  S : ansistring;
 begin
   try
     { create a new detail file }
@@ -200,11 +200,11 @@ begin
 end;
 
 function TApdModemCapDetail.DeleteModem(const ModemDetailFile,
-  ModemName: string): Integer;
+  ModemName: ansistring): Integer;
   { deletes a modem from the modem detail file }
 var
   MemStream : TMemoryStream;
-  S : string;
+  S : ansistring;
   Found : Boolean;
   ModemStart, ModemEnd : Integer;
 begin
@@ -226,10 +226,10 @@ begin
     repeat
       S := ReadLine;
       { save the beginning of the entity }
-      if (Pos('<Modem', S) > 0) and (Pos('<ModemList', S) = 0) then
+      if (ansiPos('<Modem', S) > 0) and (ansiPos('<ModemList', S) = 0) then
         ModemStart := MemStream.Position - Length(S);
-      Found := (Pos('FriendlyName =', S) > 0) and
-               (Pos(ModemName, UnXMLize(S)) > 0);
+      Found := (ansiPos('FriendlyName =', S) > 0) and
+               (ansiPos(ModemName, UnXMLize(S)) > 0);
     until Found or (MemStream.Position >= MemStream.Size);
     if not Found then begin
       Result := ecModemNotFound;
@@ -238,7 +238,7 @@ begin
     { now, search for the end of the modem element }
     repeat
       S := ReadLine;
-      Found := Pos('</Modem>', S) > 0;
+      Found := ansiPos('</Modem>', S) > 0;
       if Found then
         ModemEnd := MemStream.Position;
     until Found or (MemStream.Position >= MemStream.Size);
@@ -270,14 +270,14 @@ begin
 end;
 
 function TApdModemCapDetail.DeleteModemRecord(
-  const ModemCapIndex : string; ModemRecord: TLmModemName): Integer;
+  const ModemCapIndex : ansistring; ModemRecord: TLmModemName): Integer;
   { delete a modem from the modemcap index }
   { again, it's faster to do it with a TStringList }
 var
   List : TStringList;
   I : Integer;
   Found : Boolean;
-  S : string;
+  S : ansistring;
 begin
   Result := ecFileNotFound;
   if FileExists(ModemCapIndex) then begin
@@ -292,7 +292,7 @@ begin
       while not Found do begin
         S := 'ModemName = "' + ModemRecord.ModemName + '" Manufacturer = "' +
           ModemRecord.Manufacturer + '" Model = "' + ModemRecord.Model;
-        Found := Pos(S, List[I]) > 0;
+        Found := ansiPos(S, List[I]) > 0;
         if not Found then begin
           inc(I);
           if I >= List.Count then begin
@@ -305,7 +305,7 @@ begin
       List.Delete(I);
       { find the last modem record }
       I := pred(List.Count);
-      while (Pos('<ModemRecord ModemName = "', List[I]) = 0) and (I > 0) do begin
+      while (ansiPos('<ModemRecord ModemName = "', List[I]) = 0) and (I > 0) do begin
         List.Delete(I);
         dec(I);
       end;
@@ -711,7 +711,7 @@ const
 var
   X, I : Integer;
   FileList : TStringList;
-  S : string;
+  S : ansistring;
 begin
   { count the modem records and file references... }
   X := pred(List.Count);
@@ -721,10 +721,10 @@ begin
     FileList := TStringList.Create;
     FileList.Sorted := True;
     FileList.Duplicates := dupIgnore;
-    while (Pos('<ModemRecord ModemName = "', List[X]) > 0) do begin
+    while (ansiPos('<ModemRecord ModemName = "', List[X]) > 0) do begin
       S := Copy(List[X], ApxRPos(ModemFileStr, List[X]) + Length(ModemFileStr),
         Length(List[x]));
-      S := Copy(S, 1, Pos('"', S) - 1);
+      S := Copy(S, 1, ansiPos('"', S) - 1);
       FileList.Add(S);
       dec(X);
     end;
@@ -745,39 +745,39 @@ begin
   end;
 end;
 
-function TApdModemCapDetail.ReadLine : string;
+function TApdModemCapDetail.ReadLine : ansistring;
   { a method to read a #13#10 terminated line from the stream }
 var
-  C : Char;
+  C : ansiChar;
 begin
   Result := '';
   repeat
     DetailStream.ReadBuffer(C, 1);
     Result := Result + C;
-  until (Pos(#13#10, Result) > 0) or (AtEOF);
+  until (ansiPos(#13#10, Result) > 0) or (AtEOF);
 end;
 
-function TApdModemCapDetail.UnXMLize(const S: string): string;
+function TApdModemCapDetail.UnXMLize(const S: ansistring): ansistring;
   { a method to convert an XMLized string to a regular one }
 var
   Psn : Integer;
 begin
   { fix up the modemname with any XML stuff }
   Result := S;
-  while Pos('&amp;', Result) > 0 do
-    Delete(Result, Pos('&amp;', Result) + 1, 4);
-  while Pos('&quot;', Result) > 0 do begin
-    Psn := Pos('&quot;', Result);
-    Delete(Result, Pos('&quot;', Result), 6);
+  while ansiPos('&amp;', Result) > 0 do
+    Delete(Result, ansiPos('&amp;', Result) + 1, 4);
+  while ansiPos('&quot;', Result) > 0 do begin
+    Psn := ansiPos('&quot;', Result);
+    Delete(Result, ansiPos('&quot;', Result), 6);
     Insert('"', Result, Psn);
   end;
 end;
 
-procedure TApdModemCapDetail.WriteLine(const Str: string);
+procedure TApdModemCapDetail.WriteLine(const Str: ansistring);
   { a method to write a #13#10 terminated string to the stream }
   { no XML translations }
 begin
-  if Pos('""', Str) > 0 then
+  if ansiPos('""', Str) > 0 then
     { don't write entries without data }
     Exit;
   if Str = '>' then
@@ -787,11 +787,11 @@ begin
   DetailStream.WriteBuffer(#13#10, 2);
 end;
 
-procedure TApdModemCapDetail.WriteXMLStr(const Str, sVal : string);
+procedure TApdModemCapDetail.WriteXMLStr(const Str, sVal : ansistring);
   { writes a string and another string, the first string is the }
   { start-end tag, the second is the value }
 var
-  S : string;
+  S : ansistring;
 begin
   if sVal = '' then
     { nothing to add... }
@@ -804,7 +804,7 @@ begin
   WriteLine(Str + XMLize(sVal) + S);
 end;
 
-function TApdModemCapDetail.XMLize(const S: string): string;
+function TApdModemCapDetail.XMLize(const S: ansistring): ansistring;
   { a method to convert a regular string to an XML string }
 var
   i : integer;
@@ -822,13 +822,13 @@ begin
     end;
 end;
 
-function TApdModemCapDetail.XMLizeInt(I: Integer): string;
+function TApdModemCapDetail.XMLizeInt(I: Integer): ansistring;
   { numbers aren't escaped, just return the string }
 begin
   Result := IntToStr(I);
 end;
 
-function TApdModemCapDetail.XMLizeBool(B: Boolean): string;
+function TApdModemCapDetail.XMLizeBool(B: Boolean): ansistring;
 begin
   if B then
     Result := '1'

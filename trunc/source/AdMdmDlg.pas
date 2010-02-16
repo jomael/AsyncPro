@@ -66,7 +66,7 @@ type
     property Modem : TAdCustomModem
       read FModem write SetModem;
     procedure UpdateDisplay(
-      const StatusStr, TimeStr, DetailStr : string;
+      const StatusStr, TimeStr, DetailStr : ansistring;
       Action : TApdModemStatusAction);
 
   end;
@@ -96,7 +96,7 @@ begin
 end;
 
 procedure TApdModemStatusDialog.UpdateDisplay(
-  const StatusStr, TimeStr, DetailStr : string;
+  const StatusStr, TimeStr, DetailStr : ansistring;
   Action : TApdModemStatusAction);
   { this method is called periodically by the TApdModem component }
   { when the OnModemStatus, OnModemLog and a few other events are }

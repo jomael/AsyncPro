@@ -93,8 +93,8 @@ type
     procedure SetNotLitColor(const NewColor : TColor);
       {-Set the color the light is displayed in when it is not lit}
 
-    function GetVersion : string;
-    procedure SetVersion(const Value : string);                 
+    function GetVersion : ansistring;
+    procedure SetVersion(const Value : ansistring);
 
     procedure Paint; override;
     procedure Loaded; override;
@@ -105,7 +105,7 @@ type
     procedure SetBounds(ALeft, ATop, AWidth, AHeight : Integer); override;
     {.Z-}
 
-    property Version : string                                     
+    property Version : ansistring
       read GetVersion
       write SetVersion
       stored False;
@@ -423,12 +423,12 @@ implementation
     inherited Destroy;
   end;
 
-  function TApdCustomStatusLight.GetVersion : string;
+  function TApdCustomStatusLight.GetVersion : ansistring;
   begin
     Result := ApVersionStr;
   end;
 
-  procedure TApdCustomStatusLight.SetVersion(const Value : string);
+  procedure TApdCustomStatusLight.SetVersion(const Value : ansistring);
   begin
   end;
 

@@ -72,7 +72,7 @@ type
     procedure FormCreate(Sender: TObject);
   private
   public
-    function SelectedCom : String;
+    function SelectedCom : ansiString;
     function SelectedComNum : Word;
   end;
 
@@ -98,7 +98,7 @@ function IsPortAvailable(ComNum : Cardinal) : Boolean;
   end;
 
 var
-  ComName : array[0..12] of AnsiChar;   // --sm ansistring?
+  ComName : array[0..12] of AnsiChar;
   Res : Integer;
   DeviceLayer : TApdBaseDispatcher;
 begin
@@ -120,7 +120,7 @@ begin
           DeviceLayer.CloseCom;
         end;
       end else begin
-        Res := CreateFile(PWideChar(MakeComName(ComName, ComNum)[1]),   // --sm check
+        Res := CreateFile(PWideChar(MakeComName(ComName, ComNum)),   // --zer0 PWideChar
                  GENERIC_READ or GENERIC_WRITE,
                  0,
                  nil,
@@ -148,7 +148,7 @@ end;
 procedure TComSelectForm.FormCreate(Sender: TObject);
 var
   I : Integer;
-  S : string;
+  S : ansiString;
 begin
   for I := 1 to MaxComHandles do
     if IsPortAvailable(I) then begin
@@ -158,14 +158,14 @@ begin
   PortsComboBox.ItemIndex := 0;
 end;
 
-function TComSelectForm.SelectedCom : String;
+function TComSelectForm.SelectedCom : ansiString;
 begin
   Result := PortsComboBox.Items[PortsComboBox.ItemIndex];
 end;
 
 function TComSelectForm.SelectedComNum : Word;
 var
-  S : String;
+  S : ansiString;
 begin
   S := PortsComboBox.Items[PortsComboBox.ItemIndex];
   S := Copy(S, 4, 255);

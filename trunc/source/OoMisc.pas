@@ -128,7 +128,7 @@ const
 type
   TPipeEvent = record
     Event : Byte;
-    Data : String;  // --sm check shortstring to sting
+    Data : ansiString;  // --sm check shortstring to sting
   end;
   TOleEnum = type DWORD;
   { XML definitions }
@@ -141,7 +141,8 @@ type
 type
   CharSet = set of Ansichar;  // --sm
 
-  TPassString = string[255];  // !!! There is a good case to remove this type.
+//  TPassString = string[255];  // !!! There is a good case to remove this type.
+  TPassString = ansistring;  // --zer0
   TApdHwnd = HWND;
 
 
@@ -213,15 +214,15 @@ type { moved from AdRasUtl.pas }                                         {!!.06}
     dwFrameSize        : DWord;                                          {!!.06}
     dwfNetProtocols    : DWord;                                          {!!.06}
     dwFramingProtocol  : DWord;                                          {!!.06}
-    szScript           : array[0..Max_PATH-1] of char;                   {!!.06}
-    szAutodialDll      : array[0..Max_PATH-1] of char;                   {!!.06}
-    szAutodialFunc     : array[0..Max_PATH-1] of char;                   {!!.06}
-    szDeviceType       : array[0..RasMaxDeviceType] of char;             {!!.06}
-    szDeviceName       : array[0..RasMaxDeviceName] of char;             {!!.06}
-    szX25PadType       : array[0..RasMaxPadType] of char;                {!!.06}
-    szX25Address       : array[0..RasMaxX25Address] of char;             {!!.06}
-    szX25Facilities    : array[0..RasMaxFacilities] of char;             {!!.06}
-    szX25UserData      : array[0..RasMaxUserData] of char;               {!!.06}
+    szScript           : array[0..Max_PATH-1] of ansichar;                   {!!.06} // --sm ansi
+    szAutodialDll      : array[0..Max_PATH-1] of ansichar;                   {!!.06}
+    szAutodialFunc     : array[0..Max_PATH-1] of ansichar;                   {!!.06}
+    szDeviceType       : array[0..RasMaxDeviceType] of ansichar;             {!!.06}
+    szDeviceName       : array[0..RasMaxDeviceName] of ansichar;             {!!.06}
+    szX25PadType       : array[0..RasMaxPadType] of ansichar;                {!!.06}
+    szX25Address       : array[0..RasMaxX25Address] of ansichar;             {!!.06}
+    szX25Facilities    : array[0..RasMaxFacilities] of ansichar;             {!!.06}
+    szX25UserData      : array[0..RasMaxUserData] of ansichar;               {!!.06}
     dwChannels         : DWord;                                          {!!.06}
     dwReserved1        : DWord;                                          {!!.06}
     dwReserved2        : DWord;                                          {!!.06}
@@ -385,12 +386,12 @@ const
 
 type
   {Convenient types used by protocols}
-  TNameCharArray = array[0..fsFileName ] of Char;
+  TNameCharArray = array[0..fsFileName ] of Char;  // --sm ansi
   TExtCharArray  = array[0..fsExtension] of Char;
   TPathCharArray = array[0..fsPathName ] of Char;
-  TDirCharArray  = array[0..fsDirectory] of Char;                   
-  TChar20Array   = array[0..20] of Char;
-  TCharArray = array[0..255] of Char;
+  TDirCharArray  = array[0..fsDirectory] of Char;
+  TChar20Array   = array[0..20] of ansiChar;
+  TCharArray = array[0..255] of ansiChar;
 
   {Port characteristic constants}
   TDatabits = 5..DontChangeDatabits;
@@ -1485,7 +1486,7 @@ type
                  GotSpace, GotQuestionMark, GotQuestionParam);
 
   {Array used for internal queue}
-  TApQueue = Array[1..MaxQueue] of Char;                                    // SWB
+  TApQueue = Array[1..MaxQueue] of ansiChar;                                    // SWB // --sm ansi
 
   {Emulator for PC ANSI codes}
   PAnsiEmulator = ^TAnsiEmulator;
@@ -1497,7 +1498,8 @@ type
     emuIndex       : Cardinal;       {Index into rcvd byte array}
     emuParamIndex  : Cardinal;       {Parameter index}
     emuQueue       : TApQueue;       {Queue of recvd bytes}                 // SWB
-    emuParamStr    : array[1..MaxParams] of string[MaxParamLength];
+//    emuParamStr    : array[1..MaxParams] of string[MaxParamLength];
+    emuParamStr    : array[1..MaxParams] of ansistring;
     emuParamInt    : array[1..MaxParams] of Integer;
     emuParserState : TAnsiParser;    {Current state}
     emuOther       : Pointer;
@@ -1568,14 +1570,14 @@ const
 
 type
   {where these same variables are declared as Strings.}
-  TModemNameZ     = array[0..ApdModemNameLen] of Char;
-  TCmdStringZ     = array[0..ApdCmdLen] of Char;
-  TRspStringZ     = array[0..ApdRspLen] of Char;
-  TTagStringZ     = array[0..ApdTagLen] of Char;
-  TTagProfStringZ = array[0..ApdTagProfLen] of Char;
-  TConfigStringZ  = array[0..ApdConfigLen] of Char;
-  TBoolStrZ       = array[0..ApdBoolLen] of Char;
-  TBaudStrZ       = array[0..ApdBaudLen] of Char;
+  TModemNameZ     = array[0..ApdModemNameLen] of ansiChar;  // --sm ansi
+  TCmdStringZ     = array[0..ApdCmdLen] of ansiChar;
+  TRspStringZ     = array[0..ApdRspLen] of ansiChar;
+  TTagStringZ     = array[0..ApdTagLen] of ansiChar;
+  TTagProfStringZ = array[0..ApdTagProfLen] of ansiChar;
+  TConfigStringZ  = array[0..ApdConfigLen] of ansiChar;
+  TBoolStrZ       = array[0..ApdBoolLen] of ansiChar;
+  TBaudStrZ       = array[0..ApdBaudLen] of ansiChar;
 
   TTagArrayZ = array[1..ApdMaxTags] of TTagStringZ;
 
@@ -1644,8 +1646,8 @@ const
   ApdKeyIndexMaxLen  = 120;
 
 type
-  TKeyMapName    = array[0..ApdKeyMapNameLen] of Char;
-  TKeyMapping    = array[0..KeyMappingLen] of char;
+  TKeyMapName    = array[0..ApdKeyMapNameLen] of ansiChar; // --sm ansi
+  TKeyMapping    = array[0..KeyMappingLen] of ansichar;
   TKeyMappingStr = string[KeyMappingLen];
 
 
@@ -1663,12 +1665,12 @@ type
   end;
 
   PKeyEmulator = ^TKeyEmulator;
-  TKeyEmulator = record
-    kbKeyFileName : PChar;                            { current file name }
+  TKeyEmulator = record // --sm ansi
+    kbKeyFileName : PansiChar;                            { current file name }
     kbKeyName     : TKeyMapName;                      { current key index name }
     kbProcessAll  : Bool;
     kbProcessExt  : Bool;
-    kbKeyNameList : array[0..ApdKeyIndexMaxLen] of char;
+    kbKeyNameList : array[0..ApdKeyIndexMaxLen] of ansichar;
     kbKeyMap      : array[1..ApdMaxKeyMaps] of TVKeyMapRec;
     kbKeyDataBase : PIniDataBase;          { pointer to the INI data base file }
   end;
@@ -1731,14 +1733,14 @@ const
   zfWriteProtect     = 7;          {Transfer only if new}
 
   {Convenient protocol string constants}
-  ProtocolString : array[NoProtocol..BPlus] of array[0..9] of Char= (
+  ProtocolString : array[NoProtocol..BPlus] of array[0..9] of ansiChar= (
     'None', 'Xmodem', 'XmodemCRC', 'Xmodem1K', 'Xmodem1KG',
     'Ymodem', 'YmodemG', 'Zmodem', 'Kermit', 'Ascii', 'B+');
 
 type
   {For holding lists of files to transmit}
   PFileList = ^TFileList;
-  TFileList = array[0..65535-1] of Char;
+  TFileList = array[0..65535-1] of ansiChar;
 
 {Fax conversion}
 
@@ -1813,7 +1815,8 @@ type
   end;
 
   {For storing station IDs}
-  Str20 = string[20];
+//  Str20 = string[20];
+  Str20 = ansistring;
 
   {Stores information about our fonts}
   TFontRecord = record
@@ -1824,7 +1827,7 @@ type
   end;
 
   {Fax file signature array}
-  TSigArray = Array[0..5] of Char;
+  TSigArray = Array[0..5] of ansiChar; // --sm ansi
 
 const
   {Default fax file signature, first 6 chars in an APF}
@@ -1854,7 +1857,8 @@ type
     ID       : LongInt;          {APRO fax job signature}
     Status   : Byte;             {0=none sent, 1=some sent, 2=all sent, 3=paused}
     JobName  : Str20;            {Friendly name of fax job}
-    Sender   : String[40];       {Name of sender (same as HeaderSender)}
+//    Sender   : String[40];       {Name of sender (same as HeaderSender)}
+    Sender   : ansiString;       {Name of sender (same as HeaderSender)}
     SchedDT  : TDateTime;        {TDateTime the first job should be sent}
     NumJobs  : Byte;             {Number of FaxJobInfoRecs for this job}
     NextJob  : Byte;             {The index of the next FaxJobInfo to send}
@@ -1870,10 +1874,14 @@ type
     SchedDT        : TDateTime;        {TDateTime this job should be sent}
     AttemptNum     : Byte;             {Retry number for this recipient}
     LastResult     : Word;             {Last ErrorCode for this fax}
-    PhoneNumber    : String[50];       {Phone number to dial for this job}
-    HeaderLine     : String[100];      {Header line}
-    HeaderRecipient: String[30];       {Recipient's name}
-    HeaderTitle    : String[30];       {Title of fax}
+//    PhoneNumber    : String[50];       {Phone number to dial for this job}
+//    HeaderLine     : String[100];      {Header line}
+//    HeaderRecipient: String[30];       {Recipient's name}
+//    HeaderTitle    : String[30];       {Title of fax} // --sm --zer0
+    PhoneNumber    : ansiString;       {Phone number to dial for this job}
+    HeaderLine     : ansiString;      {Header line}
+    HeaderRecipient: ansiString;       {Recipient's name}
+    HeaderTitle    : ansiString;       {Title of fax}
     Padding        : Array[228..256] of Byte;{Expansion room}
   end;
 
@@ -1917,7 +1925,7 @@ type
   PAbsFaxCvt = ^TAbsFaxCvt;
 
   {callback function to open a converter input file}
-  TOpenFileCallback = function(Cvt : PAbsFaxCvt; FileName : PChar) : Integer;
+  TOpenFileCallback = function(Cvt : PAbsFaxCvt; FileName : PansiChar) : Integer;
 
   {callback function to close a converter input file}
   TCloseFileCallback = procedure(Cvt : PAbsFaxCvt);
@@ -1962,10 +1970,10 @@ type
     CloseCall   : TCloseFileCallback; {To close the input file, if any}
     StatusFunc  : TCvtStatusCallback; {Callback for status display}
     StatusWnd   : HWnd;               {Handle of window receiving status msgs}
-    DefExt      : array[0..3] of Char;
-    InFileName  : array[0..255] of Char;
-    OutFileName : array[0..255] of Char;
-    StationID   : array[0..20] of Char;
+    DefExt      : array[0..3] of ansiChar;
+    InFileName  : array[0..255] of ansiChar;
+    OutFileName : array[0..255] of ansiChar;
+    StationID   : array[0..20] of ansiChar;
     MainHeader  : TFaxHeaderRec;      {main header of fax output file}
     PageHeader  : TPageHeaderRec;     {header for current output page}
     OutFile     : PBufferedOutputFile;{Output file}
@@ -2259,13 +2267,13 @@ type
 
   {DispatchBuffer type}
   PDBuffer = ^TDBuffer;
-  TDBuffer = array[0..65527] of Char;
+  TDBuffer = array[0..65527] of ansiChar;
 
   POBuffer = ^TOBuffer;
   TOBuffer = array[0..pred(High(Integer))] of AnsiChar;
 
   {For storing com name}
-  TComName = array[0..5] of Char;
+  TComName = array[0..5] of ansiChar;
 
   {Trigger types}
   TTriggerType = (ttNone, ttAvail, ttTimer, ttData, ttStatus);
@@ -2368,11 +2376,11 @@ function ElapsedTimeInSecs(ET : EventTimer) : LongInt;
 function RemainingTime(ET : EventTimer) : LongInt;
 function RemainingTimeInSecs(ET : EventTimer) : LongInt;
 function DelayTicks(Ticks: LongInt; Yield : Bool) : Longint;
-function StrStCopy(Dest : PChar; S : PChar; Pos, Count : Cardinal) : PChar;
-function AddBackSlashZ(Dest : PChar; DirName : PChar) : PChar;
-function ExistFileZ(FName : PChar) : Bool;
-function ForceExtensionZ(Dest : PChar; Name, Ext : PChar) : PChar;
-function DefaultExtensionZ(Dest : PChar; Name, Ext : PChar) : PChar;
+function StrStCopy(Dest : PansiChar; S : PansiChar; Pos, Count : Cardinal) : PansiChar; // --sm ansi
+function AddBackSlashZ(Dest : PansiChar; DirName : PansiChar) : PansiChar;
+function ExistFileZ(FName : PansiChar) : Bool;
+function ForceExtensionZ(Dest : PansiChar; Name, Ext : PansiChar) : PansiChar;
+function DefaultExtensionZ(Dest : PansiChar; Name, Ext : PansiChar) : PansiChar;
 function GetPtr(P : Pointer; O : LongInt) : Pointer;
 procedure NotBuffer(var Buf; Len : Cardinal);
 
@@ -2382,10 +2390,10 @@ function DelayMS(MS : Cardinal) : Cardinal;
 function SafeYield : LongInt;
 
 
-function JustName(PathName : String) : String;
+function JustName(PathName : ansiString) : ansiString;
   {-Return just the name (no extension, no path) of a pathname}
 
-function AddBackSlash(const DirName : String) : String;
+function AddBackSlash(const DirName : ansiString) : ansiString;
   {-Add a default backslash to a directory name}
 
 function IsWin2000 : Boolean;
@@ -2399,10 +2407,10 @@ function IsWinNT : Boolean;
 type
   TApdBaseComponent = class(TComponent)
   protected
-    function GetVersion : string;
-    procedure SetVersion(const Value : string);
+    function GetVersion : ansistring;
+    procedure SetVersion(const Value : ansistring);
   published
-    property Version : string
+    property Version : ansistring
       read GetVersion
       write SetVersion
       stored False;
@@ -2410,10 +2418,10 @@ type
 
   TApdBaseWinControl = class(TWinControl)
   protected
-    function GetVersion : string;
-    procedure SetVersion(const Value : string);
+    function GetVersion : ansistring;
+    procedure SetVersion(const Value : ansistring);
   published
-    property Version : string
+    property Version : ansistring
       read GetVersion
       write SetVersion
       stored False;
@@ -2421,10 +2429,10 @@ type
 
   TApdBaseOleControl = class(TOleControl)
   protected
-    function GetVersion : string;
-    procedure SetVersion (const Value : string);
+    function GetVersion : ansistring;
+    procedure SetVersion (const Value : ansistring);
   published
-    property Version : string
+    property Version : ansistring
       read GetVersion
       write SetVersion
       stored False;
@@ -2432,10 +2440,10 @@ type
 
   TApdBaseGraphicControl = class(TGraphicControl)
   protected
-    function GetVersion : string;
-    procedure SetVersion (const Value : string);
+    function GetVersion : ansistring;
+    procedure SetVersion (const Value : ansistring);
   published
-    property Version : string
+    property Version : ansistring
       read GetVersion
       write SetVersion
       stored False;
@@ -2443,10 +2451,10 @@ type
 
   TApdBaseScrollingWinControl = class(TScrollingWinControl)
   protected
-    function GetVersion : string;
-    procedure SetVersion (const Value : string);
+    function GetVersion : ansistring;
+    procedure SetVersion (const Value : ansistring);
   published
-    property Version : string
+    property Version : ansistring
       read GetVersion
       write SetVersion
       stored False;
@@ -2455,18 +2463,18 @@ type
 {$ENDIF}
 
 
-function ApWinExecAndWait32(FileName : PChar; CommandLine : PChar;
+function ApWinExecAndWait32(FileName : PansiChar; CommandLine : PansiChar;
                             Visibility : Integer) : Integer;
 
 {$IFDEF Apax}
-procedure WriteDebug(const S : string);
+procedure WriteDebug(const S : ansistring);
 {$ENDIF}
 
 
 implementation
 
 {$IFDEF APAX}
-procedure WriteDebug(const S : string);
+procedure WriteDebug(const S : ansistring);
 var
   LogStream : TFileStream;
   TimeStamp : ansistring;
@@ -2761,7 +2769,7 @@ const
 type
   TSmallArray = Array[0..MaxLen-1] of Char;
 
-  function StrStCopy(Dest : PChar; S : PChar; Pos, Count : Cardinal) : PChar;
+  function StrStCopy(Dest : PansiChar; S : PansiChar; Pos, Count : Cardinal) : PansiChar;
   var
     Len : Cardinal;
 
@@ -2777,7 +2785,7 @@ type
     StrStCopy := Dest;
   end;
 
-  function AddBackSlashZ(Dest : PChar; DirName : PChar) : PChar;
+  function AddBackSlashZ(Dest : PansiChar; DirName : PansiChar) : PansiChar;
     {-Add a default backslash to a directory name}
   var
     L : Cardinal;
@@ -2792,20 +2800,20 @@ type
   end;
 
   {$IFNDEF PrnDrv}
-  function ExistFileZ(FName : PChar) : Bool;
+  function ExistFileZ(FName : PansiChar) : Bool;
   begin
     Result := FileExists(StrPas(FName));
   end;
   {$ENDIF}
 
-  function ForceExtensionZ(Dest : PChar; Name, Ext : PChar) : PChar;
+  function ForceExtensionZ(Dest : PansiChar; Name, Ext : PansiChar) : PansiChar;
   begin
     Result := StrPCopy(Dest,ChangeFileExt(StrPas(Name),'.'+StrPas(Ext)));
   end;
 
-  function DefaultExtensionZ(Dest : PChar; Name, Ext : PChar) : PChar;
+  function DefaultExtensionZ(Dest : PansiChar; Name, Ext : PansiChar) : PansiChar;
   var
-    S : string;
+    S : ansistring;
   begin
     S := StrPas(Name);
     if ExtractFileExt(S) = '' then
@@ -2878,7 +2886,7 @@ function PayloadLengthInBytes( const s: string): integer;
     end;
   end;
 
-  function JustName(PathName : string) : string;
+  function JustName(PathName : ansiString) : ansiString;
     {-Return just the name (no extension, no path) of a pathname}
   var
     DotPos : Byte;
@@ -2890,7 +2898,7 @@ function PayloadLengthInBytes( const s: string): integer;
     Result := PathName;
   end;
 
-  function AddBackSlash(const DirName : String) : String;
+  function AddBackSlash(const DirName : ansiString) : ansiString;
     {-Add a default backslash to a directory name}
   var
     IsQuoted : Boolean;
@@ -2928,61 +2936,61 @@ begin
 end;
 
 { TApdBaseComponent }
-function TApdBaseComponent.GetVersion : string;
+function TApdBaseComponent.GetVersion : ansistring;
 begin
   Result := ApVersionStr;
 end;
 
-procedure TApdBaseComponent.SetVersion(const Value : string);
+procedure TApdBaseComponent.SetVersion(const Value : ansistring);
 begin
 end;
 
 { TApdBaseWinControl }
-function TApdBaseWinControl.GetVersion : string;
+function TApdBaseWinControl.GetVersion : ansistring;
 begin
   Result := ApVersionStr;
 end;
 
-procedure TApdBaseWinControl.SetVersion(const Value : string);
+procedure TApdBaseWinControl.SetVersion(const Value : ansistring);
 begin
 end;
 
 { TApdBaseOleControl }
-function TApdBaseOleControl.GetVersion : string;
+function TApdBaseOleControl.GetVersion : ansistring;
 begin
   Result := ApVersionStr;
 end;
 
-procedure TApdBaseOleControl.SetVersion(const Value : string);
+procedure TApdBaseOleControl.SetVersion(const Value : ansistring);
 begin
 end;
 
 { TApdBaseGraphicControl }
-function TApdBaseGraphicControl.GetVersion: string;
+function TApdBaseGraphicControl.GetVersion: ansistring;
 begin
   Result := ApVersionStr;
 end;
 
-procedure TApdBaseGraphicControl.SetVersion(const Value: string);
+procedure TApdBaseGraphicControl.SetVersion(const Value: ansistring);
 begin
 end;
 
 { TApdBaseScrollingWinControl }
-function TApdBaseScrollingWinControl.GetVersion: string;
+function TApdBaseScrollingWinControl.GetVersion: ansistring;
 begin
   Result := ApVersionStr;
 end;
 
-procedure TApdBaseScrollingWinControl.SetVersion(const Value: string);
+procedure TApdBaseScrollingWinControl.SetVersion(const Value: ansistring);
 begin                    
 end;
 
-function ApWinExecAndWait32(FileName : PChar; CommandLine : PChar;
+function ApWinExecAndWait32(FileName : PansiChar; CommandLine : PansiChar;
                             Visibility : Integer) : Integer;
  { returns -1 if the Exec failed, otherwise returns the process' exit }
  { code when the process terminates }
 var
-  zAppName:array[0..512] of char;
+  zAppName: array[0..512] of ansichar;
 //  zCurDir:array[0..255] of PAnsiChar;
   zCurDir:PAnsiChar;
   WorkDir:AnsiString;
@@ -2996,15 +3004,15 @@ begin
   GetDir(0, WorkDir);
   StrPCopy(zCurDir, WorkDir);
   FillChar(StartupInfo, Sizeof(StartupInfo),#0);
-  StartupInfo.cb := Sizeof(StartupInfo);                               
-  StartupInfo.dwFlags := STARTF_USESHOWWINDOW;                         
-  StartupInfo.wShowWindow := Visibility;                               
-  if not CreateProcess(nil,                                            
-      zAppName,              { pointer to command line string }        
+  StartupInfo.cb := Sizeof(StartupInfo);
+  StartupInfo.dwFlags := STARTF_USESHOWWINDOW;
+  StartupInfo.wShowWindow := Visibility;
+  if not CreateProcess(nil,
+      zAppName,              { pointer to command line string }
       nil,                   { pointer to process security attributes }
-      nil,                   { pointer to thread security attributes } 
-      false,                 { handle inheritance flag }               
-      CREATE_NEW_CONSOLE or  { creation flags }                        
+      nil,                   { pointer to thread security attributes }
+      false,                 { handle inheritance flag }
+      CREATE_NEW_CONSOLE or  { creation flags }
       NORMAL_PRIORITY_CLASS,
       nil,                   { pointer to new environment block }
       nil,                   { pointer to current directory name }     

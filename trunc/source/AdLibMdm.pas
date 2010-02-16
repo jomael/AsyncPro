@@ -43,25 +43,25 @@ uses
 
 type
   { LibModem type definitions }
-  TApdLoadModemRecord = procedure (ModemName, Manufacturer, Model, ModemFile : string;
+  TApdLoadModemRecord = procedure (ModemName, Manufacturer, Model, ModemFile : ansistring; // --sm ansi
                                    var CanLoad : Boolean) of object;
-  TApdLoadModem = procedure (ModemName, Manufacturer, Model : string;
+  TApdLoadModem = procedure (ModemName, Manufacturer, Model : ansistring;
                              var CanLoad : Boolean) of object;
 
   { an entry from modemcap.xml describing the modem, one per modem }
   PLmModemName = ^TLmModemName;
-  TLmModemName = record
-    ModemName : string;
-    Manufacturer : string;
-    Model : string;
-    ModemFile : string;
+  TLmModemName = record       // --sm ansi
+    ModemName : ansistring;
+    Manufacturer : ansistring;
+    Model : ansistring;
+    ModemFile : ansistring;
   end;
 
   { a modem response }
   PLmResponseData = ^TLmResponseData;
-  TLmResponseData = record
-    Response                         : string;
-    ResponseType                     : string;
+  TLmResponseData = record                // --sm ansi
+    Response                         : ansistring;
+    ResponseType                     : ansistring;
   end;
 
   { lots of modem responses }
@@ -103,48 +103,48 @@ type
   { a modem command }
   PLmModemCommand = ^TLmModemCommand;
   TLmModemCommand = record
-    Command                          : string;
+    Command                          : ansistring;
     Sequence                         : Integer;
   end;
 
   { fax commands and responses }
-  TLmFaxClassDetails = record
-    ModemResponseFaxDetect           : string;
-    ModemResponseDataDetect          : string;
-    SerialSpeedFaxDetect             : string;
-    SerialSpeedDataDetect            : string;
-    HostCommandFaxDetect             : string;
-    HostCommandDataDetect            : string;
-    ModemResponseFaxConnect          : string;
-    ModemResponseDataConnect         : string;
+  TLmFaxClassDetails = record        // --sm ansi
+    ModemResponseFaxDetect           : ansistring;
+    ModemResponseDataDetect          : ansistring;
+    SerialSpeedFaxDetect             : ansistring;
+    SerialSpeedDataDetect            : ansistring;
+    HostCommandFaxDetect             : ansistring;
+    HostCommandDataDetect            : ansistring;
+    ModemResponseFaxConnect          : ansistring;
+    ModemResponseDataConnect         : ansistring;
     AnswerCommand                    : TList;
   end;
 
   { more fax commands and responses }
-  TLmFaxDetails = record
-    ExitCommand                      : string;
-    PreAnswerCommand                 : string;
-    PreDialCommand                   : string;
-    ResetCommand                     : string;
-    SetupCommand                     : string;
-    EnableV17Recv                    : string;
-    EnableV17Send                    : string;
-    FixModemClass                    : string;
-    FixSerialSpeed                   : string;
-    HighestSendSpeed                 : string;
-    LowestSendSpeed                  : string;
-    HardwareFlowControl              : string;
-    SerialSpeedInit                  : string;
-    Cl1FCS                           : string;
-    Cl2DC2                           : string;
-    Cl2lsEx                          : string;
-    Cl2RecvBOR                       : string;
-    Cl2SendBOR                       : string;
-    Cl2SkipCtrlQ                     : string;
-    Cl2SWBOR                         : string;
-    Class2FlowOff                    : string;
-    Class2FlowHW                     : string;
-    Class2FlowSW                     : string;
+  TLmFaxDetails = record             // --sm ansi
+    ExitCommand                      : ansistring;
+    PreAnswerCommand                 : ansistring;
+    PreDialCommand                   : ansistring;
+    ResetCommand                     : ansistring;
+    SetupCommand                     : ansistring;
+    EnableV17Recv                    : ansistring;
+    EnableV17Send                    : ansistring;
+    FixModemClass                    : ansistring;
+    FixSerialSpeed                   : ansistring;
+    HighestSendSpeed                 : ansistring;
+    LowestSendSpeed                  : ansistring;
+    HardwareFlowControl              : ansistring;
+    SerialSpeedInit                  : ansistring;
+    Cl1FCS                           : ansistring;
+    Cl2DC2                           : ansistring;
+    Cl2lsEx                          : ansistring;
+    Cl2RecvBOR                       : ansistring;
+    Cl2SendBOR                       : ansistring;
+    Cl2SkipCtrlQ                     : ansistring;
+    Cl2SWBOR                         : ansistring;
+    Class2FlowOff                    : ansistring;
+    Class2FlowHW                     : ansistring;
+    Class2FlowSW                     : ansistring;
 
     FaxClass1                        : TLmFaxClassDetails;
     FaxClass2                        : TLmFaxClassDetails;
@@ -153,46 +153,46 @@ type
 
   { supported wave formats }
   PLmWaveFormat = ^TLMWaveFormat;
-  TLmWaveFormat = record
-    ChipSet                          : string;
-    Speed                            : string;
-    SampleSize                       : string;
+  TLmWaveFormat = record             // --sm ansi
+    ChipSet                          : ansistring;
+    Speed                            : ansistring;
+    SampleSize                       : ansistring;
   end;
 
   { wave details }
-  TLmWaveDriver = record
-    BaudRate                         : string;
-    WaveHardwareID                   : string;
-    WaveDevices                      : string;
-    LowerMid                         : string;
-    LowerWaveInPid                   : string;
-    LowerWaveOutPid                  : string;
-    WaveOutMixerDest                 : string;
-    WaveOutMixerSource               : string;
-    WaveInMixerDest                  : string;
-    WaveInMixerSource                : string;
+  TLmWaveDriver = record             // --sm ansi
+    BaudRate                         : ansistring;
+    WaveHardwareID                   : ansistring;
+    WaveDevices                      : ansistring;
+    LowerMid                         : ansistring;
+    LowerWaveInPid                   : ansistring;
+    LowerWaveOutPid                  : ansistring;
+    WaveOutMixerDest                 : ansistring;
+    WaveOutMixerSource               : ansistring;
+    WaveInMixerDest                  : ansistring;
+    WaveInMixerSource                : ansistring;
 
     WaveFormat                       : TList;          // LmWaveFormat
   end;
 
   { voice modem properties }
-  TLmVoiceSettings = record
-    VoiceProfile                     : string;
+  TLmVoiceSettings = record          // --sm ansi
+    VoiceProfile                     : ansistring;
     HandsetCloseDelay                : Integer;
-    SpeakerPhoneSpecs                : string;
-    AbortPlay                        : string;
-    CallerIDOutSide                  : string;
-    CallerIDPrivate                  : string;
-    TerminatePlay                    : string;
-    TerminateRecord                  : string;
-    VoiceManufacturerID              : string;
-    VoiceProductIDWaveIn             : string;
-    VoiceProductIDWaveOut            : string;
-    VoiceSwitchFeatures              : string;
+    SpeakerPhoneSpecs                : ansistring;
+    AbortPlay                        : ansistring;
+    CallerIDOutSide                  : ansistring;
+    CallerIDPrivate                  : ansistring;
+    TerminatePlay                    : ansistring;
+    TerminateRecord                  : ansistring;
+    VoiceManufacturerID              : ansistring;
+    VoiceProductIDWaveIn             : ansistring;
+    VoiceProductIDWaveOut            : ansistring;
+    VoiceSwitchFeatures              : ansistring;
     VoiceBaudRate                    : Integer;
-    VoiceMixerMid                    : string;
-    VoiceMixerPid                    : string;
-    VoiceMixerLineID                 : string;
+    VoiceMixerMid                    : ansistring;
+    VoiceMixerPid                    : ansistring;
+    VoiceMixerLineID                 : ansistring;
 
     CloseHandset                     : TList;             // LmModemCommand;
     EnableCallerID                   : TList;             // LmModemCommand;
@@ -220,56 +220,56 @@ type
   end;
 
   { lots of specialized modem commands }
-  TLmModemSettings = record
-    Prefix                           : string;
-    Terminator                       : string;
-    DialPrefix                       : string;
-    DialSuffix                       : string;
-    SpeakerVolume_High               : string;
-    SpeakerVolume_Low                : string;
-    SpeakerVolume_Med                : string;
-    SpeakerMode_Dial                 : string;
-    SpeakerMode_Off                  : string;
-    SpeakerMode_On                   : string;
-    SpeakerMode_Setup                : string;
-    FlowControl_Hard                 : string;
-    FlowControl_Off                  : string;
-    FlowControl_Soft                 : string;
-    ErrorControl_Forced              : string;
-    ErrorControl_Off                 : string;
-    ErrorControl_On                  : string;
-    ErrorControl_Cellular            : string;
-    ErrorControl_Cellular_Forced     : string;
-    Compression_Off                  : string;
-    Compression_On                   : string;
-    Modulation_Bell                  : string;
-    Modulation_CCITT                 : string;
-    Modulation_CCITT_V23             : string;
-    SpeedNegotiation_On              : string;
-    SpeedNegotiation_Off             : string;
-    Pulse                            : string;
-    Tone                             : string;
-    Blind_Off                        : string;
-    Blind_On                         : string;
-    CallSetupFailTimer               : string;
-    InactivityTimeout                : string;
-    CompatibilityFlags               : string;
+  TLmModemSettings = record          // --sm ansi
+    Prefix                           : ansistring;
+    Terminator                       : ansistring;
+    DialPrefix                       : ansistring;
+    DialSuffix                       : ansistring;
+    SpeakerVolume_High               : ansistring;
+    SpeakerVolume_Low                : ansistring;
+    SpeakerVolume_Med                : ansistring;
+    SpeakerMode_Dial                 : ansistring;
+    SpeakerMode_Off                  : ansistring;
+    SpeakerMode_On                   : ansistring;
+    SpeakerMode_Setup                : ansistring;
+    FlowControl_Hard                 : ansistring;
+    FlowControl_Off                  : ansistring;
+    FlowControl_Soft                 : ansistring;
+    ErrorControl_Forced              : ansistring;
+    ErrorControl_Off                 : ansistring;
+    ErrorControl_On                  : ansistring;
+    ErrorControl_Cellular            : ansistring;
+    ErrorControl_Cellular_Forced     : ansistring;
+    Compression_Off                  : ansistring;
+    Compression_On                   : ansistring;
+    Modulation_Bell                  : ansistring;
+    Modulation_CCITT                 : ansistring;
+    Modulation_CCITT_V23             : ansistring;
+    SpeedNegotiation_On              : ansistring;
+    SpeedNegotiation_Off             : ansistring;
+    Pulse                            : ansistring;
+    Tone                             : ansistring;
+    Blind_Off                        : ansistring;
+    Blind_On                         : ansistring;
+    CallSetupFailTimer               : ansistring;
+    InactivityTimeout                : ansistring;
+    CompatibilityFlags               : ansistring;
     ConfigDelay                      : Integer;
   end;
 
   { modem hardware settings }
-  TLmModemHardware = record
-    AutoConfigOverride               : string;
-    ComPort                          : string;
-    InvalidRDP                       : string;
+  TLmModemHardware = record          // --sm ansi
+    AutoConfigOverride               : ansistring;
+    ComPort                          : ansistring;
+    InvalidRDP                       : ansistring;
     IoBaseAddress                    : Integer;
     InterruptNumber                  : Integer;
     PermitShare                      : Boolean;
-    RxFIFO                           : string;
+    RxFIFO                           : ansistring;
     RxTxBufferSize                   : Integer;
-    TxFIFO                           : string;
-    Pcmcia                           : string;
-    BusType                          : string;
+    TxFIFO                           : ansistring;
+    Pcmcia                           : ansistring;
+    BusType                          : ansistring;
     PCCARDAttributeMemoryAddress     : Integer;
     PCCARDAttributeMemorySize        : Integer;
     PCCARDAttributeMemoryOffset      : Integer;
@@ -277,25 +277,25 @@ type
 
   { the whole shebang }
   PLmModem = ^TLmModem;
-  TLmModem = record
-    Inheritance                      : string;
-    AttachedTo                       : string;
-    FriendlyName                     : string;
-    Manufacturer                     : string;
-    Model                            : string;
-    ModemID                          : string;
-    InactivityFormat                 : string;
-    Reset                            : string;
-    DCB                              : string;
-    Properties                       : string;
+  TLmModem = record                  // --sm ansi
+    Inheritance                      : ansistring;
+    AttachedTo                       : ansistring;
+    FriendlyName                     : ansistring;
+    Manufacturer                     : ansistring;
+    Model                            : ansistring;
+    ModemID                          : ansistring;
+    InactivityFormat                 : ansistring;
+    Reset                            : ansistring;
+    DCB                              : ansistring;
+    Properties                       : ansistring;
     ForwardDelay                     : Integer;
-    VariableTerminator               : string;
-    InfPath                          : string;
-    InfSection                       : string;
-    ProviderName                     : string;
-    DriverDesc                       : string;
-    ResponsesKeyName                 : string;
-    Default                          : string;
+    VariableTerminator               : ansistring;
+    InfPath                          : ansistring;
+    InfSection                       : ansistring;
+    ProviderName                     : ansistring;
+    DriverDesc                       : ansistring;
+    ResponsesKeyName                 : ansistring;
+    Default                          : ansistring;
     CallSetupFailTimeout             : Integer;
     InactivityTimeout                : Integer;
     SupportsWaitForBongTone          : Boolean;
@@ -322,7 +322,7 @@ type
     SupportsModemDiagnostics         : Boolean;
     MaxDTERate                       : Integer;
     MaxDCERate                       : Integer;
-    CurrentCountry                   : string;
+    CurrentCountry                   : ansistring;
     MaximumPortSpeed                 : Integer;
     PowerDelay                       : Integer;
     ConfigDelay                      : Integer;
@@ -379,27 +379,27 @@ type
   end;
 
   { loose wrapper around the TLmModemName record for use in our TStringLists }
-  TApdLmModemNameClass = class(TObject)
-    ModemName : string;
-    Manufacturer : string;
-    Model : string;
-    ModemFile : string;
+  TApdLmModemNameClass = class(TObject) // --sm ansi
+    ModemName : ansistring;
+    Manufacturer : ansistring;
+    Model : ansistring;
+    ModemFile : ansistring;
   end;
 
   TApdLmModemCollectionItem = class(TCollectionItem)
-  private
-    FModemName    : string;
-    FManufacturer : string;
-    FModel        : string;
-    FModemFile    : string;
+  private   // --sm ansi
+    FModemName    : ansistring;
+    FManufacturer : ansistring;
+    FModel        : ansistring;
+    FModemFile    : ansistring;
   published
-    property ModemName    : string
+    property ModemName    : ansistring
       read FModemName write FModemName;
-    property Manufacturer : string
+    property Manufacturer : ansistring
       read FManufacturer write FManufacturer;
-    property Model        : string
+    property Model        : ansistring
       read FModel write FModel;
-    property ModemFile    : string
+    property ModemFile    : ansistring
       read FModemFile write FModemFile;
   end;
 
@@ -415,7 +415,7 @@ type
 
   TApdLibModem = class (TComponent)
     private
-      FLibModemPath : string;
+      FLibModemPath : ansistring;
       FCompleteDbs : Boolean;
       FReadingAttributes : Boolean;
 
@@ -434,7 +434,7 @@ type
       FLastSeq : Integer;
 
     protected
-      procedure SetLibModemPath (v : string);
+      procedure SetLibModemPath (v : ansistring);
       procedure LoadModemListAttribute (oOwner     : TObject;
                                         sName,
                                         sValue     : DOMString;
@@ -485,15 +485,15 @@ type
       procedure LoadModemElementEnd (oOwner : TObject;
                                      sValue : DOMString);
 
-      function GetXMLInteger (Value : string; Default : Integer) : Integer;
-      function GetXMLBoolean (Value : string; Default : Boolean) : Boolean;
+      function GetXMLInteger (Value : ansistring; Default : Integer) : Integer;
+      function GetXMLBoolean (Value : ansistring; Default : Boolean) : Boolean;
 
       procedure LoadModemList;
       procedure FreeModemList;
       function CreateModem : PLmModem;
       procedure FreeModemEntry (Value : Integer);
       procedure FreeModem;
-      procedure LoadModem (FileName : string; Append : Boolean);
+      procedure LoadModem (FileName : ansistring; Append : Boolean);
 
     public
       constructor Create (AOwner : TComponent); override;
@@ -501,24 +501,24 @@ type
 
       { loads a specific modem detail structure from modemcap, shows }
       { a dialog when appropriate }
-      function SelectModem(var ModemFile, ModemManufacturer, ModemName: string;
+      function SelectModem(var ModemFile, ModemManufacturer, ModemName: ansistring;
         var LmModem : TLmModem) : Boolean;
 
       { returns True if the specified modem is in modemcap }
-      function IsModemValid(ModemFile, ModemName : string) : Boolean;    {!!.04}
+      function IsModemValid(ModemFile, ModemName : ansistring) : Boolean;    {!!.04}
 
       { these methods manage the modem detail files }
       { create a new modem detail file with appropriate headers }
-      function CreateNewDetailFile(const ModemDetailFile : string) : Integer;
+      function CreateNewDetailFile(const ModemDetailFile : ansistring) : Integer;
       { adds a modem to the modem detail file }
-      function AddModem(const ModemDetailFile : string; Modem : TLmModem) : Integer;
+      function AddModem(const ModemDetailFile : ansistring; Modem : TLmModem) : Integer;
       { deletes a modem from the modem detail file }
-      function DeleteModem(const ModemDetailFile, ModemName : string) : Integer;
+      function DeleteModem(const ModemDetailFile, ModemName : ansistring) : Integer;
       { retrieves a specific modem from the modem detail file }
-      function GetModem(const ModemDetailFile, ModemName : string;
+      function GetModem(const ModemDetailFile, ModemName : ansistring;
         var Modem : TLmModem) : Integer;
       { retrieves all modems from a modem detail file }
-      function GetModems(const ModemDetailFile : string) : TStringList;
+      function GetModems(const ModemDetailFile : ansistring) : TStringList;
 
       { these methods manage the modemcap index }
       { add a modem record to modemcap }
@@ -532,7 +532,7 @@ type
       property Modem : TList read FModem write FModem;
 
     published
-      property LibModemPath : string read FLibModemPath write SetLibModemPath;
+      property LibModemPath : ansistring read FLibModemPath write SetLibModemPath;
       property CompleteDbs : Boolean read FCompleteDbs;
 
       property OnLoadModemRecord : TApdLoadModemRecord
@@ -563,16 +563,16 @@ type
     AvailableModems : TStringList;
     OldOnLoadModem : TApdLoadModem;
     OldOnLoadModemRecord : TApdLoadModemRecord;
-    procedure LoadModemEvent (ModemName, Manufacturer, Model : string;
+    procedure LoadModemEvent (ModemName, Manufacturer, Model : ansistring;
                          var CanLoad : Boolean);
-    procedure LoadModemRecordEvent (ModemName, Manufacturer, Model, ModemFile : string;
+    procedure LoadModemRecordEvent (ModemName, Manufacturer, Model, ModemFile : ansistring;
                                var CanLoad : Boolean);
   public
     { Public declarations }
     LmModem : TLmModem;
     SelectedModemName,
     SelectedModemManufacturer,
-    SelectedModemFile : string;
+    SelectedModemFile : ansistring;
   end;
 
 implementation
@@ -608,7 +608,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TApdLibModem.SetLibModemPath (v : string);
+procedure TApdLibModem.SetLibModemPath (v : ansistring);
 begin
   if v <> FLibModemPath then
     FLibModemPath := v;
@@ -1568,7 +1568,7 @@ procedure TApdLibModem.LoadModemResponses (oOwner     : TObject;
                                            sValue     : DOMString;
                                            bSpecified : Boolean);
 
-  procedure AddResponse (Location : TList; Value : string);
+  procedure AddResponse (Location : TList; Value : ansistring);
   var
     Response : PLmResponseData;
   begin
@@ -2027,7 +2027,7 @@ begin
     FVoiceLoadState := vlsNone;
 end;
 
-procedure TApdLibModem.LoadModem (FileName : string; Append : Boolean);
+procedure TApdLibModem.LoadModem (FileName : ansistring; Append : Boolean);
 var
   Parser : TApdParser;
 begin
@@ -2054,9 +2054,9 @@ begin
   end;
 end;
 
-function TApdLibModem.GetXMLBoolean(Value: string;
+function TApdLibModem.GetXMLBoolean(Value: ansistring;
   Default: Boolean): Boolean;
-begin  
+begin
   Result := Default;
   Value := UpperCase (Value);
   if (Value = '1') or (Value = 'TRUE') or (Value = 'T') or (Value = 'YES') or
@@ -2067,13 +2067,13 @@ begin
     Result := False;
 end;
 
-function TApdLibModem.GetXMLInteger(Value: string;
+function TApdLibModem.GetXMLInteger(Value: ansistring;
   Default: Integer): Integer;
 begin
   Result := StrToIntDef (Value, Default);
 end;
 
-function TApdLibModem.SelectModem(var ModemFile, ModemManufacturer, ModemName: string;
+function TApdLibModem.SelectModem(var ModemFile, ModemManufacturer, ModemName: ansistring;
   var LmModem: TLmModem): Boolean;
 var
   Dialog : TApdModemSelectionDialog;
@@ -2116,7 +2116,7 @@ begin
 end;
 
 function TApdLibModem.CreateNewDetailFile(
-  const ModemDetailFile: string): Integer;
+  const ModemDetailFile: ansistring): Integer;
   { create a new modem detail file with appropriate headers }
 var
   Detail : TApdModemCapDetail;
@@ -2132,12 +2132,12 @@ begin
   end;
 end;
 
-function TApdLibModem.AddModem(const ModemDetailFile: string;
+function TApdLibModem.AddModem(const ModemDetailFile: ansistring;
   Modem: TLmModem): Integer;
   { adds a modem to the modem detail file, creates a new one if necessary }
 var
   Detail : TApdModemCapDetail;
-  S : string;
+  S : ansistring;
 begin
   Detail := nil;
   try
@@ -2156,7 +2156,7 @@ end;
 function TApdLibModem.AddModemRecord(ModemRecord: TLmModemName): Integer;
 var
   Detail : TApdModemCapDetail;
-  S : string;
+  S : ansistring;
 begin
   Detail := nil;
   try
@@ -2168,11 +2168,11 @@ begin
   end;
 end;
 
-function TApdLibModem.DeleteModem(const ModemDetailFile, ModemName: string): Integer;
+function TApdLibModem.DeleteModem(const ModemDetailFile, ModemName: ansistring): Integer;
   { deletes a modem from the modem detail file }
 var
   Detail : TApdModemCapDetail;
-  S : string;
+  S : ansistring;
 begin
   Detail := nil;
   try
@@ -2204,7 +2204,7 @@ function TApdLibModem.DeleteModemRecord(
   ModemRecord: TLmModemName): Integer;
 var
   Detail : TApdModemCapDetail;
-  S : string;
+  S : ansistring;
 begin
   Detail := nil;
   try
@@ -2217,7 +2217,7 @@ begin
 end;
 
 function TApdLibModem.GetModem(const ModemDetailFile,
-  ModemName: string; var Modem : TLmModem) : Integer;
+  ModemName: ansistring; var Modem : TLmModem) : Integer;
   { retrieves a specific modem from the modem detail file }
 var
   I : Integer;
@@ -2240,7 +2240,7 @@ begin
   end;
 end;
 
-function TApdLibModem.GetModems(const ModemDetailFile : string): TStringList;
+function TApdLibModem.GetModems(const ModemDetailFile : ansistring): TStringList;
   { retrieves all modems from a modem detail file       }
   { Result is a TStringList, .Strings is the modem name }
   {                          .Objects is the TLmModem   }
@@ -2261,7 +2261,7 @@ begin
   Result := Res;
 end;
 
-function TApdLibModem.IsModemValid(ModemFile, ModemName: string): Boolean;{!!.04}
+function TApdLibModem.IsModemValid(ModemFile, ModemName: ansistring): Boolean;{!!.04}
 var
   Res : Integer;
   LmMdm : TLmModem;
@@ -2341,7 +2341,7 @@ begin
 end;
 
 procedure TApdModemSelectionDialog.LoadModemEvent(ModemName, Manufacturer,
-  Model: string; var CanLoad: Boolean);
+  Model: ansistring; var CanLoad: Boolean);
 begin
   if (Manufacturer = cbxManufacturer.Text) and
     ((ModemName = cbxName.Text) or (Model = cbxName.Text)) then
@@ -2351,7 +2351,7 @@ begin
 end;
 
 procedure TApdModemSelectionDialog.LoadModemRecordEvent(ModemName, Manufacturer,
-  Model, ModemFile: string; var CanLoad: Boolean);
+  Model, ModemFile: ansistring; var CanLoad: Boolean);
 var
   ModemList : TApdLmModemNameClass;
 begin
@@ -2369,7 +2369,7 @@ procedure TApdModemSelectionDialog.cbxManufacturerSelect(Sender: TObject);
   { show the modems from the selected manufacturer }
 var
   I : Integer;
-  ModemName : string;
+  ModemName : ansistring;
 begin
   I := AvailableModems.IndexOf(cbxManufacturer.Text);
   if I > -1 then begin
@@ -2389,7 +2389,7 @@ end;
 
 procedure TApdModemSelectionDialog.btnOKClick(Sender: TObject);
 var
-  ModemName : string;
+  ModemName : ansistring;
   I : Integer;
 begin
   if (cbxManufacturer.Text <> '') and (cbxName.Text <> '') then begin

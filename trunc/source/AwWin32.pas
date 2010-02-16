@@ -83,7 +83,7 @@ type
     function OutBufUsed: Cardinal; override;                                // SWB
   public
     function CloseCom : Integer; override;
-    function OpenCom(ComName: PansiChar; InQueue,
+    function OpenCom(ComName: PansiChar; InQueue,     // --sm wide
       OutQueue : Cardinal) : Integer; override;
     function ProcessCommunications : Integer; override;
   end;
@@ -220,7 +220,7 @@ implementation
     {-Open the comport specified by ComName}
   begin
     {Open the device}
-    Result := CreateFile(PWideChar(ComName[1]),                       {name}    // --sm check
+    Result := CreateFile(Pwidechar(ComName),                       {name}    // --zer0 PwideChar
                          GENERIC_READ or GENERIC_WRITE, {access attributes}
                          0,                             {no sharing}
                          nil,                           {no security}
@@ -288,22 +288,19 @@ implementation
 
   function TApdWin32Dispatcher.WriteCom(Buf: PansiChar; Size: Integer): Integer;
     {-Write data to the comport}
-  type
-    PBArray = ^TBArray;
-    TBArray = array[0..pred(High(Integer))] of Byte;
   var
     SizeAtEnd : Integer;
     LeftOver  : Integer;
   begin
     {Add the data to the output queue}
     EnterCriticalSection(OutputSection);
-    try                                                              
+    try
       {we already know at this point that there is enough room for the block}
       SizeAtEnd := OutQue - OBufHead;
       if SizeAtEnd >= Size then begin
         {can move data to output queue in one block}
 //        Move(Buf^, OBuffer^[OBufHead], Size);
-        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeOf( Size));// --sm check
+        Move(Buf^, GetPtr(OBuffer,OBufHead)^,Size);// --sm check
         if SizeAtEnd = Size then
           OBufHead := 0
         else
@@ -311,9 +308,10 @@ implementation
       end else begin
         { need to use two moves }
 //        Move(Buf^, OBuffer^[OBufHead], SizeAtEnd);
-        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeOf( SizeAtEnd));// --sm check
+        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeAtEnd);// --sm check
         LeftOver := Size - SizeAtEnd;
-        Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --sm check
+//        Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --sm check
+        Move( GetPtr(Buf,SizeAtEnd)^, OBuffer^, LeftOver);// --sm check
         OBufHead := LeftOver;
       end;
     finally

@@ -875,7 +875,7 @@ type
           StringFormat  : DWORD;
           StringSize    : DWORD;
           StringOffset  : DWORD);
-      2: (StringData    : array[0..1024] of Char);
+      2: (StringData    : array[0..1024] of Char);      // --sm OK
   end;
 
   {Line extensions}
@@ -1048,7 +1048,7 @@ type
          OfferingModes                : DWORD;
          AvailableMediaModes          : DWORD;
          EndMark                      : Integer);
-     1: (Data : array[0..65520] of Char);
+     1: (Data : array[0..65520] of Char);    // --sm
    end;
 
   {Line call parameters}
@@ -1177,7 +1177,7 @@ type
          CalledIDOffset          : DWORD;
          CalledIDNameSize        : DWORD;
          CalledIDNameOffset      : DWORD;
-         ConnectedIDdFlags        : DWORD;
+         ConnectedIDdFlags       : DWORD;
          ConnectedIDSize         : DWORD;
          ConnectedIDOffset       : DWORD;
          ConnectedIDNameSize     : DWORD;

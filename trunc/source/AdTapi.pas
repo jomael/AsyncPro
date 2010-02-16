@@ -415,7 +415,7 @@ type
       {-Monitor for specific tones }
     procedure SetDevConfig(const Config : TTapiConfigRec);           
       {-Sets config, requires string from GetDevConfig or ShowConfigDialogEdit }
-    procedure PlayWaveFile(FileName : string);                         
+    procedure PlayWaveFile(FileName : ansistring);
       {-Play a wave file over the TAPI wave out device }
     procedure StopWaveFile;                                            
       {-Stop the wave file from playing }
@@ -3008,7 +3008,7 @@ type
     end;
   end;
 
-  procedure TApdCustomTapiDevice.PlayWaveFile(FileName : string);      
+  procedure TApdCustomTapiDevice.PlayWaveFile(FileName : ansistring);
     { Play a wave file through the TAPI device or through the sound card. }
   var
     MmCkInfoParent   : TMMCkInfo;

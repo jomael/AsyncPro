@@ -115,7 +115,7 @@ type
     HandlerInstalled : Boolean;
     fEnabled : Boolean;
     BufferPtr : Integer;
-{$ifndef UseOldPacket}        // --sm to delete UseOldPacket
+{$ifndef UseOldPacket}        // --zer0 to delete UseOldPacket
     fCurBfrOffset: Integer;
 {$endif}
     fDataBuffer : pansiChar;    // --sm ansi
@@ -184,7 +184,7 @@ type
 
   TPacketMode = (dpIdle,dpWaitStart,dpCollecting);
   TPacketNotifyEvent = procedure(Sender: TObject; Data : Pointer; Size : Integer) of object;
-  TStringPacketNotifyEvent = procedure(Sender: TObject; Data : string) of object;
+  TStringPacketNotifyEvent = procedure(Sender: TObject; Data : ansistring) of object;
   TApdDataPacket = class(TApdBaseComponent)
   private
     fManager : TApdDataPacketManager;
@@ -272,7 +272,7 @@ type
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
-    procedure GetCollectedString(var Data : String);
+    procedure GetCollectedString(var Data : ansistring);
      {- Returns data collected in OnStringPacket format}
     procedure GetCollectedData(var Data : Pointer; var Size : Integer);
      {- Returns data collected in OnPacket format}
@@ -290,7 +290,7 @@ type
         Default is True.}
     property PacketMode : TPacketMode read fMode;
      {- Read-only property to show if we are idle, waiting, or collecting }
-    function WaitForString(var Data : string) : Boolean;                 {!!.01}
+    function WaitForString(var Data : ansistring) : Boolean;                 {!!.01}
      {- Waits for the data match condition or a timeout, return the collected string }
     function WaitForPacket(var Data : Pointer; var Size : Integer) : Boolean;{!!.01}
      {- Waits for the data match condition or a timeout, return the collected string }
@@ -442,7 +442,7 @@ begin
     fCurBfrOffset := -1;
 {$endif}
   if BufferPtr > 0 then begin
-    move(fDataBuffer[NewStart],fDataBuffer[0],SizeOf( BufferPtr)); // --sm check BufferPtr
+    move(fDataBuffer[NewStart],fDataBuffer[0],BufferPtr); // --sm check BufferPtr
   end else
     DisposeBuffer;
   for i := 0 to pred(PacketList.Count) do
@@ -810,7 +810,7 @@ begin
     StartMatchPos := 1;
     Match := True;
     while Match and (BeginMatch <= Manager.BufferPtr - 1)
-    and (StartMatchPos <= PayloadLengthInBytes(InternalStartString)) do begin
+    and (StartMatchPos <= Length(InternalStartString)) do begin
       if (WildStartString[StartMatchPos] = '1')
       or (not IgnoreCase
         and (Manager.DataBuffer[BeginMatch+StartMatchPos - 1]
@@ -823,9 +823,9 @@ begin
         Match := False;
     end;
     if Match and (BeginMatch <= Manager.BufferPtr-1) then begin
-      if StartMatchPos >= PayloadLengthInBytes( InternalStartString) then
+      if StartMatchPos >= Length( InternalStartString) then
         if (EndCond = []) then begin
-          fDataSize := PayloadLengthInBytes( InternalStartString);
+          fDataSize := Length( InternalStartString);
           Packet(ecPacketSize);
           exit;
         end else
@@ -891,13 +891,13 @@ begin
             // The current character matches the pattern
             if (fBeginMatch = -1) then
                 fBeginMatch := StartPtr;
-            if (StartMatchPos = PayloadLengthInBytes(InternalStartString)) then
+            if (StartMatchPos = Length(InternalStartString)) then
             begin
                 // The current character is the last character of the pattern.
                 // We have matched the start string
                 if ((EndCond = []) or
                     (ecPacketSize in EndCond) and
-                    (PayloadLengthInBytes(InternalStartString) = LocalPacketSize)) then
+                    (Length(InternalStartString) = LocalPacketSize)) then
                 begin
                     // The start string is the entire packet, process it
                     fDataSize := StartPtr - fBeginMatch + 1;
@@ -969,7 +969,7 @@ begin
             if (MatchEndChar(c, EndMatchPos)) then
             begin
                 // Current character matches character from terminating string
-                if (EndMatchPos = PayloadLengthInBytes(InternalEndString)) then
+                if (EndMatchPos = Length(InternalEndString)) then
                 begin
                     // We have matched all terminating string characters.
                     // Process the packet.
@@ -1039,11 +1039,11 @@ begin
           or (IgnoreCase and (UpCase(C) = InternalStartString[StartMatchPos])) then begin
             if BeginMatch = -1 then
               fBeginMatch := I;
-            if StartMatchPos = PayloadLengthInBytes(InternalStartString) then begin
+            if StartMatchPos = Length(InternalStartString) then begin
               Mode := dpCollecting;                                         // SWB
               if ((EndCond = []) or                                         // SWB
                   ((ecPacketSize in EndCond) and                            // SWB
-                   (PayloadLengthInBytes(InternalStartString) = LocalPacketSize))) then   // SWB
+                   (Length(InternalStartString) = LocalPacketSize))) then   // SWB
               begin                                                         // SWB
                 fDataSize := I - BeginMatch + 1;
                 Packet(ecPacketSize);
@@ -1072,7 +1072,7 @@ begin
               if (WildEndString[EndMatchPos] = '1')
               or (not IgnoreCase and (C = InternalEndString[EndMatchPos]))
               or (IgnoreCase and (UpCase(C) = InternalEndString[EndMatchPos])) then begin
-                if EndMatchPos = PayloadLengthInBytes(InternalEndString) then begin
+                if EndMatchPos = Length(InternalEndString) then begin
                   fDataSize := I - BeginMatch + 1;
                   Packet(ecString);
                   exit;
@@ -1097,13 +1097,13 @@ begin
                         inc(EndMatchPos)
                       else
                         Match := False;
-                      if Match and (EndMatchPos > PayloadLengthInBytes(InternalEndString)) then begin
+                      if Match and (EndMatchPos > Length(InternalEndString)) then begin
                         fDataSize := (EndMatchStart + EndMatchPos) - BeginMatch {+1};{!!.02}
                         Packet(ecString);
                         exit;
                       end;
                     until not Match
-                      or (EndMatchPos > PayloadLengthInBytes(InternalEndString))
+                      or (EndMatchPos > Length(InternalEndString))
                       or ((EndMatchStart + EndMatchPos) > Manager.BufferPtr - 1);
                     if Match then begin
                       inc(EndMatchPos);
@@ -1148,11 +1148,11 @@ begin
   Esc := False;
   j := 0;
   {$IFDEF HugeStr}
-  SetLength(Mask,PayloadLengthInBytes(MatchString));
+  SetLength(Mask,Length(MatchString));
   {$ELSE}
-  Mask[0] := Chr(PayloadLengthInBytes(MatchString));
+  Mask[0] := Chr(Length(MatchString));
   {$ENDIF}
-  for i := 1 to PayloadLengthInBytes(MatchString) do
+  for i := 1 to Length(MatchString) do
     if Esc then begin
       inc(j);
       MatchString[j] := MatchString[i];
@@ -1181,7 +1181,7 @@ end;
 procedure TApdDataPacket.LogPacketEvent(Event : TDispatchSubType; Data :
   Pointer; DataSize : Integer);
 var
-  NameStr : string;                                                 
+  NameStr : ansistring;
 begin
   NameStr := 'Packet:'+Name;
   if Assigned(fManager.ComPort.Dispatcher) then                          {!!.02}
@@ -1191,7 +1191,7 @@ begin
           dtPacket,Event,0,Data,DataSize)
       else
         fManager.ComPort.Dispatcher.AddDispatchEntry(
-          dtPacket,Event,0,@NameStr[1],PayloadLengthInBytes(NameStr));    // --sm check Lenght
+          dtPacket,Event,0,@NameStr[1],Length(NameStr));    // --sm check Lenght
   end;
 end;
 
@@ -1219,13 +1219,13 @@ begin
     end;                                                                 {!!.04}
 
     if (StartCond = scString) then begin
-      LogPacketEvent(dstStartStr,@FStartString[1],PayloadLengthInBytes(StartString)); // --sm Length
+      LogPacketEvent(dstStartStr,@FStartString[1],Length(StartString)); // --sm Length
       if (StartString  = '') then
         raise EInvalidProperty.Create(ecStartStringEmpty, False);
-      if (ecPacketSize in EndCond) and (PacketSize < PayloadLengthInBytes(StartString)) then  // --sm Length
+      if (ecPacketSize in EndCond) and (PacketSize < Length(StartString)) then  // --sm Length
         raise EInvalidProperty.Create(ecPacketTooSmall, False);
       if not IncludeStrings then
-        inc(LocalPacketSize,PayloadLengthInBytes(StartString)); // --sm Length
+        inc(LocalPacketSize,Length(StartString)); // --sm Length
       Mode := dpWaitStart;
       if IgnoreCase then
         InternalStartString := UpperCase(StartString)
@@ -1243,9 +1243,9 @@ begin
     if (ecString in EndCond) then begin
       if (EndString  = '') then
         raise EInvalidProperty.Create(ecEmptyEndString, False);
-      LogPacketEvent(dstEndStr,@FEndString[1],PayloadLengthInBytes(EndString)); // --sm Length
+      LogPacketEvent(dstEndStr,@FEndString[1],Length(EndString)); // --sm Length
       if not IncludeStrings then
-        inc(LocalPacketSize,PayloadLengthInBytes(EndString));
+        inc(LocalPacketSize,Length(EndString));
       if IgnoreCase then
         InternalEndString := UpperCase(EndString)
       else
@@ -1301,7 +1301,7 @@ end;
 
 procedure TApdDataPacket.DoPacket;
 var
-  S : string;
+  S : ansistring;
 begin
   try
     if Assigned(fOnPacket) then
@@ -1312,7 +1312,7 @@ begin
         raise EStringSizeError.Create(ecPacketTooLong, False);
       {$ENDIF}
       SetLength(S, fDataSize);
-      Move(PacketBuffer^, S[1], SizeOf( fDataSize)); // --sm check
+      Move(PacketBuffer^, S[1], fDataSize); // --sm check
       fOnStringPacket(Self,S);
     end;
   except                                                               
@@ -1329,12 +1329,12 @@ begin
     Enabled := False;
     LocalSize := fDataSize;
     if (StartCond = scString) and not IncludeStrings then begin
-      PacketBuffer := pansiChar(@Manager.DataBuffer[BeginMatch+PayloadLengthInBytes(InternalStartString)]); // --sm Length
-      dec(fDataSize,PayloadLengthInBytes(InternalStartString)); // --sm Length
+      PacketBuffer := pansiChar(@Manager.DataBuffer[BeginMatch+Length(InternalStartString)]); // --sm Length
+      dec(fDataSize,Length(InternalStartString)); // --sm Length
     end else
       PacketBuffer := pansiChar(@Manager.DataBuffer[BeginMatch]);
     if not IncludeStrings and (Reason = ecString) then
-      dec(fDataSize,PayloadLengthInBytes(InternalEndString)); // --sm Length
+      dec(fDataSize,Length(InternalEndString)); // --sm Length
     LogPacketEvent(dstStringPacket,nil,0);
     case Reason of
     ecString :
@@ -1417,7 +1417,7 @@ begin                                                                    {!!.04}
     FFlushOnTimeout := v;                                                {!!.04}
 end;                                                                     {!!.04}
 
-procedure TApdDataPacket.GetCollectedString(var Data: String);
+procedure TApdDataPacket.GetCollectedString(var Data: ansistring);
  {- Returns data collected in OnStringPacket format}
 var
   SLength : Integer;
@@ -1428,7 +1428,7 @@ begin
     SLength := 255;
   {$ENDIF}
   SetLength(Data, SLength);
-  Move(PacketBuffer^, Data[1], SizeOf( SLength));// --sm check
+  Move(PacketBuffer^, Data[1], SLength);// --sm check
 end;
 
 procedure TApdDataPacket.GetCollectedData(var Data: Pointer;
@@ -1439,7 +1439,7 @@ begin
   Size := fDataSize;
 end;
 
-function TApdDataPacket.WaitForString(var Data : string) : Boolean;      {!!.01}
+function TApdDataPacket.WaitForString(var Data : ansistring) : Boolean;      {!!.01}
   { waits for the data match or timeout }
 var
   Res : LongInt;
@@ -1457,7 +1457,7 @@ begin
       Res := 255;
     {$ENDIF}
     SetLength(Data, Res);
-    Move(PacketBuffer^, Data[1], SizeOf( Res)); // --sm check
+    Move(PacketBuffer^, Data[1], Res); // --sm check
   end;
 end;
 

@@ -273,9 +273,9 @@ type
       function CheckTriggers : Boolean;
       procedure DonePortPrim; virtual;
       function DumpDispatchLogPrim(
-                                  FName : PChar;
+                                  FName : PansiChar;
                                   AppendFile, InHex, AllHex : Boolean) : Integer;
-      function DumpTracePrim(FName : PChar;
+      function DumpTracePrim(FName : PansiChar;
                           AppendFile, InHex, AllHex : Boolean) : Integer;
       function ExtractData : Boolean;
       function FindTriggerFromHandle(TriggerHandle : Cardinal; Delete : Boolean;
@@ -342,9 +342,9 @@ type
       function AddStatusTrigger(SType : Cardinal) : Integer;
       function AddTimerTrigger : Integer;
       procedure AddTraceEntry(CurEntry : ansiChar; CurCh : ansiChar);
-      function AppendDispatchLog(FName : PWideChar;
+      function AppendDispatchLog(FName : PansiChar;   // --sm wide to ansi
                                   InHex, AllHex : Boolean) : Integer;
-      function AppendTrace(FName : PChar;
+      function AppendTrace(FName : PansiChar;
                             InHex, AllHEx : Boolean) : Integer;
       function ChangeBaud(NewBaud : LongInt) : Integer;
       procedure ChangeLengthTrigger(Length : Cardinal);
@@ -365,8 +365,8 @@ type
       procedure DeregisterProcTriggerHandler(NP : TApdNotifyProc);
       procedure DeregisterEventTriggerHandler(NP : TApdNotifyEvent);
       procedure DonePort;
-      function DumpDispatchLog(FName : PChar; InHex, AllHex : Boolean) : Integer;
-      function DumpTrace(FName : PChar; InHex, AllHex : Boolean) : Integer;
+      function DumpDispatchLog(FName : PansiChar; InHex, AllHex : Boolean) : Integer;
+      function DumpTrace(FName : PansiChar; InHex, AllHex : Boolean) : Integer;
       function ExtendTimer(TriggerHandle : Cardinal;
         Ticks : LongInt) : Integer;
       function FlushInBuffer : Integer;
@@ -402,7 +402,7 @@ type
       function PeekChar(var C : ansiChar; Count : Cardinal) : Integer;
       function ProcessCommunications : Integer; virtual; abstract;
       function PutBlock(const Block; Len : Cardinal) : Integer;
-      function PutChar(C : Char) : Integer;
+      function PutChar(C : ansiChar) : Integer; // --sm ansi
       function PutString(S : String) : Integer;
       procedure RegisterWndTriggerHandler(HW : TApdHwnd);
       procedure RegisterProcTriggerHandler(NP : TApdNotifyProc);
@@ -1688,7 +1688,7 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.PutChar(C : Char) : Integer;
+  function TApdBaseDispatcher.PutChar(C : ansiChar) : Integer;
     {-Route through PutBlock to transmit a single character}
   begin
     Result := PutBlock(C, 1);
@@ -3569,7 +3569,7 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.DumpTracePrim(FName : PChar;
+  function TApdBaseDispatcher.DumpTracePrim(FName : PansiChar;
                           AppendFile, InHex, AllHex : Boolean) : Integer;
     {-Write the TraceQueue to FName}
   const
@@ -3713,14 +3713,14 @@ const
     end;
   end;
 
-  function TApdBaseDispatcher.DumpTrace(FName : PChar;
+  function TApdBaseDispatcher.DumpTrace(FName : PansiChar;
                       InHex, AllHex : Boolean) : Integer;
     {-Write the TraceQueue to FName}
   begin
     Result := DumpTracePrim(FName, False, InHex, AllHex);
   end;
 
-  function TApdBaseDispatcher.AppendTrace(FName : PChar;
+  function TApdBaseDispatcher.AppendTrace(FName : PansiChar;
                         InHex, AllHex : Boolean) : Integer;
     {-Append the TraceQueue to FName}
   begin
@@ -3812,7 +3812,7 @@ const
     Insert('.', Result, Length(Result) - 2);                              {!!.04}
   end;
 
-  function TApdBaseDispatcher.DumpDispatchLogPrim(FName : PWideChar;
+  function TApdBaseDispatcher.DumpDispatchLogPrim(FName : PansiChar; // --sm wide to ansi
                                                   AppendFile, InHex, AllHex : Boolean) : Integer;
 
     {-Dump the dispatch log}
@@ -4091,16 +4091,16 @@ const
   end;
 
   function TApdBaseDispatcher.DumpDispatchLog(
-                            FName : PChar;
+                            FName : PansiChar;
                             InHex, AllHex : Boolean) : Integer;
 
     {-Dump the dispatch log}
   begin
-    Result := DumpDispatchLogPrim(FName, False, InHex, AllHex);      
+    Result := DumpDispatchLogPrim(FName, False, InHex, AllHex);
   end;
 
   function TApdBaseDispatcher.AppendDispatchLog(
-                              FName : PWideChar;
+                              FName : PansiChar;  // --sm wide to ansi
                               InHex, AllHex : Boolean) : Integer;
     {-Append the dispatch log}
   begin

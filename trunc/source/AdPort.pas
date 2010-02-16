@@ -163,7 +163,7 @@ type
 
 const
   {Parity strings}
-  ParityName : array[TParity] of string[5] =
+  ParityName : array[TParity] of string[5] =        // --zer0 string[5]
     ('None', 'Odd', 'Even', 'Mark', 'Space');
 
   {Property defaults}
@@ -387,8 +387,8 @@ type
 
     {Tracing}
     procedure InitTracing(const NumEntries : Cardinal);
-    procedure DumpTrace(const FName : string; const InHex : Boolean);        // --sm check shortstring to sting
-    procedure AppendTrace(const FName : String;                        // SWB// --sm check shortstring to sting
+    procedure DumpTrace(const FName : ansistring; const InHex : Boolean);        // --sm check shortstring to sting
+    procedure AppendTrace(const FName : ansistring;                        // SWB// --sm check shortstring to sting
                           const InHex : Boolean;                            // SWB
                           const NewState : TTraceLogState);                 // SWB
     procedure ClearTracing;
@@ -398,8 +398,8 @@ type
 
     {DispatchLogging}
     procedure InitLogging(const Size : Cardinal);
-    procedure DumpLog(const FName : String; const InHex : Boolean);// --sm check shortstring to sting
-    procedure AppendLog(const FName : AnsiString;  // --sm check shortstring to sting                        // SWB
+    procedure DumpLog(const FName : ansistring; const InHex : Boolean);// --sm check shortstring to sting
+    procedure AppendLog(const FName : ansistring;  // --sm check shortstring to sting                        // SWB
                         const InHex : Boolean;                              // SWB
                         const NewState : TTraceLogState);                   // SWB
     procedure ClearLogging;
@@ -453,7 +453,7 @@ type
       {-Discard the contents of the output buffer}
 
     {Trigger managment}
-    function AddDataTrigger(const Data : String;// --sm check shortstring to sting
+    function AddDataTrigger(const Data : ansistring;// --sm check shortstring to sting
                             const IgnoreCase : Boolean) : Word;
       {-Add a data trigger}
     function AddTimerTrigger : Word;
@@ -483,16 +483,16 @@ type
 
     procedure GetBlock(var Block; const Len : Word);
       {-Return the next block of data}
-    procedure PutChar(const C : Char);
+    procedure PutChar(const C : ansiChar);
       {-Add C to the output buffer}
-    procedure PutString(const S : String);
+    procedure PutString(const S : ansistring);
       {-Add S to the output buffer}
     function PutBlock(const Block; const Len : Word) : Integer;
       {-Add Block to the output buffer}
 
     {Waits}
-    function CheckForString(var Index : Byte; C : Char;
-                            const S : String;
+    function CheckForString(var Index : Byte; C : ansiChar;
+                            const S : ansistring;
                             IgnoreCase : Boolean) : Boolean;
       {-Compare C against a sequence of chars, looking for S}
     function WaitForString(const S : AnsiString;
@@ -606,7 +606,7 @@ type
     {Tracing}
     procedure AddTraceEntry(const CurEntry, CurCh : AnsiChar);
       {-Add an entry to the trace buffer}
-    procedure AddStringToLog(S : string);
+    procedure AddStringToLog(S : ansistring);
       {-Add a string to the current LOG file}
 
     {Trigger events}
@@ -646,7 +646,7 @@ type
       read FOnWaitchar write FOnWaitChar;
 
     {I/O properties}
-    property Output : String
+    property Output : ansistring
       write PutString;
 
     {TComHandle, read only}
@@ -745,7 +745,7 @@ type
     property Tag;
   end;
 
-  function ComName(const ComNumber : Word) : string;// --sm check shortstring to sting
+  function ComName(const ComNumber : Word) : ansistring;// --sm check shortstring to sting
   function SearchComPort(const C : TComponent) : TApdCustomComPort;
 
 implementation
@@ -2368,11 +2368,11 @@ const
     FTracing := tlOn;
   end;
 
-  procedure TApdCustomComPort.DumpTrace(const FName : string;// --sm check shortstring to sting
+  procedure TApdCustomComPort.DumpTrace(const FName : ansistring;// --sm check shortstring to sting
                                         const InHex : Boolean);
     {-Dump the trace file}
   var
-    Dest : array[0..255] of Char;
+    Dest : array[0..255] of ansiChar; // --zer0 ansichar
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self, Dispatcher.DumpTrace(StrPCopy(Dest, FName),
@@ -2380,12 +2380,12 @@ const
     FTracing := tlOff;
   end;
 
-  procedure TApdCustomComPort.AppendTrace(const FName : string;// --sm check shortstring to sting
+  procedure TApdCustomComPort.AppendTrace(const FName : ansistring;// --sm check shortstring to sting
                                           const InHex : Boolean;
                                           const NewState : TTraceLogState); // SWB
     {-Append the trace file}
   var
-    Dest : array[0..255] of Char;
+    Dest : array[0..255] of AnsiChar;
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self,
@@ -2415,7 +2415,7 @@ const
     Dispatcher.AddTraceEntry(CurEntry, CurCh);
   end;
 
-  procedure TApdCustomComPort.AddStringToLog(S : string);
+  procedure TApdCustomComPort.AddStringToLog(S : ansistring);
   begin
     if (PortState = psShuttingDown) then Exit;
     ValidDispatcher.AddStringToLog(S);
@@ -2468,11 +2468,11 @@ const
     FLogging := tlOn;
   end;
 
-  procedure TApdCustomComPort.DumpLog(const FName : String;// --sm check shortstring to sting
+  procedure TApdCustomComPort.DumpLog(const FName : ansistring;// --sm check shortstring to sting
                                       const InHex : Boolean);
     {-Dump the dispatch log}
   var
-    Dest : array[0..255] of Char;
+    Dest : array[0..255] of ansiChar;
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self,
@@ -2485,7 +2485,7 @@ const
                                         const NewState : TTraceLogState);   // SWB
     {-Dump the dispatch log}
   var
-    Dest : array[0..255] of Char;
+    Dest : array[0..255] of ansiChar;
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self,
@@ -2524,7 +2524,7 @@ const
     FLogging := tlPause;
   end;
 
-  function TApdCustomComPort.AddDataTrigger(const Data : String;// --sm check shortstring to sting
+  function TApdCustomComPort.AddDataTrigger(const Data : ansistring;// --sm check shortstring to sting
                                             const IgnoreCase : Boolean) : Word;
     {-Add a ShortString data trigger}
   var
@@ -2658,19 +2658,19 @@ const
     CheckException(Self, ValidDispatcher.GetBlock(PAnsiChar(@Block), Len));
   end;
 
-  procedure TApdCustomComPort.PutChar(const C : Char);
+  procedure TApdCustomComPort.PutChar(const C : ansiChar);
     {-Add C to the output buffer}
   begin
     if (PortState = psShuttingDown) then Exit;
     CheckException(Self, ValidDispatcher.PutChar(C));
   end;
 
-  procedure TApdCustomComPort.PutString(const S : String);
+  procedure TApdCustomComPort.PutString(const S : ansistring);
     {-Add S to the output buffer}
   begin
     if (PortState = psShuttingDown) then Exit;
    {$IFOPT H+}
-    CheckException(Self, ValidDispatcher.PutBlock(Pointer(S)^, PayloadLengthInBytes(S)));
+    CheckException(Self, ValidDispatcher.PutBlock(Pointer(S)^, Length(S)));
    {$ELSE}      // --sm
     CheckException(Self, ValidDispatcher.PutString(S));
    {$ENDIF}
@@ -2681,17 +2681,17 @@ const
   begin
     PutBlock := 0;
     if (PortState = psShuttingDown) then Exit;
-    CheckException(Self, ValidDispatcher.PutBlock(PChar(Block), Len));
+    CheckException(Self, ValidDispatcher.PutBlock(PansiChar(Block), Len));
   end;
 
 {Waits}
 
-  function TApdCustomComPort.CheckForString(var Index : Byte; C : Char;
-                                            const S : String;
+  function TApdCustomComPort.CheckForString(var Index : Byte; C : ansiChar;
+                                            const S : ansistring;
                                             IgnoreCase : Boolean) : Boolean;
     {-Compare C against a sequence of chars, looking for S}
   var
-    CurChar : Char;
+    CurChar : ansiChar;
   begin
     CheckForString := False;
     if (PortState = psShuttingDown) then Exit;
@@ -2707,7 +2707,7 @@ const
     {Compare...}
     if C = CurChar then
       {Got match, was it complete?}
-      if Index = PayloadLengthInBytes(S) then begin
+      if Index = Length(S) then begin
         Index := 0;
         CheckForString := True;
       end else
@@ -2989,7 +2989,7 @@ const
     Result := FindComPort(C);
   end;
 
-  function ComName(const ComNumber : Word) : String;// --sm check shortstring to sting
+  function ComName(const ComNumber : Word) : ansistring;// --sm check shortstring to sting
     {-Return a comname ShortString for ComNumber}
   begin
     Result := 'COM' + IntToStr(ComNumber);

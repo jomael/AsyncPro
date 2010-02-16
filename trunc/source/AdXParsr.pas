@@ -89,7 +89,7 @@ type
     FContext : Integer;
     FCurrentElement : DOMString;
     FCurrentElementContent : Integer;
-    FCurrentPath : string;
+    FCurrentPath : ansistring;  // --sm ansi
     FDataBuffer : DOMString;
     FDocStack : TList;
     FElementInfo : TStringList;
@@ -124,8 +124,7 @@ type
     FXMLDecParsed : Boolean;
 
     procedure Cleanup;
-// --sm to delete function CheckParamEntityNesting
-//    procedure CheckParamEntityNesting(const aString : DOMString);
+    procedure CheckParamEntityNesting(const aString : DOMString);
     procedure DataBufferAppend(const sVal : DOMString);
     procedure DataBufferFlush;
     procedure DataBufferNormalize;
@@ -163,7 +162,7 @@ type
     procedure Initialize;
     function IsEndDocument : Boolean;
     function IsWhitespace(const cVal : DOMChar) : Boolean;
-    function LoadDataSource(sSrcName   : string;
+    function LoadDataSource(sSrcName   : ansistring;
                             oErrors    : TStringList) : Boolean;
     function ParseAttribute(const sName : DOMString) : DOMString;
     function ParseEntityRef(bPEAllowed : Boolean) : DOMString;
@@ -234,7 +233,7 @@ type
     procedure ValidatePCData(const aString      : DOMString;
                                    aInEntityRef : Boolean);
     procedure ValidatePublicID(const aString : DOMString);
-    procedure ValidateVersNum(const aString : string);
+    procedure ValidateVersNum(const aString : ansistring);  // --sm ansi
 
   protected
     { Protected declarations }
@@ -248,7 +247,7 @@ type
     destructor Destroy; override;
 
     function GetErrorMsg(wIdx : Integer) : DOMString;
-    function ParseDataSource(const sSource : string) : Boolean;
+    function ParseDataSource(const sSource : ansistring) : Boolean; // --sm ansi
     function ParseMemory(var aBuffer; aSize : Longint) : Boolean;
     function ParseStream(oStream : TStream) : Boolean;
 
@@ -562,21 +561,20 @@ begin
 end;
 
 {--------}
-// --sm to delete
-//procedure TApdParser.CheckParamEntityNesting(const aString : DOMString);
-//var
-//  OpenPos : Integer;
-//  ClosePos : Integer;
-//begin
-//  OpenPos := ApxPos('(', aString);
-//  ClosePos := ApxPos(')', aString);
-//  if (((OpenPos  <> 0) and (ClosePos = 0)) or
-//      ((ClosePos <> 0) and (OpenPos  = 0))) then
-//     raise EAdParserError.CreateError(FFilter.Line,
-//                                       FFilter.LinePos,
-//                                       sBadParamEntNesting +
-//                                       aString);
-//end;
+procedure TApdParser.CheckParamEntityNesting(const aString : DOMString);
+var
+  OpenPos : Integer;
+  ClosePos : Integer;
+begin
+  OpenPos := ApxPos('(', aString);
+  ClosePos := ApxPos(')', aString);
+  if (((OpenPos  <> 0) and (ClosePos = 0)) or
+      ((ClosePos <> 0) and (OpenPos  = 0))) then
+     raise EAdParserError.CreateError(FFilter.Line,
+                                       FFilter.LinePos,
+                                       sBadParamEntNesting +
+                                       aString);
+end;
 {--------}
 procedure TApdParser.Cleanup;
 var
@@ -637,15 +635,15 @@ var
   j           : Integer;
   CharDeleted : Boolean;
 begin
-  while (PayloadLengthInBytes(FDataBuffer) > 0) and
+  while (Length(FDataBuffer) > 0) and
         IsWhiteSpace(FDataBuffer[1]) do
     Delete(FDataBuffer, 1, 1);
-  while (PayloadLengthInBytes(FDataBuffer) > 0) and
-        IsWhiteSpace(FDataBuffer[PayloadLengthInBytes(FDataBuffer)]) do
-    Delete(FDataBuffer, PayloadLengthInBytes(FDataBuffer), 1);
+  while (Length(FDataBuffer) > 0) and
+        IsWhiteSpace(FDataBuffer[Length(FDataBuffer)]) do
+    Delete(FDataBuffer, Length(FDataBuffer), 1);
 
   j := 1;
-  BuffLen := PayloadLengthInBytes(FDataBuffer);
+  BuffLen := Length(FDataBuffer);
   CharDeleted := False;
   while j < BuffLen do begin
     if IsWhiteSpace(FDataBuffer[j]) then begin
@@ -654,13 +652,13 @@ begin
 
       { Remove additional whitespace }
       j := j + 1;
-      while (j <= PayloadLengthInBytes(FDataBuffer)) and
+      while (j <= Length(FDataBuffer)) and
             IsWhiteSpace(FDataBuffer[j]) do begin
         Delete(FDataBuffer, j, 1);
         CharDeleted := True;
       end;
       if (CharDeleted) then begin
-        BuffLen := PayloadLengthInBytes(FDataBuffer);
+        BuffLen := Length(FDataBuffer);
         CharDeleted := False;
       end;
     end;
@@ -861,7 +859,7 @@ function TApdParser.GetExternalTextEntityValue(const sName,
                                                     sSystemId : DOMString)
                                                               : DOMString;
 var
-  CompletePath : string;
+  CompletePath : ansistring;
 begin
   DataBufferFlush;
   Result := '';
@@ -937,14 +935,14 @@ begin
             (cVal = #$0D) or (cVal = #$0A);
 end;
 {--------}
-function TApdParser.LoadDataSource(sSrcName  : string;
+function TApdParser.LoadDataSource(sSrcName  : ansistring;
                                   oErrors   : TStringList) : Boolean;
 var
   aFileStream : TApdFileStream;
 begin
   begin
     { Must be a local or network file. Eliminate file:// prefix. }
-    if StrLIComp(PChar(sSrcName), 'file://', 7) = 0 then
+    if StrLIComp(PansiChar(sSrcName), 'file://', 7) = 0 then    // --sm ansi
       Delete(sSrcName, 1, 7);
 
     if FileExists(sSrcName) then begin
@@ -1071,7 +1069,7 @@ begin
   { Did we find '--' within the comment? }
   if (TempComment <> '') and
      ((ApxPos('--', TempComment) <> 0) or
-      (TempComment[PayloadLengthInBytes(TempComment)] = '-')) then
+      (TempComment[Length(TempComment)] = '-')) then
     { Yes. Raise an error. }
     raise EAdParserError.CreateError(FFilter.Line,
                                      FFilter.LinePos,
@@ -1210,7 +1208,7 @@ begin
   EntRefs.Free;
 end;
 {--------}
-function TApdParser.ParseDataSource(const sSource : string) : Boolean;
+function TApdParser.ParseDataSource(const sSource : ansistring) : Boolean;
 begin
   FErrors.Clear;
   FIsStandAlone := False;
@@ -1555,7 +1553,7 @@ begin
       end;
       Move(TempChar,
            PByteArray(Pointer(TempBuff))[CurrLength],
-           2);      // --sm check
+           2);      // --zer0 original code
       Inc(CurrLength, 2);
       SkipChar;
       Added := True;
@@ -1669,7 +1667,7 @@ begin
   end;
   if (not Found) then begin
     {$IFDEF DCC4OrLater}
-    SetLength(TempStr, PayloadLengthInBytes(S));
+    SetLength(TempStr, Length(S));
     {$ENDIF}
     for i := 0 to High(S) do begin
       ApxUcs4ToIso88591(s[i], TempChar);
@@ -1779,13 +1777,13 @@ end;
 procedure TApdParser.PushString(const sVal : DOMString);
 var
   MemStream  : TApdMemoryStream;
-  TempString : string;
+  TempString : ansistring;
 begin
-  if PayloadLengthInBytes(sVal) > 0 then begin
+  if Length(sVal) > 0 then begin
     PushDocument;
     MemStream := TApdMemoryStream.Create;
-    TempString := WideCharLenToString(Pointer(sVal), PayloadLengthInBytes(sVal));
-    MemStream.Write(TempString[1], PayloadLengthInBytes(TempString));
+    TempString := WideCharLenToString(Pointer(sVal), Length(sVal));
+    MemStream.Write(TempString[1], Length(TempString));
     MemStream.Position := 0;
     FFilter := TApdInCharFilter.Create(MemStream, BufferSize);
   end;
@@ -1992,7 +1990,7 @@ begin
         SkipChar;
         Move(TempChar,
              PByteArray(Pointer(Result))^[CurrLen],
-             2);       // --sm check
+             2);       // --zer0 original code
         Inc(CurrLen, 2);
       end else
         raise EAdParserError.CreateError(FFilter.Line,
@@ -2204,7 +2202,7 @@ var
   Good : Boolean;
 begin
   { Production [81]}
-  for i := 1 to PayloadLengthInBytes(aValue) do begin
+  for i := 1 to Length(aValue) do begin
     Good := False;
     if ((aValue[i] >= 'A') and
         (aValue[i] <= 'z')) then
@@ -2235,7 +2233,7 @@ var
   TempChr : DOMChar;
   i       : Integer;
 begin
-  for i := 1 to PayloadLengthInBytes(aValue) do begin
+  for i := 1 to Length(aValue) do begin
     TempChr := aValue[i];
     if (TempChr = '%') or
        (TempChr = '&') or
@@ -2295,7 +2293,7 @@ var
   Ucs4Char : TApdUcs4Char;
   i        : Integer;
 begin
-  for i := 1 to PayloadLengthInBytes(aString) do begin
+  for i := 1 to Length(aString) do begin
     ApxIso88591ToUcs4(AnsiChar(aString[i]), Ucs4Char);
     if (not ApxIsPubidChar(Ucs4Char)) then
       raise EAdParserError.CreateError(FFilter.Line,
@@ -2306,13 +2304,13 @@ begin
 end;
 
 {--------}
-procedure TApdParser.ValidateVersNum(const aString : string);
+procedure TApdParser.ValidateVersNum(const aString : ansistring);
 var
   i       : Integer;
-  TempChr : char;
+  TempChr : ansichar;
   Good    : Boolean;
 begin
-  for i := 1 to PayloadLengthInBytes(aString) do begin
+  for i := 1 to Length(aString) do begin
     Good := False;
     TempChr := aString[i];
     if (TempChr >= 'A') and

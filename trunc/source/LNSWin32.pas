@@ -361,7 +361,7 @@ end;
 function TApdWin32Dispatcher.OpenCom(ComName: PansiChar; InQueue, OutQueue: Cardinal): Integer;
 begin
     {Open the device}
-    Result := CreateFile(PWideChar(ComName[1]),         {name}  // --sm Check on PWideChar [1]
+    Result := CreateFile(PWideChar(ComName),         {name}  // --zer0 PWideChar
                          GENERIC_READ or GENERIC_WRITE, {access attributes}
                          0,                             {no sharing}
                          nil,                           {no security}
@@ -449,7 +449,7 @@ begin
                     // Read either all the data in the buffer or as much as the caller
                     // can accept.
                     bytesToRead := Min(len, BytesUsed - BytesRead);
-                    Move((Data + BytesRead)^, Buf^, SizeOf( bytesToRead));// --sm check
+                    Move((Data + BytesRead)^, Buf^, bytesToRead);// --sm check
                     BytesRead := BytesRead + bytesToRead;
                     Dec(len, bytesToRead);
                     Inc(Buf, bytesToRead);
@@ -565,9 +565,6 @@ end;
 
 //  Place outbound data into the output buffer & wake up the output thread
 function TApdWin32Dispatcher.WriteCom(Buf: PansiChar; Size: Integer): Integer;
-type
-    PBArray = ^TBArray;
-    TBArray = array[0..pred(High(Integer))] of Byte;
 var
     SizeAtEnd   : Integer;
     LeftOver    : Integer;
@@ -581,7 +578,7 @@ begin
         begin
             {can move data to output queue in one block}
 //            Move(Buf^, OBuffer^[OBufHead], Size);
-            Move(Buf^, GetPtr(OBuffer, OBufHead)^, SizeOf( Size));// --csm heck
+            Move(Buf^, GetPtr(OBuffer, OBufHead)^, Size);// --sm heck
 
             if SizeAtEnd = Size then
                 OBufHead := 0
@@ -591,9 +588,10 @@ begin
         begin
             { need to use two moves }
 //            Move(Buf^, OBuffer^[OBufHead], SizeAtEnd);
-            Move(Buf^, GetPtr(OBuffer, OBufHead)^, SizeOf( SizeAtEnd));// --sm check
+            Move(Buf^, GetPtr(OBuffer, OBufHead)^, SizeAtEnd);// --sm check
             LeftOver := Size - SizeAtEnd;
-            Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --sm check
+//            Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --sm check
+            Move( GetPtr( Buf, SizeAtEnd)^ ,OBuffer^, LeftOver);// --sm check
             OBufHead := LeftOver;
         end;
     finally
@@ -912,16 +910,16 @@ begin
                         numToWrite := OBufHead - OBufTail;
                         GetMem(tempBuff, numToWrite);
 //                        Move(OBuffer^[OBufTail], tempBuff^, numToWrite);
-                        Move(GetPtr(OBuffer,OBufTail)^, tempBuff^, SizeOf( numToWrite));// --sm delete SizeOf
+                        Move(GetPtr(OBuffer,OBufTail)^, tempBuff^, numToWrite);// --sm delete SizeOf
 //PAnsiChar(AddWordToPtr( tempBuff, (OutQue - OBufTail)));GetPtr(DBuffer, NewTail)^
                     end else
                     begin
                         numToWrite := (OutQue - OBufTail) + OBufHead;
                         GetMem(tempBuff, numToWrite);
 //                        Move(OBuffer^[OBufTail], tempBuff^, OutQue - OBufTail);
-                        Move(GetPtr( OBuffer, OBufTail)^, tempBuff^, SizeOf((OutQue - OBufTail)));// --sm delete SizeOf
+                        Move(GetPtr( OBuffer, OBufTail)^, tempBuff^, (OutQue - OBufTail));// --sm delete SizeOf
 //                        Move(OBuffer^[0], tempBuff^[OutQue - OBufTail], OBufHead);
-                        Move( GetPtr( OBuffer,0)^, tempBuff^[OutQue - OBufTail], SizeOf( OBufHead));// --sm delete SizeOf
+                        Move( GetPtr( OBuffer,0)^, tempBuff^[OutQue - OBufTail], OBufHead);// --sm delete SizeOf
 
                     end;
                     // Reset the queue head and tail
