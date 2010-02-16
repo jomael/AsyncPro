@@ -20,6 +20,7 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *   Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -41,8 +42,7 @@ unit AdTSel;
 interface
 
 uses
-  WinProcs,
-  WinTypes,
+  Windows,
   Messages,
   SysUtils,
   Classes,
@@ -160,7 +160,7 @@ var
   LineExt    : TLineExtensionID;
   ApiVersion : LongInt;
   LineCaps   : PLineDevCaps;
-  S          : String;
+  S          : AnsiString;
   VS         : TVarString;
 begin
   {Initialize a TAPI line}
@@ -188,7 +188,7 @@ begin
           with LineCaps^ do begin
             SetLength(S, LineNameSize);
             {$IFDEF H+}
-            Move(LineCaps^.Data[LineNameOffset], PChar(S)^, LineNameSize);
+            Move(LineCaps^.Data[LineNameOffset], PAnsiChar(S)^, LineNameSize);
             {$ELSE}
             Move(LineCaps^.Data[LineNameOffset], S[1], LineNameSize);
             {$ENDIF}
@@ -241,7 +241,7 @@ begin
     EnumTapiPorts;
 
   {Show ports only if requested}
-  if (ShowPorts) and not(ShowOnlySupported and EnableVoice) then         {!!.02}                                             
+  if (ShowPorts) and not(ShowOnlySupported and EnableVoice) then         {!!.02}
     EnumComPorts;
 
   Screen.Cursor := crDefault;

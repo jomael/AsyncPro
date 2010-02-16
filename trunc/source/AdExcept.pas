@@ -22,6 +22,7 @@
  * Contributor(s):
  *    Sulaiman Mah
  *    Sean B. Durkin
+ *    Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -42,8 +43,7 @@ interface
 
 uses
   Messages,
-  WinTypes,
-  WinProcs,
+  Windows,
   SysUtils,
   Classes,
   {$IFNDEF UseResourceStrings}
@@ -65,6 +65,19 @@ uses
 
 {*** English ***}
   {$I AdExcept.inc}
+{*** French ***}
+  {.$I AdExcept.fra}
+{*** German ***}
+  {.$I AdExcept.deu}
+{*** Spanish ***}
+  {.$I AdExcept.esp}
+{*** Swedish ***}
+  {.$I AdExcept.sw}
+{*** Norwegian ***}
+  {.$I AdExcept.nor}
+{*** Danish ***}
+  {.$I AdExcept.dk}
+
 
 type
   {General Apro exception class}
@@ -74,7 +87,7 @@ type
 
   public
     constructor Create(const EC : Integer; PassThru : Boolean);
-    constructor CreateUnknown(const Msg : ansiString; Dummy : Byte);
+    constructor CreateUnknown(const Msg : String; Dummy : Byte);
 
     class function MapCodeToStringID(const Code : Integer) : Word;
       {-Return a string table index for Code}
@@ -311,31 +324,36 @@ type
   EAdTermInvalidParameter       = class(EAdTerminal);
   EAdTermTooLarge               = class(EAdTerminal);
 
-    {TApdPager Exceptions}
+  {TApdPager Exceptions}
+  {$M+}
   EApdPagerException = class (Exception)
     private
       FErrorCode : Integer;
     public
       { Parameters to the construtor are reversed to prevent problems with
         C++ Builder }
-      constructor Create (const ErrCode : Integer; const Msg : ansistring);
+      constructor Create (const ErrCode : Integer; const Msg : string);
     published
       property ErrorCode : Integer read FErrorCode;
   end;
+  {$M-}
 
   {TApdGSMPhone Exceptions}
+  {$M+}
   EApdGSMPhoneException = class (Exception)
     private
       FErrorCode : Integer;
     public
       { Parameters to the construtor are reversed to prevent problems with
         C++ Builder }
-      constructor Create (const ErrCode : Integer; const Msg : ansistring);
+      constructor Create (const ErrCode : Integer; const Msg : string);
     published
       property ErrorCode : Integer read FErrorCode;
   end;
+  {$M-}
 
   { XML exceptions }
+  {$M+}
   EAdStreamError = class(EXML)
   private
     seFilePos : Longint;
@@ -345,6 +363,7 @@ type
     property FilePos : Longint
        read seFilePos;
   end;
+  {$M-}
 
   EAdFilterError = class(EAdStreamError)
   private
@@ -374,13 +393,13 @@ type
   function XlatException(const E : Exception) : Integer;
     {-Translate an exception into an error code}
 
-  function AproLoadStr(const ErrorCode : SmallInt) : ansiString;    // --sm ansi
+  function AproLoadStr(const ErrorCode : SmallInt) : string;
 
-  function AproLoadZ(P : PansiChar; Code : Integer) : PansiChar;    // --sm ansi
+  function AproLoadZ(P : PAnsiChar; Code : Integer) : PAnsiChar;    // --sm ansi
 
-  function ErrorMsg(const ErrorCode : SmallInt) : ansiString ; // --sm ansi
+  function ErrorMsg(const ErrorCode : SmallInt) : string;
   {$IFDEF UseResourceStrings}
-  function MessageNumberToString(MessageNumber : SmallInt) : ansiString;   // --sm ansi
+  function MessageNumberToString(MessageNumber : SmallInt) : string;
   {$ENDIF}
   {.Z-}
 
@@ -396,7 +415,7 @@ implementation
 uses
   AdStrMap;
 {$ENDIF}
-  function AproLoadZ(P : PansiChar; Code : Integer) : PansiChar;
+  function AproLoadZ(P : PAnsiChar; Code : Integer) : PAnsiChar;
   begin
     {$IFDEF UseResourceStrings}
     Result := StrPCopy(P, AproLoadStr(Code));
@@ -405,26 +424,8 @@ uses
     {$ENDIF}
   end;
 
-  function AproLoadStr(const ErrorCode : SmallInt) : ansiString;    // --sm ansi
+  function AproLoadStr(const ErrorCode : SmallInt) : string;
     {-Return an error message for ErrorCode}
-  var
-    Buffer : array[0..255] of Char;
-
-    function TrimWhite(const S : ShortString) : ansistring;// --sm ansi
-    var
-      i : Integer;
-    begin
-      Result := S;
-      for i := Length(Result) downto 1 do
-        if Result[i] < ' ' then
-          Result[i] := ' ';
-      i := pos('  ',Result);
-      while i <> 0 do begin
-        delete(Result,i,1);
-        i := pos('  ',Result);
-      end;
-    end;
-
   begin
     {$IFDEF UseResourceStrings}
     Result := MessageNumberToString(ErrorCode);
@@ -432,22 +433,19 @@ uses
     Result := AproStrRes.GetString(abs(ErrorCode));
     {$ENDIF}
 
-    if Result = '' then begin
-      if FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,nil,abs(ErrorCode),0,
-                       Buffer,255,nil) > 0 then
-        Result := TrimWhite(StrPas(Buffer));
-    end;
+    if Result = '' then
+      Result := SysErrorMessage(ErrorCode);
   end;
 
   {Alias for function above}
-  function ErrorMsg(const ErrorCode : SmallInt) : ansistring;// --sm ansi
+  function ErrorMsg(const ErrorCode : SmallInt) : string;
     {-Return an error message for ErrorCode}
   begin
     Result := AproLoadStr(ErrorCode);
   end;
 
   {$IFDEF UseResourceStrings}
-  function MessageNumberToString(MessageNumber : SmallInt) : ansistring;// --sm ansi
+  function MessageNumberToString(MessageNumber : SmallInt) : string;
   var
     Middle : integer;
     Min    : integer;
@@ -479,7 +477,7 @@ uses
     inherited Create(AproLoadStr(Abs(EC)));
   end;
 
-  constructor EAPDException.CreateUnknown(const Msg : ansiString; Dummy : Byte);
+  constructor EAPDException.CreateUnknown(const Msg : String; Dummy : Byte);
   begin
     ErrorCode := 0;
 
@@ -494,7 +492,7 @@ uses
   function CheckException(const Ctl : TComponent; const Res : Integer) : Integer;
     {-Check Res, raise appropriate exception if non-zero}
   var
-    ErrorMsg : ansiString;
+    ErrorMsg : String;
     FileIO   : EInOutError;
 
   begin
@@ -772,7 +770,7 @@ end;
 { EApdGSMPhoneException }
 
 constructor EApdGSMPhoneException.Create(const ErrCode: Integer;
-                                         const Msg: ansistring);
+                                         const Msg: string);
 begin
   inherited Create (Msg);
 
@@ -782,7 +780,7 @@ end;
 { EApdPagerException }
 
 constructor EApdPagerException.Create(const ErrCode: Integer;
-                                      const Msg: ansistring);
+                                      const Msg: string);
 begin
   inherited Create (Msg);
 
