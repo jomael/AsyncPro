@@ -22,6 +22,7 @@
  * Contributor(s):
  *  Sulaiman Mah
  *  Sean B. Durkin
+ *  Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -44,8 +45,7 @@ unit AdSocket;
 interface
 
 uses
-  WinTypes,
-  WinProcs,
+  Windows,
   Messages,
   SysUtils,
   Classes,
@@ -122,12 +122,12 @@ type
     asDllLoaded : Boolean;
     asStartErrorCode : Integer;
     asWSData : TWSAData;
-    function GetDescription : ansistring;
+    function GetDescription : string;
     function GetHandle : HWnd;
     function GetLastError : Integer;
-    function GetLocalHost : ansistring;
-    function GetLocalAddress : ansistring;
-    function GetSystemStatus : ansistring;
+    function GetLocalHost : string;
+    function GetLocalAddress : string;
+    function GetSystemStatus : string;
     procedure CMAPDSocketMessage(var Message: TCMAPDSocketMessage); message CM_APDSOCKETMESSAGE;
     procedure WndProc(var Message : TMessage);
   protected
@@ -148,13 +148,13 @@ type
     function htons(HostShort : Word) : Word;
     function ntohl(NetLong : LongInt) : LongInt;
     function ntohs(NetShort : Word) : Word;
-    function NetAddr2String(InAddr : TInAddr) : ansistring;
-    function String2NetAddr(const S : ansistring) : TInAddr;
+    function NetAddr2String(InAddr : TInAddr) : string;
+    function String2NetAddr(const S : string) : TInAddr;
     { Lookup routines }
-    function LookupAddress(InAddr : TInAddr) : ansistring;
-    function LookupName(const Name : ansistring) : TInAddr;
-    function LookupPort(Port : Word) : Ansistring;
-    function LookupService(const Service : ansistring) : Integer;
+    function LookupAddress(InAddr : TInAddr) : string;
+    function LookupName(const Name : AnsiString) : TInAddr;
+    function LookupPort(Port : Word) : string;
+    function LookupService(const Service : AnsiString) : Integer;
     { Socket methods }
     function AcceptSocket(Socket : TSocket; var Address : TSockAddrIn) : TSocket;
     function BindSocket(Socket : TSocket; Address : TSockAddrIn) : Integer;
@@ -171,14 +171,14 @@ type
     function SetAsyncStyles(Socket : TSocket; lEvent : LongInt) : Integer;
     function WriteSocket(Socket : TSocket; var Buf; BufSize, Flags : Integer) : Integer;
     { Properties }
-    property Description : ansistring read GetDescription;
+    property Description : string read GetDescription;
     property Handle : HWnd read GetHandle;
     property HighVersion : Word read asWSData.wHighVersion;
     property LastError : Integer read GetLastError;
-    property LocalHost : ansistring read GetLocalHost;
-    property LocalAddress : ansistring read GetLocalAddress;
+    property LocalHost : string read GetLocalHost;
+    property LocalAddress : string read GetLocalAddress;
     property MaxSockets : Word read asWSData.iMaxSockets;
-    property SystemStatus : ansistring read GetSystemStatus;
+    property SystemStatus : string read GetSystemStatus;
     property WsVersion : Word read asWSData.wVersion;
     { Events }
     property OnWsAccept : TWsNotifyEvent read FOnWsAccept write FOnWsAccept;
@@ -250,9 +250,9 @@ begin
 end;
 
 { -Gets the info in the Description field of WSAData }
-function TApdSocket.GetDescription : ansistring;
+function TApdSocket.GetDescription : string;
 begin
-  Result := StrPas(asWSData.szDescription);
+  Result := string(asWSData.szDescription);
 end;
 
 { -Creates window handle for class }
@@ -269,19 +269,19 @@ begin
 end;
 
 { -Gets the name of the local host machine }
-function TApdSocket.GetLocalHost : ansistring; // --sm how GetLocalHost is called - none
+function TApdSocket.GetLocalHost : string; // --sm how GetLocalHost is called - none
 var
-  HostStr : array[0..255] of AnsiChar;      // --sm AnsiString?
+  HostStr : array[0..255] of AnsiChar;      // --sm AnsiString? (sz: yes)
 begin
   Result := '';
   CheckLoaded;
   if SockFuncs.GetHostName(@HostStr, SizeOf(HostStr)) = 0 then begin   // --sm GetHostName
-    Result := StrPas(HostStr);
+    Result := string(HostStr);
   end;
 end;
 
 { -Gets the address of the local host machine }
-function TApdSocket.GetLocalAddress : ansistring;
+function TApdSocket.GetLocalAddress : string;
 var
   HostStr : array[0..255] of AnsiChar;
   HostEnt : PHostEnt;
@@ -296,9 +296,9 @@ begin
 end;
 
 { -Gets the info in the SystemStatus field of WSAData }
-function TApdSocket.GetSystemStatus : ansistring;
+function TApdSocket.GetSystemStatus : string;
 begin
-  Result := StrPas(asWSData.szSystemStatus);
+  Result := string(asWSData.szSystemStatus);
 end;
 
 { -Message handler for Winsock messages }
@@ -414,31 +414,31 @@ begin
 end;
 
 { -Converts TInAddr to a XXX.XXX.XXX.XXX string }
-function TApdSocket.NetAddr2String(InAddr : TInAddr) : ansistring;
+function TApdSocket.NetAddr2String(InAddr : TInAddr) : string;
 var
   TempStr : array[0..IPStrSize] of AnsiChar;
 begin
   Result := '';
   CheckLoaded;
   StrCopy(TempStr, @SockFuncs.INet_NtoA(InAddr)^);
-  Result := StrPas(TempStr);
+  Result := string(TempStr);
 end;
 
 { -Converts XXX.XXX.XXX.XXX string to a TInAddr }
-function TApdSocket.String2NetAddr(const S : ansistring) : TInAddr;
+function TApdSocket.String2NetAddr(const S : string) : TInAddr;
 var
   TempStr : array[0..IPStrSize] of AnsiChar;
 begin
   FillChar(Result, SizeOf(Result), #0);
   CheckLoaded;
-  StrPLCopy(TempStr, S, IPStrSize);
+  StrPLCopy(TempStr, AnsiString(S), IPStrSize);
   Result.S_addr := SockFuncs.INet_Addr(@TempStr);
 end;
 
 { Lookup functions }
 
 { -Returns a name for an IP address }
-function TApdSocket.LookupAddress(InAddr : TInAddr) : ansistring;
+function TApdSocket.LookupAddress(InAddr : TInAddr) : string;
 var
   HostEnt : PHostEnt;
   TempStr : array[0..255] of AnsiChar;
@@ -447,24 +447,23 @@ begin
   CheckLoaded;
   HostEnt := SockFuncs.GetHostByAddr(InAddr, SizeOf(InAddr), PF_INET);
   if Assigned(HostEnt) then
-    Result := StrPas(StrCopy(TempStr, @HostEnt^.h_name^));
+    Result := string(StrCopy(TempStr, @HostEnt^.h_name^));
 end;
 
 { -Returns an IP address for a name }
-function TApdSocket.LookupName(const Name : ansistring) : TInAddr;
+function TApdSocket.LookupName(const Name : AnsiString) : TInAddr;
 var
   HostEnt : PHostEnt;
-  TempStr : array[0..255] of AnsiChar;
 begin
   FillChar(Result, SizeOf(Result), #0);
   CheckLoaded;
-  HostEnt := SockFuncs.GetHostByName(@StrPCopy(TempStr, Name)^);
+  HostEnt := SockFuncs.GetHostByName(PAnsiChar(Name));
   if Assigned(HostEnt) then
     Result.S_addr := HostEnt.h_addr_list[0].S_addr;
 end;
 
 { -Returns a service name for a port }
-function TApdSocket.LookupPort(Port : Word) : Ansistring;
+function TApdSocket.LookupPort(Port : Word) : string;
 var
   ServEnt : PServEnt;
 begin
@@ -472,19 +471,17 @@ begin
   CheckLoaded;
   ServEnt := SockFuncs.GetServByPort(htons(Port), nil);
   if Assigned(ServEnt) then
-    Result := StrPas( ServEnt^.s_name);
+    Result := string(ServEnt^.s_name);
 end;
 
 { -Returns a port for a service name }
-function TApdSocket.LookupService(const Service : ansistring) : Integer;
+function TApdSocket.LookupService(const Service : AnsiString) : Integer;
 var
   ServEnt : PServEnt;
-  Temp1, Temp2 : array[0..255] of AnsiChar;
 begin
   Result := 0;
   CheckLoaded;
-  ServEnt := SockFuncs.GetServByName(@StrPCopy(Temp1, Service)^,
-    @StrPCopy(Temp2, 'tcp')^);
+  ServEnt := SockFuncs.GetServByName(PAnsiChar(Service), 'tcp');
   if Assigned(ServEnt) then
     Result := ntohs(ServEnt^.s_port)
 end;

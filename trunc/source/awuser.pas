@@ -3078,7 +3078,7 @@ end;
           FillChar(tChkIndex, SizeOf(TCheckIndex), 0);
           tMatched := False;
           tIgnoreCase := IgnoreCase;
-          Move(Data^, tData, SizeOf( Len)); // --sm check
+          Move(Data^, tData, Len);
           if IgnoreCase and (Len <> 0) then
             AnsiUpperBuff(@tData, Len);
           Result := tHandle;
@@ -3160,7 +3160,7 @@ end;
   function TApdBaseDispatcher.SetTimerTrigger(TriggerHandle : Cardinal;
                             Ticks : LongInt; Activate : Boolean) : Integer;
   const
-    DeactivateStr : string = 'Deactivated';
+    DeactivateStr : Ansistring = 'Deactivated';
   var
     Trigger : PTimerTrigger;
     T : TTriggerType;
@@ -3181,7 +3181,7 @@ end;
                 TriggerHandle,@Ticks,sizeof(Ticks))
             else
               AddDispatchEntry(dtTriggerDataChange, dstTimerTrigger,
-                TriggerHandle,@DeactivateStr[1],PayloadLengthInBytes(DeactivateStr));
+                TriggerHandle,@DeactivateStr[1],Length(DeactivateStr));
           tActive := Activate;
           Result := ecOk;
         end

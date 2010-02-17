@@ -334,7 +334,7 @@ type
     function FailureCodeMsg(const FailureCode : Integer) : ansistring;
     function GetDevConfig : TApdModemConfig;
     function ModemLogToString(LogCode : TApdModemLogCode) : ansistring;
-    function ModemStatusMsg(Status : TApdModemState) : ansistring;
+    function ModemStatusMsg(Status : TApdModemState) : string;
     function SelectDevice : Boolean;
     function SendCommand(const Command : ansistring) : Boolean;
     procedure SetDevConfig(const Config : TApdModemConfig);
@@ -1157,10 +1157,10 @@ begin
   end;
 end;
 
-function TAdCustomModem.ModemStatusMsg(Status: TApdModemState): ansistring;
+function TAdCustomModem.ModemStatusMsg(Status: TApdModemState): string;
   { convert a status code into a string }
 var
-  Plural : ansichar;
+  Plural : char;
 begin
   case Status of
     msUnknown :
@@ -1246,7 +1246,7 @@ begin
 end;
 
 procedure TAdCustomModem.ResponseStringPacket(Sender: TObject;
-  Data: ansistring);
+  Data: AnsiString);
 var
   Res : Integer;
 begin

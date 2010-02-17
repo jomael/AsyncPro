@@ -1019,7 +1019,7 @@ end;
 procedure TApdDataPacket.ProcessData(StartPtr : Integer);
 var
   I,J : Integer;
-  C : Char;
+  C : AnsiChar;
   Match : Boolean;
 begin
   if Enabled then begin
@@ -1494,3 +1494,4 @@ initialization
 finalization
   Finalize;
 end.
+

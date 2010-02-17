@@ -20,6 +20,7 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *  Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
@@ -27,7 +28,7 @@
 {*                   ADMDMDLG.PAS 5.00                   *}
 {*********************************************************}
 {* Modem status dialog for TAdModemStatus component      *}
-{*********************************************************}  
+{*********************************************************}
 
 {Global defines potentially affecting this unit}
 {$I AWDEFINE.INC}
@@ -66,7 +67,7 @@ type
     property Modem : TAdCustomModem
       read FModem write SetModem;
     procedure UpdateDisplay(
-      const StatusStr, TimeStr, DetailStr : ansistring;
+      const StatusStr, TimeStr, DetailStr : string;
       Action : TApdModemStatusAction);
 
   end;
@@ -96,7 +97,7 @@ begin
 end;
 
 procedure TApdModemStatusDialog.UpdateDisplay(
-  const StatusStr, TimeStr, DetailStr : ansistring;
+  const StatusStr, TimeStr, DetailStr : string;
   Action : TApdModemStatusAction);
   { this method is called periodically by the TApdModem component }
   { when the OnModemStatus, OnModemLog and a few other events are }

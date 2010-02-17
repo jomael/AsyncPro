@@ -431,7 +431,7 @@ type
     p_proto   : SmallInt;
   end;
 
-  PSockAddrIn = ^TSockAddrIn;
+  PSockAddrIn = ^TSockAddrIn; // --sz verified with wtsdefs.h
   TSockAddrIn = packed record
     case Integer of
       0: (sin_family : Word;
@@ -443,7 +443,7 @@ type
   end;
 
   PwsaData = ^TwsaData;
-  TwsaData = packed record
+  TwsaData = packed record // --sz verified with winsock2.h
     wVersion       : Word;
     wHighVersion   : Word;
     szDescription  : array[0..wsaDESCRIPTION_Len] of AnsiChar;
