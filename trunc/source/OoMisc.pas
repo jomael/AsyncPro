@@ -127,7 +127,7 @@ const
 type
   TPipeEvent = record
     Event : Byte;
-    Data : ansiString;
+    Data : AnsiString;
   end;
   TOleEnum = type DWORD;
   { XML definitions }
@@ -138,10 +138,10 @@ type
   {$EndIf}
 
 type
-  CharSet = set of Ansichar;
+  CharSet = set of AnsiChar;
 
 //  TPassString = string[255];  // !!! There is a good case to remove this type.
-  TPassString = ansistring;
+  TPassString = AnsiString;
   TApdHwnd = HWND;
 
 
@@ -1502,7 +1502,7 @@ type
     emuParamIndex  : Cardinal;       {Parameter index}
     emuQueue       : TApQueue;       {Queue of recvd bytes}                 // SWB
 //    emuParamStr    : array[1..MaxParams] of string[MaxParamLength];
-    emuParamStr    : array[1..MaxParams] of ansistring;
+    emuParamStr    : array[1..MaxParams] of AnsiString;
     emuParamInt    : array[1..MaxParams] of Integer;
     emuParserState : TAnsiParser;    {Current state}
     emuOther       : Pointer;
@@ -1573,14 +1573,14 @@ const
 
 type
   {where these same variables are declared as Strings.}
-  TModemNameZ     = array[0..ApdModemNameLen] of ansiChar;
-  TCmdStringZ     = array[0..ApdCmdLen] of ansiChar;
-  TRspStringZ     = array[0..ApdRspLen] of ansiChar;
-  TTagStringZ     = array[0..ApdTagLen] of ansiChar;
-  TTagProfStringZ = array[0..ApdTagProfLen] of ansiChar;
-  TConfigStringZ  = array[0..ApdConfigLen] of ansiChar;
-  TBoolStrZ       = array[0..ApdBoolLen] of ansiChar;
-  TBaudStrZ       = array[0..ApdBaudLen] of ansiChar;
+  TModemNameZ     = array[0..ApdModemNameLen] of AnsiChar;
+  TCmdStringZ     = array[0..ApdCmdLen] of AnsiChar;
+  TRspStringZ     = array[0..ApdRspLen] of AnsiChar;
+  TTagStringZ     = array[0..ApdTagLen] of AnsiChar;
+  TTagProfStringZ = array[0..ApdTagProfLen] of AnsiChar;
+  TConfigStringZ  = array[0..ApdConfigLen] of AnsiChar;
+  TBoolStrZ       = array[0..ApdBoolLen] of AnsiChar;
+  TBaudStrZ       = array[0..ApdBaudLen] of AnsiChar;
 
   TTagArrayZ = array[1..ApdMaxTags] of TTagStringZ;
 
@@ -1649,8 +1649,8 @@ const
   ApdKeyIndexMaxLen  = 120;
 
 type
-  TKeyMapName    = array[0..ApdKeyMapNameLen] of ansiChar;
-  TKeyMapping    = array[0..KeyMappingLen] of ansichar;
+  TKeyMapName    = array[0..ApdKeyMapNameLen] of AnsiChar;
+  TKeyMapping    = array[0..KeyMappingLen] of AnsiChar;
   TKeyMappingStr = string[KeyMappingLen];
 
 
@@ -1673,7 +1673,7 @@ type
     kbKeyName     : TKeyMapName;                      { current key index name }
     kbProcessAll  : Bool;
     kbProcessExt  : Bool;
-    kbKeyNameList : array[0..ApdKeyIndexMaxLen] of ansichar;
+    kbKeyNameList : array[0..ApdKeyIndexMaxLen] of AnsiChar;
     kbKeyMap      : array[1..ApdMaxKeyMaps] of TVKeyMapRec;
     kbKeyDataBase : PIniDataBase;          { pointer to the INI data base file }
   end;
@@ -1743,7 +1743,7 @@ const
 type
   {For holding lists of files to transmit}
   PFileList = ^TFileList;
-  TFileList = array[0..65535-1] of ansiChar;
+  TFileList = array[0..65535-1] of AnsiChar;
 
 {Fax conversion}
 
@@ -1819,7 +1819,7 @@ type
 
   {For storing station IDs}
   Str20 = string[20];
-//  Str20 = ansistring;
+//  Str20 = AnsiString;
 
   {Stores information about our fonts}
   TFontRecord = record
@@ -1830,7 +1830,7 @@ type
   end;
 
   {Fax file signature array}
-  TSigArray = Array[0..5] of ansiChar;
+  TSigArray = Array[0..5] of AnsiChar;
 
 const
   {Default fax file signature, first 6 chars in an APF}
@@ -1861,7 +1861,7 @@ type
     Status   : Byte;             {0=none sent, 1=some sent, 2=all sent, 3=paused}
     JobName  : Str20;            {Friendly name of fax job}
 //    Sender   : String[40];       {Name of sender (same as HeaderSender)}
-    Sender   : ansiString;       {Name of sender (same as HeaderSender)}
+    Sender   : AnsiString;       {Name of sender (same as HeaderSender)}
     SchedDT  : TDateTime;        {TDateTime the first job should be sent}
     NumJobs  : Byte;             {Number of FaxJobInfoRecs for this job}
     NextJob  : Byte;             {The index of the next FaxJobInfo to send}
@@ -1881,10 +1881,10 @@ type
 //    HeaderLine     : String[100];      {Header line}
 //    HeaderRecipient: String[30];       {Recipient's name}
 //    HeaderTitle    : String[30];       {Title of fax}
-    PhoneNumber    : ansiString;       {Phone number to dial for this job}
-    HeaderLine     : ansiString;      {Header line}
-    HeaderRecipient: ansiString;       {Recipient's name}
-    HeaderTitle    : ansiString;       {Title of fax}
+    PhoneNumber    : AnsiString;       {Phone number to dial for this job}
+    HeaderLine     : AnsiString;      {Header line}
+    HeaderRecipient: AnsiString;       {Recipient's name}
+    HeaderTitle    : AnsiString;       {Title of fax}
     Padding        : Array[228..256] of Byte;{Expansion room}
   end;
 
@@ -2138,7 +2138,7 @@ const
 type
   TLineReader = class
     protected
-      Buffer : array[0..LineBufferSize] of Ansichar;
+      Buffer : array[0..LineBufferSize] of AnsiChar;
       fEOLF : Boolean;
       ReadPtr : PAnsiChar;
       fStream : TStream;
@@ -2232,7 +2232,7 @@ type
     InFile     : TLineReader;                  {Input file}
     OnLine     : DWORD;                        {Number of current input line}
     CurRow     : Cardinal;                     {Current raster row of CurStr}
-    CurStr     : array[0..255] of Ansichar;
+    CurStr     : array[0..255] of AnsiChar;
     Pending    : string;
     FFPending  : Boolean;                      {TRUE if formfeed pending}
     FontRec    : TFontRecord;                  {Holds current font info}

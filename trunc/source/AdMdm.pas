@@ -105,16 +105,16 @@ type
 
   TApdModemConfig = record
 //    ConfigVersion : string[8];       { version tag to support future features }
-    ConfigVersion : ansistring;       { version tag to support future features }
+    ConfigVersion : AnsiString;       { version tag to support future features }
     { port settings }
 //    AttachedTo : string[20];
 //    Manufacturer : string[100];
 //    ModemName : string[100];
 //    ModemModel : string[100];
-    AttachedTo : ansistring;
-    Manufacturer : ansistring;
-    ModemName : ansistring;
-    ModemModel : ansistring;
+    AttachedTo : AnsiString;
+    Manufacturer : AnsiString;
+    ModemName : AnsiString;
+    ModemModel : AnsiString;
 
     DataBits : Word;
     Parity : TParity;
@@ -133,38 +133,38 @@ type
     InactivityTimeout : Integer;
     { extra commands }
 //    ExtraSettings : string[50];
-    ExtraSettings : ansistring;
+    ExtraSettings : AnsiString;
     Padding : Array[81..128] of Byte;  { Expansion room }
   end;
 
   TApdModemNameProp = class(TPersistent)
   private
-    FManufacturer: ansistring;
-    FName: ansistring;
-    FModemFile: ansistring;
-    procedure SetManufacturer(const Value: ansistring);
-    procedure SetName(const Value: ansistring);
-    procedure SetModemFile(const Value: ansistring);
+    FManufacturer: AnsiString;
+    FName: AnsiString;
+    FModemFile: AnsiString;
+    procedure SetManufacturer(const Value: AnsiString);
+    procedure SetName(const Value: AnsiString);
+    procedure SetModemFile(const Value: AnsiString);
   public
     procedure Assign(Source: TPersistent); override;                     {!!.02}
     procedure Clear;                                                     {!!.02}
 
   published
-    property Manufacturer : ansistring
+    property Manufacturer : AnsiString
       read FManufacturer write SetManufacturer;
-    property Name : ansistring
+    property Name : AnsiString
       read FName write SetName;
-    property ModemFile : ansistring
+    property ModemFile : AnsiString
       read FModemFile write SetModemFile;
   end;
 
   TApdCallerIDInfo = record
     HasData : Boolean;
-    Date   : ansistring;
-    Time   : ansistring;
-    Number : ansistring;
-    Name   : ansistring;
-    Msg    : ansistring;
+    Date   : AnsiString;
+    Time   : AnsiString;
+    Number : AnsiString;
+    Name   : AnsiString;
+    Msg    : AnsiString;
   end;
 
   { event types }
@@ -184,7 +184,7 @@ type
     FComPort: TApdCustomComPort;
     FDialTimeout: Integer;
     FFailCode: Integer;
-    FModemCapFolder: ansistring;
+    FModemCapFolder: AnsiString;
     FRingWaitTimeout: DWORD;
     FRingCount: Integer;
     FStatusDisplay: TAdAbstractModemStatus;
@@ -198,7 +198,7 @@ type
     FOnModemFail: TModemFailEvent;
     FOnModemStatus: TModemStatusEvent;
     FConnected: Boolean;
-    FPhoneNumber: ansistring;
+    FPhoneNumber: AnsiString;
     FStartTime : DWORD;
     FDeviceSelected: Boolean;                                     {!!.04}{!!.05}
     FModemConfig : TApdModemConfig;
@@ -213,7 +213,7 @@ type
     procedure SetAnswerOnRing(const Value: Integer);
     procedure SetComPort(const Value: TApdCustomComPort);
     procedure SetDialTimeout(const Value: Integer);
-    procedure SetModemCapFolder(const Value: ansistring);
+    procedure SetModemCapFolder(const Value: AnsiString);
     procedure SetRingWaitTimeout(const Value: DWORD);
     procedure SetSelectedDevice(const Value: TApdModemNameProp);
     procedure SetStatusDisplay(const Value: TAdAbstractModemStatus);
@@ -231,7 +231,7 @@ type
     ErrorResponse : Boolean;
     ConnectResponse : Boolean;
     TimedOut : Boolean;
-    LastCommand : ansistring;
+    LastCommand : AnsiString;
     DcdTrigger : Word;
     StatusTimerTrigger : Word;
     FCallerIDProvided : Boolean;
@@ -261,7 +261,7 @@ type
     { add triggers to detect connection state }
     procedure PrepForConnect(EnableTriggers : Boolean);
     { detect modem responses }
-    procedure ResponseStringPacket(Sender: TObject; Data: ansistring);
+    procedure ResponseStringPacket(Sender: TObject; Data: AnsiString);
     { detect timeouts }
     procedure ResponseTimeout(Sender : TObject);
     { status trigger notification event }
@@ -270,14 +270,14 @@ type
     { send all commands in the list }
     function SendCommands(Commands : TList) : Boolean;
     { check the responses for the response }
-    function CheckResponses(const Response, DefResponse : ansistring;
+    function CheckResponses(const Response, DefResponse : AnsiString;
       Responses : TList) : Boolean;
     { check the response for any errors }
-    function CheckErrors(const Response : ansistring) : Integer;
+    function CheckErrors(const Response : AnsiString) : Integer;
     { check for the CallerID tags }
-    procedure CheckCallerID(const Response  : ansistring);
+    procedure CheckCallerID(const Response  : AnsiString);
     { check <StandardConnect> response for extra info }
-    function ParseStandardConnect(const Response : ansistring): Boolean;      {!!.05}
+    function ParseStandardConnect(const Response : AnsiString): Boolean;      {!!.05}
 
     procedure ChangeResponseTimeout(aTimeout, aEnableTimeout: integer);   {!!.KINO}
   public
@@ -310,13 +310,13 @@ type
       read FFailCode;
     property Handle : THandle
       read FHandle;
-    property ModemCapFolder : ansistring
+    property ModemCapFolder : AnsiString
       read FModemCapFolder write SetModemCapFolder;
     property ModemState : TApdModemState
       read FModemState;
     property NegotiationResponses : TStringList
       read GetNegotiationResponses;
-    property PhoneNumber : ansistring
+    property PhoneNumber : AnsiString
       read FPhoneNumber;
     property RingCount : Integer
       read FRingCount;
@@ -332,19 +332,19 @@ type
     procedure CancelCall;
     procedure ConfigAndOpen;
     function DefaultDeviceConfig : TApdModemConfig;
-    procedure Dial(const ANumber : ansistring);
-    function FailureCodeMsg(const FailureCode : Integer) : ansistring;
+    procedure Dial(const ANumber : AnsiString);
+    function FailureCodeMsg(const FailureCode : Integer) : AnsiString;
     function GetDevConfig : TApdModemConfig;
-    function ModemLogToString(LogCode : TApdModemLogCode) : ansistring;
+    function ModemLogToString(LogCode : TApdModemLogCode) : AnsiString;
     function ModemStatusMsg(Status : TApdModemState) : string;
     function SelectDevice : Boolean;
-    function SendCommand(const Command : ansistring) : Boolean;
+    function SendCommand(const Command : AnsiString) : Boolean;
     procedure SetDevConfig(const Config : TApdModemConfig);
     function ShowConfigDialog : Boolean;
 
     { undocumented }
-    function ConvertXML(const S : ansistring) : ansistring;
-    function StripXML(const S : ansistring) : ansistring;                        {!!.04}
+    function ConvertXML(const S : AnsiString) : AnsiString;
+    function StripXML(const S : AnsiString) : AnsiString;                        {!!.04}
 
     property OnModemCallerID : TModemCallerIDEvent
       read FOnModemCallerID write FOnModemCallerID;
@@ -381,10 +381,10 @@ type
   TAdAbstractModemStatus = class(TApdBaseComponent)
   private
     FStatusDialog: TForm;
-    FCaption: ansistring;
+    FCaption: AnsiString;
     FStarted: Boolean;
     FModem: TAdCustomModem;
-    procedure SetCaption(const Value: ansistring);
+    procedure SetCaption(const Value: AnsiString);
     procedure SetStarted(Start : Boolean);
     procedure SetModem(const Value: TAdCustomModem);
   public
@@ -392,14 +392,14 @@ type
     destructor Destroy; override;
     property StatusDialog : TForm
       read FStatusDialog write FStatusDialog;
-    property Caption : ansistring
+    property Caption : AnsiString
       read FCaption write SetCaption;
     property Modem : TAdCustomModem
       read FModem write SetModem;
     property Started : Boolean
       read FStarted;
     procedure UpdateDisplay(Modem : TAdCustomModem;
-      const StatusStr, TimeStr, DetailStr : ansistring;
+      const StatusStr, TimeStr, DetailStr : AnsiString;
       Action : TApdModemStatusAction);
   end;
 
@@ -437,7 +437,7 @@ begin
   FName := '';
 end;
 
-procedure TApdModemNameProp.SetManufacturer(const Value: ansistring);
+procedure TApdModemNameProp.SetManufacturer(const Value: AnsiString);
   { write access method for Manufacturer property }
 begin
   if FManufacturer <> Value then begin
@@ -445,12 +445,12 @@ begin
   end;
 end;
 
-procedure TApdModemNameProp.SetModemFile(const Value: ansistring);
+procedure TApdModemNameProp.SetModemFile(const Value: AnsiString);
 begin
   FModemFile := Value;
 end;
 
-procedure TApdModemNameProp.SetName(const Value: ansistring);
+procedure TApdModemNameProp.SetName(const Value: AnsiString);
   { write access method for Name property }
 begin
   FName := Value;
@@ -563,12 +563,12 @@ begin
     DoStatus(msUnknown);
 end;
 
-procedure TAdCustomModem.CheckCallerID(const Response: ansistring);
+procedure TAdCustomModem.CheckCallerID(const Response: AnsiString);
   { check for the CallerID tags }
 var
   I,
   Psn : Integer;
-  S : ansistring;
+  S : AnsiString;
 
   function CheckIt : Boolean;
   begin
@@ -629,7 +629,7 @@ begin
 
 end;
 
-function TAdCustomModem.CheckErrors(const Response: ansistring): Integer;
+function TAdCustomModem.CheckErrors(const Response: AnsiString): Integer;
 begin
   if CheckResponses(Response, ApxDefErrorResponse, LmModem.Responses.Error) then
     Result := ecModemRejectedCommand
@@ -690,9 +690,9 @@ begin
     FComPort.Open := True;
 end;
 
-function TAdCustomModem.CheckResponses(const Response, DefResponse: ansistring;
+function TAdCustomModem.CheckResponses(const Response, DefResponse: AnsiString;
   Responses: TList): Boolean;
-  function StripCtrl(const S : ansistring) : ansistring;
+  function StripCtrl(const S : AnsiString) : AnsiString;
     { strip out the CR/LF prefix and suffix }
   begin
     Result := S;
@@ -703,7 +703,7 @@ function TAdCustomModem.CheckResponses(const Response, DefResponse: ansistring;
   end;
 var
   I : Integer;
-  S : ansistring;
+  S : AnsiString;
 begin
   { assume it's not a response that we're looking for }
   Result := False;
@@ -736,7 +736,7 @@ begin
   DoConnect;
 end;
 
-function TAdCustomModem.ConvertXML(const S: ansistring): ansistring;
+function TAdCustomModem.ConvertXML(const S: AnsiString): AnsiString;
   { converts the '<CR>' and '<LF>' from LibModem into #13 and #10 }
 var
   Psn : Integer;
@@ -871,7 +871,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TAdCustomModem.Dial(const ANumber: ansistring);
+procedure TAdCustomModem.Dial(const ANumber: AnsiString);
   { initiate the dialing sequence }
 begin
   FCallerIDProvided := False;
@@ -966,7 +966,7 @@ end;
 procedure TAdCustomModem.DoStatus(NewModemState: TApdModemState);
   { change FModemState and generate the event }
 var
-  S : ansistring;
+  S : AnsiString;
   Action : TApdModemStatusAction;
   FirstState : Boolean;
 begin
@@ -1018,7 +1018,7 @@ begin
 end;
 
 function TAdCustomModem.FailureCodeMsg(
-  const FailureCode: Integer): ansistring;
+  const FailureCode: Integer): AnsiString;
   { convert a FailureCode into a string }
 begin
   Result := ErrorMsg(FailureCode);                                       {!!.04}
@@ -1056,7 +1056,7 @@ end;
 
 procedure TAdCustomModem.Initialize;
   { initialize the modem }
-  function PoundReplace(const str : ansistring; Value : Integer) : ansistring;
+  function PoundReplace(const str : AnsiString; Value : Integer) : AnsiString;
   { some modem init strings have variable params, replace them here }
   var
     I : Integer;
@@ -1072,7 +1072,7 @@ procedure TAdCustomModem.Initialize;
     end;                                                                    // SWB
   end;
 var
-  ConfigInit : ansistring;
+  ConfigInit : AnsiString;
 begin
   { set the msInitializing state }
   DoStatus(msInitializing);
@@ -1143,7 +1143,7 @@ begin
 end;
 
 function TAdCustomModem.ModemLogToString(
-  LogCode: TApdModemLogCode): ansistring;
+  LogCode: TApdModemLogCode): AnsiString;
   { convert a LogCode into a string }
 begin
   case LogCode of
@@ -1408,7 +1408,7 @@ begin
   end;
 end;
 
-function TAdCustomModem.SendCommand(const Command: ansistring): Boolean;
+function TAdCustomModem.SendCommand(const Command: AnsiString): Boolean;
   { send a command to the modem, returns when the response is received }
   { or on a timeout }
 var
@@ -1514,7 +1514,7 @@ begin
   FDialTimeout := Value;
 end;
 
-procedure TAdCustomModem.SetModemCapFolder(const Value: ansistring);
+procedure TAdCustomModem.SetModemCapFolder(const Value: AnsiString);
   { write access method for ModemCapFolder property }
 begin
   FModemCapFolder := Value;
@@ -1567,7 +1567,7 @@ begin
   FStatusDisplay := Value;
 end;
 
-function TAdCustomModem.StripXML(const S: ansistring): ansistring;               {!!.04}
+function TAdCustomModem.StripXML(const S: AnsiString): AnsiString;               {!!.04}
   { strip the XML tags out of the string }
 var
   Psn : Integer;
@@ -1601,12 +1601,12 @@ begin                                                                    {!!.05}
     DoDisconnect;                                                        {!!.05}
 end;                                                                     {!!.05}
 
-function TAdCustomModem.ParseStandardConnect(const Response: ansistring) : Boolean;{!!.05}
+function TAdCustomModem.ParseStandardConnect(const Response: AnsiString) : Boolean;{!!.05}
 var
   Position      : Integer;
   Len           : Integer;
   SavedPosition : Integer;
-  S : ansistring;
+  S : AnsiString;
 
   procedure SkipWhitespace;
   begin
@@ -1672,7 +1672,7 @@ begin
   inherited;
 end;
 
-procedure TAdAbstractModemStatus.SetCaption(const Value: ansistring);
+procedure TAdAbstractModemStatus.SetCaption(const Value: AnsiString);
 begin
   if FCaption <> Value then begin
     FCaption := Value;
@@ -1707,7 +1707,7 @@ begin
 end;
 
 procedure TAdAbstractModemStatus.UpdateDisplay(Modem: TAdCustomModem;
-  const StatusStr, TimeStr, DetailStr : ansistring;
+  const StatusStr, TimeStr, DetailStr : AnsiString;
   Action : TApdModemStatusAction);
 begin
   if Action = msaClose then begin

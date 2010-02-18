@@ -2939,7 +2939,7 @@ type
     if X = 0 then with VS do begin
       if StringSize > 10 then
         StringSize := 10;
-      S[0] := ansiChar(Chr(StringSize));//Chr(StringSize);
+      S[0] := AnsiChar(Chr(StringSize));//Chr(StringSize);
       Move(StringData[StringOffset], S[1], StringSize);
       Delete(S, 1, 3);
       Val(S, Result, X);

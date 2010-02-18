@@ -2478,7 +2478,7 @@ end;
 procedure TAdCustomTerminal.PasteFromClipboard;                          {!!.04}
 var                                                                      {!!.04}
   i             : Integer;                                               {!!.04}
-  ClipboardText : ansistring;                                                {!!.04}
+  ClipboardText : AnsiString;                                                {!!.04}
   ClipboardLen  : Integer;                                               {!!.04}
 
 begin                                                                    {!!.04}
@@ -4759,7 +4759,7 @@ begin
   {send it to the host}
   if (Key = ^H) then
     Key := #127;
-  teSendChar(ansiChar(Key), true, csKeyboard);                                   {!!.04}
+  teSendChar(AnsiChar(Key), true, csKeyboard);                                   {!!.04}
 end;
 {--------}
 procedure TAdTTYEmulator.LazyPaint;

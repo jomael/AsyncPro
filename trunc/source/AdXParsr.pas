@@ -88,7 +88,7 @@ type
     FContext : Integer;
     FCurrentElement : DOMString;
     FCurrentElementContent : Integer;
-    FCurrentPath : ansistring;
+    FCurrentPath : AnsiString;
     FDataBuffer : DOMString;
     FDocStack : TList;
     FElementInfo : TStringList;
@@ -161,7 +161,7 @@ type
     procedure Initialize;
     function IsEndDocument : Boolean;
     function IsWhitespace(const cVal : DOMChar) : Boolean;
-    function LoadDataSource(sSrcName   : ansistring;
+    function LoadDataSource(sSrcName   : AnsiString;
                             oErrors    : TStringList) : Boolean;
     function ParseAttribute(const sName : DOMString) : DOMString;
     function ParseEntityRef(bPEAllowed : Boolean) : DOMString;
@@ -232,7 +232,7 @@ type
     procedure ValidatePCData(const aString      : DOMString;
                                    aInEntityRef : Boolean);
     procedure ValidatePublicID(const aString : DOMString);
-    procedure ValidateVersNum(const aString : ansistring);
+    procedure ValidateVersNum(const aString : AnsiString);
 
   protected
     { Protected declarations }
@@ -246,7 +246,7 @@ type
     destructor Destroy; override;
 
     function GetErrorMsg(wIdx : Integer) : DOMString;
-    function ParseDataSource(const sSource : ansistring) : Boolean; 
+    function ParseDataSource(const sSource : AnsiString) : Boolean;
     function ParseMemory(var aBuffer; aSize : Longint) : Boolean;
     function ParseStream(oStream : TStream) : Boolean;
 
@@ -858,7 +858,7 @@ function TApdParser.GetExternalTextEntityValue(const sName,
                                                     sSystemId : DOMString)
                                                               : DOMString;
 var
-  CompletePath : ansistring;
+  CompletePath : AnsiString;
 begin
   DataBufferFlush;
   Result := '';
@@ -934,7 +934,7 @@ begin
             (cVal = #$0D) or (cVal = #$0A);
 end;
 {--------}
-function TApdParser.LoadDataSource(sSrcName  : ansistring;
+function TApdParser.LoadDataSource(sSrcName  : AnsiString;
                                   oErrors   : TStringList) : Boolean;
 var
   aFileStream : TApdFileStream;
@@ -1207,7 +1207,7 @@ begin
   EntRefs.Free;
 end;
 {--------}
-function TApdParser.ParseDataSource(const sSource : ansistring) : Boolean;
+function TApdParser.ParseDataSource(const sSource : AnsiString) : Boolean;
 begin
   FErrors.Clear;
   FIsStandAlone := False;
@@ -1776,7 +1776,7 @@ end;
 procedure TApdParser.PushString(const sVal : DOMString);
 var
   MemStream  : TApdMemoryStream;
-  TempString : ansistring;
+  TempString : AnsiString;
 begin
   if Length(sVal) > 0 then begin
     PushDocument;
@@ -2303,10 +2303,10 @@ begin
 end;
 
 {--------}
-procedure TApdParser.ValidateVersNum(const aString : ansistring);
+procedure TApdParser.ValidateVersNum(const aString : AnsiString);
 var
   i       : Integer;
-  TempChr : ansichar;
+  TempChr : AnsiChar;
   Good    : Boolean;
 begin
   for i := 1 to Length(aString) do begin

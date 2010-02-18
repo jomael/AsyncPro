@@ -3856,7 +3856,7 @@ end;
     Result := AproLoadStr(drTypeBase + ord(drType));
   end;
 
-  function GetDSTStr(drsType : TDispatchSubType) : ansistring; 
+  function GetDSTStr(drsType : TDispatchSubType) : AnsiString;
   begin
     if drsType = dstNone then
       Result := ''

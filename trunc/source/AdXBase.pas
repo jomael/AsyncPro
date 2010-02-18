@@ -47,7 +47,7 @@ uses
 
 type
   TApdUcs4Char = Longint;
-  TApdUtf8Char = AnsiString; // packed array [0..6] of ansichar;   // --sm does use 8Char=8bit is ansiString=8bit
+  TApdUtf8Char = AnsiString; // packed array [0..6] of AnsiChar;   // --sm does use 8Char=8bit is AnsiString=8bit
   DOMChar = WideChar;
   PDOMChar = PWideChar;
 

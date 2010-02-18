@@ -180,7 +180,7 @@ type
          read tpGetArgument;
       property ArgumentCount : integer read FArgCount;
       property Command : byte read FCommand;
-      property Sequence : ansistring read tpGetSequence;
+      property Sequence : AnsiString read tpGetSequence;
   end;
 
   TAdVT100Parser = class(TAdTerminalParser)
@@ -738,7 +738,7 @@ begin
     Result := FArgs^[aInx];
 end;
 {--------}
-function TAdVT100Parser.tpGetSequence : ansistring;
+function TAdVT100Parser.tpGetSequence : AnsiString;
 begin
   if (FCommand <> eNone) then
     Result := GetStringFromSeq(FSequence)

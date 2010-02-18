@@ -53,10 +53,10 @@ type
     function ExportDetailXML(Modem : TLmModem) : Integer;
     procedure FixupModemcap(var List : TStringList);
     function ReadLine : AnsiString;
-    procedure WriteLine(const Str : ansistring);
+    procedure WriteLine(const Str : AnsiString);
     procedure WriteXMLStr(const Str, sVal : AnsiString);
 
-    function XMLize(const S : ansistring) : ansistring;
+    function XMLize(const S : AnsiString) : AnsiString;
     function XMLizeInt(I : Integer) : AnsiString;
     function XMLizeBool(B : Boolean) : AnsiString;
     function UnXMLize(const S : AnsiString) : AnsiString;
@@ -96,7 +96,7 @@ function TApdModemCapDetail.AddModem(const ModemDetailFile: string;
 var
   C : AnsiChar;
   I : Integer;
-  S : ansistring;
+  S : AnsiString;
   Found : Boolean;
 begin
   DetailStream := nil;
@@ -714,7 +714,7 @@ const
 var
   X, I : Integer;
   FileList : TStringList;
-  S : ansistring;
+  S : AnsiString;
 begin
   { count the modem records and file references... }
   X := pred(List.Count);
@@ -751,7 +751,7 @@ end;
 function TApdModemCapDetail.ReadLine : AnsiString;
   { a method to read a #13#10 terminated line from the stream }
 var
-  C : ansiChar;
+  C : AnsiChar;
 begin
   Result := '';
   repeat
@@ -776,7 +776,7 @@ begin
   end;
 end;
 
-procedure TApdModemCapDetail.WriteLine(const Str: ansistring);
+procedure TApdModemCapDetail.WriteLine(const Str: AnsiString);
   { a method to write a #13#10 terminated string to the stream }
   { no XML translations }
 begin
@@ -807,7 +807,7 @@ begin
   WriteLine(Str + XMLize(sVal) + S);
 end;
 
-function TApdModemCapDetail.XMLize(const S: ansistring): ansistring;
+function TApdModemCapDetail.XMLize(const S: AnsiString): AnsiString;
   { a method to convert a regular string to an XML string }
 var
   i : integer;

@@ -167,7 +167,7 @@ type
 
   TApdDeviceSocket = class(TApdSocket)
   private
-    FWsTerminal : ansistring;
+    FWsTerminal : AnsiString;
     {$IFDEF Win32}
     SockSection : TRTLCriticalSection;
     {$ENDIF}

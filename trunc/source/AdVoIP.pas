@@ -211,7 +211,7 @@ type
     FEnabled: Boolean;
     FLogName: string;
     public
-      procedure AddLogString(Verbose : Boolean; const S : ansistring);
+      procedure AddLogString(Verbose : Boolean; const S : AnsiString);
       procedure ClearLog;
     published
       property LogName : string
@@ -1644,7 +1644,7 @@ end;
 procedure TApdVoIPLog.AddLogString(Verbose : Boolean; const S: Ansistring);
 var
   LogStream : TFileStream;
-  TimeStamp : ansistring;
+  TimeStamp : AnsiString;
 begin
   if FEnabled then
     if Verbose and FVerboseLog then begin

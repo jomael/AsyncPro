@@ -1127,7 +1127,7 @@ var
 begin
   P := BS + (aBit shr 3);
   M := 1 shl (byte(aBit) and 7);
-  P^ := ansichar(byte(P^) or M);
+  P^ := AnsiChar(byte(P^) or M);
 end;
 {====================================================================}
 

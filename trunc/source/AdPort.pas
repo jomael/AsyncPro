@@ -454,7 +454,7 @@ type
       {-Discard the contents of the output buffer}
 
     {Trigger managment}
-    function AddDataTrigger(const Data : ansistring;
+    function AddDataTrigger(const Data : AnsiString;
                             const IgnoreCase : Boolean) : Word;
       {-Add a data trigger}
     function AddTimerTrigger : Word;
@@ -2525,12 +2525,12 @@ const
     FLogging := tlPause;
   end;
 
-  function TApdCustomComPort.AddDataTrigger(const Data : ansistring;
+  function TApdCustomComPort.AddDataTrigger(const Data : AnsiString;
                                             const IgnoreCase : Boolean) : Word;
     {-Add a ShortString data trigger}
   var
     Len : Word;
-    P : array[0..255] of ansiChar;
+    P : array[0..255] of AnsiChar;
   begin
     if (PortState = psShuttingDown) then begin
       Result := 0;
