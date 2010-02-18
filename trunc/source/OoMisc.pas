@@ -23,7 +23,6 @@
  *    Sulaiman Mah
  *    Sean B. Durkin
  *    Sebastian Zierer
- *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
@@ -128,7 +127,7 @@ const
 type
   TPipeEvent = record
     Event : Byte;
-    Data : ansiString;  // --sm check shortstring to sting
+    Data : ansiString;
   end;
   TOleEnum = type DWORD;
   { XML definitions }
@@ -139,10 +138,10 @@ type
   {$EndIf}
 
 type
-  CharSet = set of Ansichar;  // --sm
+  CharSet = set of Ansichar;
 
 //  TPassString = string[255];  // !!! There is a good case to remove this type.
-  TPassString = ansistring;  // --zer0
+  TPassString = ansistring;
   TApdHwnd = HWND;
 
 
@@ -1574,7 +1573,7 @@ const
 
 type
   {where these same variables are declared as Strings.}
-  TModemNameZ     = array[0..ApdModemNameLen] of ansiChar;  // --sm ansi
+  TModemNameZ     = array[0..ApdModemNameLen] of ansiChar;
   TCmdStringZ     = array[0..ApdCmdLen] of ansiChar;
   TRspStringZ     = array[0..ApdRspLen] of ansiChar;
   TTagStringZ     = array[0..ApdTagLen] of ansiChar;
@@ -1650,7 +1649,7 @@ const
   ApdKeyIndexMaxLen  = 120;
 
 type
-  TKeyMapName    = array[0..ApdKeyMapNameLen] of ansiChar; // --sm ansi
+  TKeyMapName    = array[0..ApdKeyMapNameLen] of ansiChar;
   TKeyMapping    = array[0..KeyMappingLen] of ansichar;
   TKeyMappingStr = string[KeyMappingLen];
 
@@ -1669,7 +1668,7 @@ type
   end;
 
   PKeyEmulator = ^TKeyEmulator;
-  TKeyEmulator = record // --sm ansi
+  TKeyEmulator = record
     kbKeyFileName : PansiChar;                            { current file name }
     kbKeyName     : TKeyMapName;                      { current key index name }
     kbProcessAll  : Bool;
@@ -1831,7 +1830,7 @@ type
   end;
 
   {Fax file signature array}
-  TSigArray = Array[0..5] of ansiChar; // --sm ansi
+  TSigArray = Array[0..5] of ansiChar;
 
 const
   {Default fax file signature, first 6 chars in an APF}
@@ -1881,7 +1880,7 @@ type
 //    PhoneNumber    : String[50];       {Phone number to dial for this job}
 //    HeaderLine     : String[100];      {Header line}
 //    HeaderRecipient: String[30];       {Recipient's name}
-//    HeaderTitle    : String[30];       {Title of fax} // --sm --zer0
+//    HeaderTitle    : String[30];       {Title of fax}
     PhoneNumber    : ansiString;       {Phone number to dial for this job}
     HeaderLine     : ansiString;      {Header line}
     HeaderRecipient: ansiString;       {Recipient's name}

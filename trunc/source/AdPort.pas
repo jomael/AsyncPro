@@ -30,8 +30,9 @@
  *                            Logging := tlOn.  This also closes a timing window
  *                            where log entries could be lost between setting
  *                            Logging to tlAppend and then tlOn.
+ *	Sulaiman Mah
+ *	Sean B. Durkin 
  *  Sebastian Zierer
- *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
@@ -163,7 +164,7 @@ type
 
 const
   {Parity strings}
-  ParityName : array[TParity] of string[5] =        // --zer0 string[5]
+  ParityName : array[TParity] of string[5] =        
     ('None', 'Odd', 'Even', 'Mark', 'Space');
 
   {Property defaults}
@@ -387,8 +388,8 @@ type
 
     {Tracing}
     procedure InitTracing(const NumEntries : Cardinal);
-    procedure DumpTrace(const FName : string; const InHex : Boolean);        // --sm check shortstring to sting
-    procedure AppendTrace(const FName : string;                             // SWB// --sm check shortstring to sting
+    procedure DumpTrace(const FName : string; const InHex : Boolean);        
+    procedure AppendTrace(const FName : string;                             // SWB
                           const InHex : Boolean;                            // SWB
                           const NewState : TTraceLogState);                 // SWB
     procedure ClearTracing;
@@ -398,8 +399,8 @@ type
 
     {DispatchLogging}
     procedure InitLogging(const Size : Cardinal);
-    procedure DumpLog(const FName : string; const InHex : Boolean);// --sm check shortstring to sting
-    procedure AppendLog(const FName : string;  // --sm check shortstring to sting                        // SWB
+    procedure DumpLog(const FName : string; const InHex : Boolean);
+    procedure AppendLog(const FName : string;                               // SWB
                         const InHex : Boolean;                              // SWB
                         const NewState : TTraceLogState);                   // SWB
     procedure ClearLogging;
@@ -453,7 +454,7 @@ type
       {-Discard the contents of the output buffer}
 
     {Trigger managment}
-    function AddDataTrigger(const Data : ansistring;// --sm check shortstring to sting
+    function AddDataTrigger(const Data : ansistring;
                             const IgnoreCase : Boolean) : Word;
       {-Add a data trigger}
     function AddTimerTrigger : Word;
@@ -2159,7 +2160,7 @@ const
         for I := 0 to SourcePort.UserList.Count-1 do begin
           New(UL);
           Move(SourcePort.UserList.Items[I]^, UL^,
-               SizeOf(TUserListEntry));   // --sm check
+               SizeOf(TUserListEntry));
           UserList.Add(UL);
         end;
 
@@ -2524,12 +2525,12 @@ const
     FLogging := tlPause;
   end;
 
-  function TApdCustomComPort.AddDataTrigger(const Data : ansistring;// --sm check shortstring to sting
+  function TApdCustomComPort.AddDataTrigger(const Data : ansistring;
                                             const IgnoreCase : Boolean) : Word;
     {-Add a ShortString data trigger}
   var
     Len : Word;
-    P : array[0..255] of ansiChar;  // --sm ansi
+    P : array[0..255] of ansiChar;
   begin
     if (PortState = psShuttingDown) then begin
       Result := 0;
@@ -2670,7 +2671,7 @@ const
     if (PortState = psShuttingDown) then Exit;
    {$IFOPT H+}
     CheckException(Self, ValidDispatcher.PutBlock(Pointer(S)^, Length(S)));
-   {$ELSE}      // --sm
+   {$ELSE}
     CheckException(Self, ValidDispatcher.PutString(S));
    {$ENDIF}
   end;

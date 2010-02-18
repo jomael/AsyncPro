@@ -23,7 +23,6 @@
  *  Sulaiman Mah
  *  Sean B. Durkin
  *  Sebastian Zierer
- *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
@@ -98,7 +97,7 @@ type
   EApdSocketException = class(Exception)
     ErrorCode : Integer;
     { Dummy parameters are a hack to make BCB happy }
-    constructor CreateNoInit(ErrCode : Integer; Dummy : PansiChar); // --sm ansi
+    constructor CreateNoInit(ErrCode : Integer; Dummy : PansiChar);
     constructor CreateTranslate(ErrCode, Dummy1, Dummy2 : Integer);
   end;
 
@@ -269,13 +268,13 @@ begin
 end;
 
 { -Gets the name of the local host machine }
-function TApdSocket.GetLocalHost : string; // --sm how GetLocalHost is called - none
+function TApdSocket.GetLocalHost : string; 
 var
-  HostStr : array[0..255] of AnsiChar;      // --sm AnsiString? (sz: yes)
+  HostStr : array[0..255] of AnsiChar;   
 begin
   Result := '';
   CheckLoaded;
-  if SockFuncs.GetHostName(@HostStr, SizeOf(HostStr)) = 0 then begin   // --sm GetHostName
+  if SockFuncs.GetHostName(@HostStr, SizeOf(HostStr)) = 0 then begin
     Result := string(HostStr);
   end;
 end;

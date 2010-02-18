@@ -22,7 +22,6 @@
  * Contributor(s):
  *  Sulaiman Mah
  *  Sean B. Durkin
- *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
@@ -89,7 +88,7 @@ type
     FContext : Integer;
     FCurrentElement : DOMString;
     FCurrentElementContent : Integer;
-    FCurrentPath : ansistring;  // --sm ansi
+    FCurrentPath : ansistring;
     FDataBuffer : DOMString;
     FDocStack : TList;
     FElementInfo : TStringList;
@@ -233,7 +232,7 @@ type
     procedure ValidatePCData(const aString      : DOMString;
                                    aInEntityRef : Boolean);
     procedure ValidatePublicID(const aString : DOMString);
-    procedure ValidateVersNum(const aString : ansistring);  // --sm ansi
+    procedure ValidateVersNum(const aString : ansistring);
 
   protected
     { Protected declarations }
@@ -247,7 +246,7 @@ type
     destructor Destroy; override;
 
     function GetErrorMsg(wIdx : Integer) : DOMString;
-    function ParseDataSource(const sSource : ansistring) : Boolean; // --sm ansi
+    function ParseDataSource(const sSource : ansistring) : Boolean; 
     function ParseMemory(var aBuffer; aSize : Longint) : Boolean;
     function ParseStream(oStream : TStream) : Boolean;
 
@@ -942,7 +941,7 @@ var
 begin
   begin
     { Must be a local or network file. Eliminate file:// prefix. }
-    if StrLIComp(PansiChar(sSrcName), 'file://', 7) = 0 then    // --sm ansi
+    if StrLIComp(PansiChar(sSrcName), 'file://', 7) = 0 then
       Delete(sSrcName, 1, 7);
 
     if FileExists(sSrcName) then begin
@@ -1553,7 +1552,7 @@ begin
       end;
       Move(TempChar,
            PByteArray(Pointer(TempBuff))[CurrLength],
-           2);      // --zer0 original code
+           2);
       Inc(CurrLength, 2);
       SkipChar;
       Added := True;
@@ -1990,7 +1989,7 @@ begin
         SkipChar;
         Move(TempChar,
              PByteArray(Pointer(Result))^[CurrLen],
-             2);       // --zer0 original code
+             2);
         Inc(CurrLen, 2);
       end else
         raise EAdParserError.CreateError(FFilter.Line,

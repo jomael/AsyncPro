@@ -20,11 +20,12 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *
+ *    Sulaiman Mah
+ *    Sean B. Durkin
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADSTRMAP.PAS 4.06                   *}
+{*                   ADSTRMAP.PAS 5.00                   *}
 {*********************************************************}
 (* Defines the string mapping tables                     *)
 {*********************************************************}

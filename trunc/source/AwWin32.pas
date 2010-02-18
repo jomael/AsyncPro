@@ -338,7 +338,7 @@ end;
       if SizeAtEnd >= Size then begin
         {can move data to output queue in one block}
 //        Move(Buf^, OBuffer^[OBufHead], Size);
-        Move(Buf^, GetPtr(OBuffer,OBufHead)^,Size);// --sm check
+        Move(Buf^, GetPtr(OBuffer,OBufHead)^,Size);
         if SizeAtEnd = Size then
           OBufHead := 0
         else
@@ -346,10 +346,10 @@ end;
       end else begin
         { need to use two moves }
 //        Move(Buf^, OBuffer^[OBufHead], SizeAtEnd);
-        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeAtEnd);// --sm check
+        Move(Buf^, GetPtr(OBuffer,OBufHead)^, SizeAtEnd);
         LeftOver := Size - SizeAtEnd;
-//        Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));// --sm check
-        Move( GetPtr(Buf,SizeAtEnd)^, OBuffer^, LeftOver);// --sm check
+//        Move(PBArray(Buf)^[SizeAtEnd], OBuffer^, SizeOf( LeftOver));
+        Move( GetPtr(Buf,SizeAtEnd)^, OBuffer^, LeftOver);
         OBufHead := LeftOver;
       end;
     finally

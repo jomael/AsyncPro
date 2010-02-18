@@ -20,8 +20,9 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ * 	Sulaiman Mah
+ * 	Sean B. Durkin
  *  Sebastian Zierer
- *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}

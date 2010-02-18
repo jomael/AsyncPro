@@ -84,10 +84,10 @@
 {Options required for this unit}
 {$X+,B-,I-,T-,J+}
 
-{.$DEFINE DebugThreads}         // --sm to delete
+{.$DEFINE DebugThreads}
 
 {$IFDEF CONSOLE}
-{.$DEFINE DebugThreadConsole}   // --sm to delete
+{.$DEFINE DebugThreadConsole}
 {$ENDIF}
 
 {!!.02} { removed Win16 references }
@@ -261,12 +261,11 @@ type
       function GetComState(var DCB: TDCB): Integer; virtual; abstract;
       function ReadCom(Buf : PAnsiChar; Size: Integer) : Integer; virtual; abstract;
       function SetComState(var DCB : TDCB) : Integer; virtual; abstract;
-      function WriteCom(Buf : PansiChar; Size: Integer) : Integer; virtual; abstract; // --sm check
+      function WriteCom(Buf : PansiChar; Size: Integer) : Integer; virtual; abstract;
       function WaitComEvent(var EvtMask : DWORD;
         lpOverlapped : POverlapped) : Boolean; virtual; abstract;
       function SetupCom(InSize, OutSize : Integer) : Boolean; virtual; abstract;
 
-// --sm to delete unwanted functions and procedures
       function CheckReceiveTriggers : Boolean;
       function CheckStatusTriggers : Boolean;
       function CheckTimerTriggers : Boolean;
@@ -297,7 +296,7 @@ type
       procedure ResetDataTriggers;
       function SendNotify(Msg, Trigger, Data: Cardinal) : Boolean;
       function SetCommStateFix(var DCB : TDCB) : Integer;
-      procedure StartDispatcher; virtual; abstract; // --sm need it
+      procedure StartDispatcher; virtual; abstract;
       procedure StopDispatcher;  virtual; abstract;
       procedure ThreadGone(Sender: TObject);                                // SWB
       procedure ThreadStart(Sender : TObject);                              // SWB
@@ -336,9 +335,9 @@ type
 
       procedure AbortDispatchLogging;
       procedure AbortTracing;
-      function AddDataTrigger(Data : PAnsiChar; // --sm PansiChar
+      function AddDataTrigger(Data : PAnsiChar; 
                                IgnoreCase : Boolean) : Integer;
-      function AddDataTriggerLen(Data : PAnsiChar;  // --sm Pansichar
+      function AddDataTriggerLen(Data : PAnsiChar;  
                               IgnoreCase : Boolean;
                               Len : Cardinal) : Integer;
       function AddStatusTrigger(SType : Cardinal) : Integer;
@@ -405,7 +404,7 @@ type
       function PeekChar(var C : AnsiChar; Count : Cardinal) : Integer;
       function ProcessCommunications : Integer; virtual; abstract;
       function PutBlock(const Block; Len : Cardinal) : Integer;
-      function PutChar(C : AnsiChar) : Integer; // --sm ansi
+      function PutChar(C : AnsiChar) : Integer;
       function PutString(S : AnsiString) : Integer;
       procedure RegisterWndTriggerHandler(HW : TApdHwnd);
       procedure RegisterProcTriggerHandler(NP : TApdNotifyProc);
@@ -1639,7 +1638,7 @@ end;
 
         if EndCount <> 0 then begin
           {Move data from end of dispatch buffer}
-          Move( GetPtr(DBuffer, NewTail)^, Pointer(Block)^, SizeOf( EndCount)); // --sm check
+          Move( GetPtr(DBuffer, NewTail)^, Pointer(Block)^, SizeOf( EndCount));
           Inc(NewTail, EndCount);
         end;
 
@@ -1647,7 +1646,7 @@ end;
           {Move data from beginning of dispatch buffer}
           Move(DBuffer^,
                GetPtr(Block, EndCount+1)^,
-               SizeOf( BeginCount));  // --sm check
+               SizeOf( BeginCount));
           NewTail := BeginCount;
         end;
 
@@ -2284,7 +2283,7 @@ end;
       {Check another index?}
       if Check then begin
         {Compare this index...}
-        if C = P[Indexes[I]] then       // -- sm wants to modified this (SZ disagrees)  => if C = P[Indexes[I]*PayloadLengthInBytes(P)] then
+        if C = P[Indexes[I]] then      
           {Got match, was it complete?}
           if Indexes[I] = Len-1 then begin
             Indexes[I] := 0;
@@ -2572,7 +2571,7 @@ end;
             AddDispatchEntry(dtDispatch,                                    // SWB
                              dstStatus,                                     // SWB
                              0,                                             // SWB
-                             PAnsiChar('Dispatch buffer full.'),                // SWB
+                             PAnsiChar('Dispatch buffer full.'),            // SWB
                              21);                                           // SWB
         Result := True;
         Exit;
@@ -3857,7 +3856,7 @@ end;
     Result := AproLoadStr(drTypeBase + ord(drType));
   end;
 
-  function GetDSTStr(drsType : TDispatchSubType) : ansistring;  // --sm ansi
+  function GetDSTStr(drsType : TDispatchSubType) : ansistring; 
   begin
     if drsType = dstNone then
       Result := ''
@@ -3884,7 +3883,7 @@ end;
     Col : Cardinal;
     Res : Integer;
     DumpFile : Text;
-    C : AnsiChar;     // --sm ansi
+    C : AnsiChar;     
     LogFileBuffer : array[1..512] of AnsiChar;
     S : string[80];
     logBfr      : TLogBuffer;                                               // SWB
@@ -3921,18 +3920,18 @@ end;
         VER_PLATFORM_WIN32_NT      : begin                               {!!.04}
           SerPack := StrPas(OSVersion.szCSDVersion);                     {!!.04}
           case OSVersion.dwMajorVersion of                               {!!.04}
-            2 : if OsVersion.dwMinorVersion = 6 then                     // --sm
-                  Result := 'Window CE ';                                // --sm
+            2 : if OsVersion.dwMinorVersion = 6 then      // --sm MajorVersion.MinorVersion
+                  Result := 'Window CE ';
             3 : Result := 'Windows NT 3.5 ';                             {!!.04}
             4 : Result := 'Windows NT 4 ';                               {!!.04}
             5 : case OSVersion.dwMinorVersion of                         {!!.04}
                 0 : Result := 'Windows 2000 ';                           {!!.04}
                 1 : Result := 'Windows XP ';                             {!!.04}
-                2 : Result := 'Windows 2003 ';                           // --sm
+                2 : Result := 'Windows 2003 ';
                 end;
-            6 : case OSVersion.dwMinorVersion of                         // --sm
-                0 : Result := 'Windows Vista ';                          // --sm
-                1 : Result := 'Windows 7 ';                              // --sm
+            6 : case OSVersion.dwMinorVersion of
+                0 : Result := 'Windows Vista ';
+                1 : Result := 'Windows 7 ';
                 end;                                                     {!!.04}
             else Result := 'WinNT ';                                     {!!.04}
           end;                                                           {!!.04}
@@ -4012,11 +4011,11 @@ end;
         {$IFDEF VER190}	   					                                // KGM
         S := 'Delphi 2007';                                                 // KGM
         {$ENDIF}							                                // KGM
-        {$IFDEF VER200}                                       // --sm
+        {$IFDEF VER200}                                       
         S := 'Delphi 2009';
-        {$IFDEF VER210}	   		                                // --sm
+        {$IFDEF VER210}	   		                              
         S := 'Delphi 2010';
-        {$ifdef DELPHI_Future}                                // --sm
+        {$ifdef DELPHI_Future}                                
           {$define DELPHI_2010_UP}
           S := 'Delphi 2010 UP';
         {$endif}
@@ -4355,11 +4354,11 @@ end;
                 NumToWrite := OutQue - OBufTail
               else begin
                 GetMem(TempBuff, OBufHead);
-                Move(OBuffer^, TempBuff^, SizeOf( OBufHead)); // --sm check
+                Move(OBuffer^, TempBuff^, SizeOf( OBufHead));
 //                Move(OBuffer^[OBufTail], OBuffer^, OutQue - OBufTail);
-                Move(GetPtr(OBuffer, OBufTail)^, OBuffer^, (OutQue - OBufTail));// --sm check
+                Move(GetPtr(OBuffer, OBufTail)^, OBuffer^, (OutQue - OBufTail));
 //                Move(TempBuff^, OBuffer^[OutQue - OBufTail], OBufHead);
-                Move(TempBuff^, GetPtr(OBuffer, (OutQue - OBufTail))^, OBufHead);// --sm check
+                Move(TempBuff^, GetPtr(OBuffer, (OutQue - OBufTail))^, OBufHead);
                 FreeMem(TempBuff);
                 Inc(OBufHead, OutQue - OBufTail);
                 NumToWrite := OBufHead;

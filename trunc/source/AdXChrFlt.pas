@@ -324,7 +324,7 @@ begin
                                      Line,
                                      LinePos,
                                      sBadUTF8Char);
-  Move(Len, Utf8Char, 1);  // --sm check
+  Move(Len, Utf8Char, 1);
   {get the remaining characters from the stream}
   for i := 2 to Len do begin
     {if the buffer is empty, fill it}

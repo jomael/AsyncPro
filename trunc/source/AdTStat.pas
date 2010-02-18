@@ -20,12 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *   Sebastian Zierer
- *
+ *    Sulaiman Mah
+ *    Sean B. Durkin
+ *    Sebastian Zierer
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADTSTAT.PAS 4.06                    *}
+{*                   ADTSTAT.PAS 5.00                    *}
 {*********************************************************}
 {* TApdTapiStatus dialog                                 *}
 {*********************************************************}

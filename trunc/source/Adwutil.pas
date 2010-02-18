@@ -127,7 +127,7 @@ const
 
   { Get # bytes to read }
   FiOnRead = Ioc_Out or ((LongInt(SizeOf(LongInt)) and IocParm_Mask) shl 16) or
-    (LongInt(Byte('f')) shl 8) or 127;  // --sm OK
+    (LongInt(Byte('f')) shl 8) or 127;
 
   { Set/Clear non-blocking i/o }
   FiOnBio  = Ioc_In or((LongInt(SizeOf(LongInt)) and IocParm_Mask) shl 16) or

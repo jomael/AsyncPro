@@ -20,7 +20,9 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *
+ *    Sulaiman Mah
+ *    Sean B. Durkin
+ *    Sebastian Zierer
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
@@ -105,11 +107,11 @@ type
 //    ConfigVersion : string[8];       { version tag to support future features }
     ConfigVersion : ansistring;       { version tag to support future features }
     { port settings }
-//    AttachedTo : string[20];      // --sm
+//    AttachedTo : string[20];
 //    Manufacturer : string[100];
 //    ModemName : string[100];
 //    ModemModel : string[100];
-    AttachedTo : ansistring;      // --sm
+    AttachedTo : ansistring;
     Manufacturer : ansistring;
     ModemName : ansistring;
     ModemModel : ansistring;
@@ -136,7 +138,7 @@ type
   end;
 
   TApdModemNameProp = class(TPersistent)
-  private // --sm ansi
+  private
     FManufacturer: ansistring;
     FName: ansistring;
     FModemFile: ansistring;
@@ -157,7 +159,7 @@ type
   end;
 
   TApdCallerIDInfo = record
-    HasData : Boolean;    // --sm ansi
+    HasData : Boolean;
     Date   : ansistring;
     Time   : ansistring;
     Number : ansistring;
@@ -1599,7 +1601,7 @@ begin                                                                    {!!.05}
     DoDisconnect;                                                        {!!.05}
 end;                                                                     {!!.05}
 
-function TAdCustomModem.ParseStandardConnect(const Response: ansistring) : Boolean;{!!.05} // --sm ansi
+function TAdCustomModem.ParseStandardConnect(const Response: ansistring) : Boolean;{!!.05}
 var
   Position      : Integer;
   Len           : Integer;

@@ -20,12 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *   Sebastian Zierer
- *
+ *    Sulaiman Mah
+ *    Sean B. Durkin
+ *    Sebastian Zierer
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                    ADTAPI.PAS 4.06                    *}
+{*                    ADTAPI.PAS 5.00                    *}
 {*********************************************************}
 {* TApdTapiDevice, status and log components             *}
 {*********************************************************}
@@ -3148,10 +3149,10 @@ type
     { Read the waveform data into the idle buffer. }
     if ActiveWaveOutBuffer = 2 then
       Res := mmioRead(MmioOutHandle,
-        PansiChar(WaveOutBuffer2), BytesInBuffer) // --sm PansiChar
+        PansiChar(WaveOutBuffer2), BytesInBuffer)
     else
       Res := mmioRead(MmioOutHandle,
-        PansiChar(WaveOutBuffer1), BytesInBuffer);  // --sm PansiChar
+        PansiChar(WaveOutBuffer1), BytesInBuffer);
     if ActiveWaveOutBuffer = 0 then
       ActiveWaveOutBuffer := 1;
     if Res = -1 then
@@ -3163,10 +3164,10 @@ type
     Res   : LongInt;
   begin
     if ActiveWaveOutBuffer = 1 then begin
-      WaveOutHeader^.lpData := PansiChar(WaveOutBuffer1); // --sm PansiChar
+      WaveOutHeader^.lpData := PansiChar(WaveOutBuffer1);
       ActiveWaveOutBuffer := 2;
     end else begin
-      WaveOutHeader^.lpData := PansiChar(WaveOutBuffer2);// --sm PansiChar
+      WaveOutHeader^.lpData := PansiChar(WaveOutBuffer2);
       ActiveWaveOutBuffer := 1;
     end;
     WaveOutHeader^.dwBufferLength := BytesInBuffer;
@@ -3441,9 +3442,9 @@ type
     Res : Integer;
   begin
     if (ActiveBuffer = 1) then
-      WaveInHeader^.lpData := PansiChar(WaveInBuffer1) // --sm PansiChar
+      WaveInHeader^.lpData := PansiChar(WaveInBuffer1)
     else
-      WaveInHeader^.lpData := PansiChar(WaveInBuffer2); // --sm PansiChar
+      WaveInHeader^.lpData := PansiChar(WaveInBuffer2);
 
     Res := waveInPrepareHeader(
       WaveInHandle, WaveInHeader, SizeOf(TWaveHdr));
@@ -3500,7 +3501,7 @@ type
       wBitsPerSample  := BitsPerSample;
       cbSize          := 0;
     end;
-    Res := mmioWrite(MmioInHandle, PansiChar(@WaveFormat), SizeOf(WaveFormat)); // --sm PansiChar
+    Res := mmioWrite(MmioInHandle, PansiChar(@WaveFormat), SizeOf(WaveFormat));
     if (Res = -1) then begin
       raise ETapiWaveFail.CreateUnknown('MMIO Write Error', 0);
     end;
@@ -3542,7 +3543,7 @@ type
       end;
     end;
 
-    Res := mmioWrite(MmioInHandle, PansiChar(WaveInHeader^.lpData), BytesRecorded);// --sm PansiChar
+    Res := mmioWrite(MmioInHandle, PansiChar(WaveInHeader^.lpData), BytesRecorded);
     if (Res = -1) then begin
       raise ETapiWaveFail.CreateUnknown('MMIO Write Error', 0);
     end;

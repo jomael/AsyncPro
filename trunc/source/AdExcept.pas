@@ -23,7 +23,6 @@
  *    Sulaiman Mah
  *    Sean B. Durkin
  *    Sebastian Zierer
- *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
@@ -395,7 +394,7 @@ type
 
   function AproLoadStr(const ErrorCode : SmallInt) : string;
 
-  function AproLoadZ(P : PAnsiChar; Code : Integer) : PAnsiChar;    // --sm ansi
+  function AproLoadZ(P : PAnsiChar; Code : Integer) : PAnsiChar; 
 
   function ErrorMsg(const ErrorCode : SmallInt) : string;
   {$IFDEF UseResourceStrings}

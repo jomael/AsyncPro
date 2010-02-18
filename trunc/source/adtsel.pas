@@ -20,12 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *   Sebastian Zierer
- *
+ *    Sulaiman Mah
+ *    Sean B. Durkin
+ *    Sebastian Zierer
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                    ADTSEL.PAS 4.06                    *}
+{*                    ADTSEL.PAS 5.00                    *}
 {*********************************************************}
 {* TAPI Device Selection dialog                          *}
 {*********************************************************}

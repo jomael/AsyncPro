@@ -48,8 +48,8 @@ uses
 type
   TApdUcs4Char = Longint;
   TApdUtf8Char = AnsiString; // packed array [0..6] of ansichar;   // --sm does use 8Char=8bit is ansiString=8bit
-  DOMChar = WideChar;         // --sm OK
-  PDOMChar = PWideChar;       // --sm OK
+  DOMChar = WideChar;
+  PDOMChar = PWideChar;
 
   { Character encoding types}
   TApdCharEncoding = (ceUnknown, ceUTF8);
@@ -112,7 +112,7 @@ uses
 {== Utility methods ==================================================}
 function ApxPos(const aSubStr, aString : DOMString) : Integer;
 begin
-  Result := AnsiPos(aSubStr, aString);  // --sm change - AnsiPos to Pos - there is no WidePos
+  Result := AnsiPos(aSubStr, aString);
   Result := Pos(aSubStr, aString);
 end;
 {--------}
@@ -125,7 +125,7 @@ begin
   cLast := sSubStr[j];
   for i := Length(sTerm) downto j do begin
     if (sTerm[i] = cLast) and
-       (Copy(sTerm, i - j + 1, j) = sSubStr) then begin // --sm check j value = 4
+       (Copy(sTerm, i - j + 1, j) = sSubStr) then begin
       Result := i - j + 1;
       Exit;
     end;

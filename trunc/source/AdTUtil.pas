@@ -20,12 +20,13 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *   Sebastian Zierer
- *
+ *    Sulaiman Mah
+ *    Sean B. Durkin
+ *    Sebastian Zierer
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADTUTIL.PAS 4.06                    *}
+{*                   ADTUTIL.PAS 5.00                    *}
 {*********************************************************}
 {* TAPI DLL interface and utility methods                *}
 {*********************************************************}

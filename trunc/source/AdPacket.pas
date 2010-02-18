@@ -115,10 +115,10 @@ type
     HandlerInstalled : Boolean;
     fEnabled : Boolean;
     BufferPtr : Integer;
-{$ifndef UseOldPacket}        // --zer0 to delete UseOldPacket
+{$ifndef UseOldPacket}        
     fCurBfrOffset: Integer;
 {$endif}
-    fDataBuffer : PAnsiChar;    // --sm ansi
+    fDataBuffer : PAnsiChar;  
     dpDataBufferSize : Integer;
     fCapture : TApdDataPacket;
     Timer : Integer;
@@ -170,7 +170,7 @@ type
      {- Set ownership of incoming data to a particular packet}
     procedure ReleaseCapture(Value : TApdDataPacket);
      {- Opposite of SetCapture, see above}
-    property DataBuffer : PAnsiChar read fDataBuffer;   // --sm ansi
+    property DataBuffer : PAnsiChar read fDataBuffer;   
      {- The packet data buffer for the port. Only packets should access this}
     property ComPort : TApdCustomComPort read fComPort;
      {- The com port associated with this packet manager}
@@ -190,7 +190,7 @@ type
     fManager : TApdDataPacketManager;
     fStartCond : TPacketStartCond;
     fEndCond : TPacketEndSet;
-    fStartString,fEndString : AnsiString; // --sm
+    fStartString,fEndString : AnsiString;
     fComPort : TApdCustomComPort;
     fMode : TPacketMode;
     fPacketSize : Integer;
@@ -205,13 +205,13 @@ type
     fEnabled : Boolean;
     fIncludeStrings : Boolean;
 
-    PacketBuffer : PAnsiChar;       // --sm ansi
+    PacketBuffer : PAnsiChar;     
     StartMatchPos,EndMatchPos,EndMatchStart : Integer;
     LocalPacketSize : Integer;
     WildStartString,
     WildEndString,
     InternalStartString,
-    InternalEndString : AnsiString; // --sm ansi
+    InternalEndString : AnsiString; 
     WillCollect : Boolean;
     EnablePending : Boolean;
     HaveCapture : Boolean;
@@ -227,7 +227,7 @@ type
     procedure SetEnabled(Value : Boolean);
     procedure SetMode(Value : TPacketMode);
     procedure SetEndCond(const Value: TPacketEndSet);
-    procedure SetEndString(Value : AnsiString);     // --sm
+    procedure SetEndString(Value : AnsiString);  
     procedure SetFlushOnTimeout (const v : Boolean);                     {!!.04}
     procedure ProcessData(StartPtr : Integer);
      {- Processes incoming data, collecting and/or looking for a match}
@@ -303,9 +303,9 @@ type
      {- Conditions for this packet to start collecting data}
     property EndCond : TPacketEndSet read fEndCond write SetEndCond default [];
      {- Conditions for this packet to stop collecting data}
-    property StartString : AnsiString read fStartString write fStartString; // --sm
+    property StartString : AnsiString read fStartString write fStartString;
      {- Packet start string}
-    property EndString : AnsiString read fEndString write SetEndString;   // --sm
+    property EndString : AnsiString read fEndString write SetEndString;  
      {- Packet end string}
     property IgnoreCase : Boolean read fIgnoreCase write fIgnoreCase default adpDefIgnoreCase;
      {- Ignore case when matching StartString and EndString}
@@ -442,7 +442,7 @@ begin
     fCurBfrOffset := -1;
 {$endif}
   if BufferPtr > 0 then begin
-    move(fDataBuffer[NewStart],fDataBuffer[0],BufferPtr); // --sm check BufferPtr
+    move(fDataBuffer[NewStart],fDataBuffer[0],BufferPtr);
   end else
     DisposeBuffer;
   for i := 0 to pred(PacketList.Count) do
@@ -847,7 +847,7 @@ end;
 // on to the next character.
 procedure TApdDataPacket.ProcessData(StartPtr : Integer);
 
-    function MatchStartChar(c: AnsiChar; n: Integer): Boolean; // --sm ansi
+    function MatchStartChar(c: AnsiChar; n: Integer): Boolean; 
     begin
         Result := (WildStartString[n] = '1') or
                   ((not IgnoreCase) and (c = InternalStartString[n])) or
@@ -1139,11 +1139,11 @@ begin
   end;
 end;
 
-procedure SetupWildMask(var MatchString,Mask : AnsiString); // --sm
+procedure SetupWildMask(var MatchString,Mask : AnsiString); 
 var
   i,j : Integer;
   Esc : boolean;
-  Ch : AnsiChar;  // --sm ansi
+  Ch : AnsiChar;  
 begin
   Esc := False;
   j := 0;
@@ -1191,7 +1191,7 @@ begin
           dtPacket,Event,0,Data,DataSize)
       else
         fManager.ComPort.Dispatcher.AddDispatchEntry(
-          dtPacket,Event,0,@NameStr[1],Length(NameStr));    // --sm check Lenght
+          dtPacket,Event,0,@NameStr[1],Length(NameStr));
   end;
 end;
 
@@ -1219,13 +1219,13 @@ begin
     end;                                                                 {!!.04}
 
     if (StartCond = scString) then begin
-      LogPacketEvent(dstStartStr,@FStartString[1],Length(StartString)); // --sm Length
+      LogPacketEvent(dstStartStr,@FStartString[1],Length(StartString));
       if (StartString  = '') then
         raise EInvalidProperty.Create(ecStartStringEmpty, False);
-      if (ecPacketSize in EndCond) and (PacketSize < Length(StartString)) then  // --sm Length
+      if (ecPacketSize in EndCond) and (PacketSize < Length(StartString)) then
         raise EInvalidProperty.Create(ecPacketTooSmall, False);
       if not IncludeStrings then
-        inc(LocalPacketSize,Length(StartString)); // --sm Length
+        inc(LocalPacketSize,Length(StartString));
       Mode := dpWaitStart;
       if IgnoreCase then
         InternalStartString := UpperCase(StartString)
@@ -1243,7 +1243,7 @@ begin
     if (ecString in EndCond) then begin
       if (EndString  = '') then
         raise EInvalidProperty.Create(ecEmptyEndString, False);
-      LogPacketEvent(dstEndStr,@FEndString[1],Length(EndString)); // --sm Length
+      LogPacketEvent(dstEndStr,@FEndString[1],Length(EndString));
       if not IncludeStrings then
         inc(LocalPacketSize,Length(EndString));
       if IgnoreCase then
@@ -1312,7 +1312,7 @@ begin
         raise EStringSizeError.Create(ecPacketTooLong, False);
       {$ENDIF}
       SetLength(S, fDataSize);
-      Move(PacketBuffer^, S[1], fDataSize); // --sm check
+      Move(PacketBuffer^, S[1], fDataSize);
       fOnStringPacket(Self,S);
     end;
   except
@@ -1329,12 +1329,12 @@ begin
     Enabled := False;
     LocalSize := fDataSize;
     if (StartCond = scString) and not IncludeStrings then begin
-      PacketBuffer := PAnsiChar(@Manager.DataBuffer[BeginMatch+Length(InternalStartString)]); // --sm Length
-      dec(fDataSize,Length(InternalStartString)); // --sm Length
+      PacketBuffer := PAnsiChar(@Manager.DataBuffer[BeginMatch+Length(InternalStartString)]);
+      dec(fDataSize,Length(InternalStartString)); 
     end else
       PacketBuffer := PAnsiChar(@Manager.DataBuffer[BeginMatch]);
     if not IncludeStrings and (Reason = ecString) then
-      dec(fDataSize,Length(InternalEndString)); // --sm Length
+      dec(fDataSize,Length(InternalEndString)); 
     LogPacketEvent(dstStringPacket,nil,0);
     case Reason of
     ecString :
@@ -1372,7 +1372,7 @@ begin
     LogPacketEvent(dstPacketTimeout,nil,0);
     Enabled := False;
     FTimedOut := True;                                                   {!!.02}
-    PacketBuffer := PAnsiChar (@Manager.DataBuffer[BeginMatch +              {!!.04}
+    PacketBuffer := PAnsiChar (@Manager.DataBuffer[BeginMatch +          {!!.04}
                            Length (InternalStartString)]);               {!!.04}
     fDataSize := Manager.BufferPtr - BeginMatch;                         {!!.04}
     if SyncEvents and assigned(ComPort.Dispatcher.DispThread) then
@@ -1391,7 +1391,7 @@ begin
   PacketManagerList.Free;
 end;
 
-procedure TApdDataPacket.SetEndString(Value: AnsiString); // --sm
+procedure TApdDataPacket.SetEndString(Value: AnsiString); 
 var
   OldEnabled : Boolean;
 begin
@@ -1428,7 +1428,7 @@ begin
     SLength := 255;
   {$ENDIF}
   SetLength(Data, SLength);
-  Move(PacketBuffer^, Data[1], SLength);// --sm check
+  Move(PacketBuffer^, Data[1], SLength);
 end;
 
 procedure TApdDataPacket.GetCollectedData(var Data: Pointer;
@@ -1457,7 +1457,7 @@ begin
       Res := 255;
     {$ENDIF}
     SetLength(Data, Res);
-    Move(PacketBuffer^, Data[1], Res); // --sm check
+    Move(PacketBuffer^, Data[1], Res);
   end;
 end;
 

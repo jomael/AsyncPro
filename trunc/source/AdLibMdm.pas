@@ -20,7 +20,8 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *
+ *    Sulaiman Mah
+ *    Sean B. Durkin
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
@@ -43,14 +44,14 @@ uses
 
 type
   { LibModem type definitions }
-  TApdLoadModemRecord = procedure (ModemName, Manufacturer, Model, ModemFile : ansistring; // --sm ansi
+  TApdLoadModemRecord = procedure (ModemName, Manufacturer, Model, ModemFile : ansistring;
                                    var CanLoad : Boolean) of object;
   TApdLoadModem = procedure (ModemName, Manufacturer, Model : ansistring;
                              var CanLoad : Boolean) of object;
 
   { an entry from modemcap.xml describing the modem, one per modem }
   PLmModemName = ^TLmModemName;
-  TLmModemName = record       // --sm ansi
+  TLmModemName = record
     ModemName : ansistring;
     Manufacturer : ansistring;
     Model : ansistring;
@@ -59,7 +60,7 @@ type
 
   { a modem response }
   PLmResponseData = ^TLmResponseData;
-  TLmResponseData = record                // --sm ansi
+  TLmResponseData = record
     Response                         : ansistring;
     ResponseType                     : ansistring;
   end;
@@ -108,7 +109,7 @@ type
   end;
 
   { fax commands and responses }
-  TLmFaxClassDetails = record        // --sm ansi
+  TLmFaxClassDetails = record
     ModemResponseFaxDetect           : ansistring;
     ModemResponseDataDetect          : ansistring;
     SerialSpeedFaxDetect             : ansistring;
@@ -121,7 +122,7 @@ type
   end;
 
   { more fax commands and responses }
-  TLmFaxDetails = record             // --sm ansi
+  TLmFaxDetails = record
     ExitCommand                      : ansistring;
     PreAnswerCommand                 : ansistring;
     PreDialCommand                   : ansistring;
@@ -153,14 +154,14 @@ type
 
   { supported wave formats }
   PLmWaveFormat = ^TLMWaveFormat;
-  TLmWaveFormat = record             // --sm ansi
+  TLmWaveFormat = record
     ChipSet                          : ansistring;
     Speed                            : ansistring;
     SampleSize                       : ansistring;
   end;
 
   { wave details }
-  TLmWaveDriver = record             // --sm ansi
+  TLmWaveDriver = record
     BaudRate                         : ansistring;
     WaveHardwareID                   : ansistring;
     WaveDevices                      : ansistring;
@@ -176,7 +177,7 @@ type
   end;
 
   { voice modem properties }
-  TLmVoiceSettings = record          // --sm ansi
+  TLmVoiceSettings = record
     VoiceProfile                     : ansistring;
     HandsetCloseDelay                : Integer;
     SpeakerPhoneSpecs                : ansistring;
@@ -220,7 +221,7 @@ type
   end;
 
   { lots of specialized modem commands }
-  TLmModemSettings = record          // --sm ansi
+  TLmModemSettings = record
     Prefix                           : ansistring;
     Terminator                       : ansistring;
     DialPrefix                       : ansistring;
@@ -258,7 +259,7 @@ type
   end;
 
   { modem hardware settings }
-  TLmModemHardware = record          // --sm ansi
+  TLmModemHardware = record
     AutoConfigOverride               : ansistring;
     ComPort                          : ansistring;
     InvalidRDP                       : ansistring;
@@ -277,7 +278,7 @@ type
 
   { the whole shebang }
   PLmModem = ^TLmModem;
-  TLmModem = record                  // --sm ansi
+  TLmModem = record
     Inheritance                      : ansistring;
     AttachedTo                       : ansistring;
     FriendlyName                     : ansistring;
@@ -379,7 +380,7 @@ type
   end;
 
   { loose wrapper around the TLmModemName record for use in our TStringLists }
-  TApdLmModemNameClass = class(TObject) // --sm ansi
+  TApdLmModemNameClass = class(TObject)
     ModemName : ansistring;
     Manufacturer : ansistring;
     Model : ansistring;
@@ -387,7 +388,7 @@ type
   end;
 
   TApdLmModemCollectionItem = class(TCollectionItem)
-  private   // --sm ansi
+  private
     FModemName    : ansistring;
     FManufacturer : ansistring;
     FModel        : ansistring;
@@ -1186,7 +1187,7 @@ begin
   Result.Voice.VoiceToDataAnswer := TList.Create;
   Result.Voice.WaveDriver.WaveFormat := TList.Create;
 
-  { Create Fax Entries } // --sm, do we need fax?
+  { Create Fax Entries }
 
   Result.FaxDetails.FaxClass1.AnswerCommand := TList.Create;
   Result.FaxDetails.FaxClass2.AnswerCommand := TList.Create;
@@ -1574,7 +1575,7 @@ procedure TApdLibModem.LoadModemResponses (oOwner     : TObject;
   var
     Response : PLmResponseData;
   begin
-    Response := AllocMem (SizeOf (TLmResponseData)); // --sm check AllocMem & SizeOF
+    Response := AllocMem (SizeOf (TLmResponseData));
     Response.Response := sValue;
     Location.Add (Response);
   end;
@@ -1665,7 +1666,7 @@ procedure TApdLibModem.AddCommand (CmdList : TList; sValue : DOMString);
 var
   Command : PLmModemCommand;
 begin
-  Command := AllocMem (SizeOf (TLmModemCommand)); // --sm
+  Command := AllocMem (SizeOf (TLmModemCommand));
   Command.Command := sValue;
   Command.Sequence := FLastSeq;
   CmdList.Add (Command);
@@ -1780,7 +1781,7 @@ begin
   else if (sValue = 'Options') then
     FModemLoadState := mlsOptions
 
-  // Handle all the fax options                 // --sm Fax to delete
+  // Handle all the fax options
 
   else if (sValue = 'FaxDetails') then
     FModemLoadState := mlsFaxDetails
@@ -1796,7 +1797,7 @@ begin
       flsClass2   : FFaxLoadState := flsClass2Answer;
       flsClass2_0 : FFaxLoadState := flsClass2_0Answer;
     end
-  // Handle all the voice options             // --sm Voice to delete
+  // Handle all the voice options
 
   else if (sValue = 'Voice') then
     FModemLoadState := mlsVoice
@@ -2108,7 +2109,7 @@ begin
       ModemFile := Dialog.SelectedModemFile;
       ModemManufacturer := Dialog.SelectedModemManufacturer;
       ModemName := Dialog.SelectedModemName;
-      lmModem := PLmModem(FModem[0])^; // --sz Move(PLmModem(FModem[0])^, LmModem, SizeOf(TLmModem));  // --sz this will not work because it would be moving the memory content of an AnsiString, let Delphi copy the record // --sm check
+      lmModem := PLmModem(FModem[0])^; 
       Result := True;
     end else
       Result := False;
@@ -2235,7 +2236,7 @@ begin
   for I := 0 to pred(FModem.Count) do begin
     if PLmModem(FModem[I])^.FriendlyName = ModemName then begin
       { oops, we assumed wrong... }
-      Modem := PLmModem(FModem[I])^; // --sz Move(PLmModem(FModem[I])^, Modem, SizeOf(TLmModem));       // --sm check
+      Modem := PLmModem(FModem[I])^; // --sz Move(PLmModem(FModem[I])^, Modem, SizeOf(TLmModem)); 
       Result := ecOK;
       Break;
     end;

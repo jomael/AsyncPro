@@ -20,12 +20,14 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *   Sebastian Zierer
+ *	Sulaiman Mah
+ *	Sean B. Durkin
+ *  Sebastian Zierer
  *
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADSTATLT.PAS 4.06                   *}
+{*                   ADSTATLT.PAS 5.00                   *}
 {*********************************************************}
 {* TApdSLController, TApdStatusLight component           *}
 {*********************************************************}

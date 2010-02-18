@@ -54,7 +54,7 @@ type
 
   TDataBuffer = class(TIOBuffer)
   private
-    FData       : PAnsiChar;    // --sm Ansi
+    FData       : PAnsiChar;
     FDataUsed   : Integer;
     FDataRead   : Integer;
   public
@@ -78,7 +78,7 @@ type
     FSubType    : TDispatchSubType;
     FTime       : DWord;
     FData       : Cardinal;
-    FBuffer     : PAnsiChar;     // --sm ansi
+    FBuffer     : PAnsiChar;
 
     function  GetMoreData : Cardinal;
   public
@@ -141,7 +141,7 @@ constructor TLogBuffer.Create(typ : TDispatchType;
                               styp : TDispatchSubType;
                               tim : DWORD;
                               data : Cardinal;
-                              bfr : PansiChar;  // --sm ansi
+                              bfr : PansiChar;
                               bfrLen : Integer);
 begin
     inherited Create;
@@ -153,7 +153,7 @@ begin
     if (FDataSize > 0) then
     begin
         GetMem(FBuffer, FDataSize);
-        Move(bfr^, FBuffer^, SizeOf( FDataSize));// --sm OK
+        Move(bfr^, FBuffer^, SizeOf( FDataSize));
     end;
 end;
 
