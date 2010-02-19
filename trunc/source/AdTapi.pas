@@ -468,7 +468,7 @@ type
       read GetBPSRate;
     property CalledID : string                                           {!!.04}
       read GetCalledID;                                                  {!!.04}
-    property CalledIDName : Ansistring                                       {!!.04}
+    property CalledIDName : Ansistring                                   {!!.04}
       read GetCalledIDName;                                              {!!.04}
     property CallerID : Ansistring
       read GetCallerID;

@@ -384,13 +384,13 @@ const
 
 type
   {Convenient types used by protocols}
-  TNameCharArray = array[0..fsFileName ] of AnsiChar; //SZ used by protocols --> Ansi
-  TExtCharArray  = array[0..fsExtension] of AnsiChar;
-  TPathCharArray = array[0..fsPathName ] of Char;
+  TNameCharArray  = array[0..fsFileName ] of AnsiChar; //SZ used by protocols --> Ansi
+  TExtCharArray   = array[0..fsExtension] of AnsiChar;
+  TPathCharArray  = array[0..fsPathName ] of Char;
   TPathCharArrayA = array[0..fsPathName ] of AnsiChar;  //SZ FIXME can this be changed to Char??
-  TDirCharArray  = array[0..fsDirectory] of AnsiChar;
-  TChar20Array   = array[0..20] of AnsiChar;
-  TCharArray = array[0..255] of AnsiChar;
+  TDirCharArray   = array[0..fsDirectory] of AnsiChar;
+  TChar20Array    = array[0..20] of AnsiChar;
+  TCharArray      = array[0..255] of AnsiChar;
 
   {For generic buffer typecasts}
   PByteBuffer = ^TByteBuffer;
