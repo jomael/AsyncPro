@@ -1,10 +1,10 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{76C5F2AD-15A1-4F2F-ADEB-F96D5857A977}</ProjectGuid>
-			<MainSource>A500_R2010.dpk</MainSource>
+			<ProjectGuid>{51637F97-D7D2-4610-B928-BCB5AB161633}</ProjectGuid>
+			<MainSource>AsyncPro.dpk</MainSource>
+			<ProjectVersion>12.0</ProjectVersion>
 			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-			<ProjectVersion>12.0</ProjectVersion>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
 			<Base>true</Base>
@@ -20,25 +20,22 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
-			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
-			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-			<DCC_WriteableConstants>true</DCC_WriteableConstants>
-			<DCC_DependencyCheckOutputName>C:\Program Files\Common Files\BPL\A500_R2010.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Program Files\Common Files\BPL\AsyncPro_D2010.bpl</DCC_DependencyCheckOutputName>
+			<DllSuffix>_D2010</DllSuffix>
+			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DCC_Platform>x86</DCC_Platform>
-			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;$(DCC_UnitAlias)</DCC_UnitAlias>
-			<DCC_Description>TurboPower Async Professional 5.00 run-time Package - Delphi 2010</DCC_Description>
-			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+			<DCC_Description>TurboPower AsyncPro 5 run-time package</DCC_Description>
 			<DCC_S>false</DCC_S>
 			<DCC_N>false</DCC_N>
 			<GenDll>true</GenDll>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
-			<DCC_K>false</DCC_K>
-			<DCC_AssertionsAtRuntime>false</DCC_AssertionsAtRuntime>
-			<GenPackage>true</GenPackage>
-			<DCC_F>false</DCC_F>
 			<DCC_E>false</DCC_E>
+			<GenPackage>true</GenPackage>
+			<DCC_K>false</DCC_K>
+			<DCC_F>false</DCC_F>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -50,49 +47,29 @@
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="A500_R2010.dpk">
+			<DelphiCompile Include="AsyncPro.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="designide.dcp"/>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="vclx.dcp"/>
-			<DCCReference Include="..\source\OoMisc.pas"/>
-			<DCCReference Include="..\source\AdExcept.pas"/>
-			<DCCReference Include="..\source\AdLibMdm.pas">
-				<Form>ApdModemSelectionDialog</Form>
-			</DCCReference>
-			<DCCReference Include="..\source\AdMdm.pas"/>
-			<DCCReference Include="..\source\AdMdmCfg.pas">
-				<Form>ApdModemConfigDialog</Form>
-			</DCCReference>
-			<DCCReference Include="..\source\AdMdmDlg.pas">
-				<Form>ApdModemStatusDialog</Form>
-			</DCCReference>
-			<DCCReference Include="..\source\AdPacket.pas"/>
-			<DCCReference Include="..\source\AdPort.pas"/>
-			<DCCReference Include="..\source\AdSelCom.pas">
+			<DCCReference Include="vcl.dcp"/>
+			<DCCReference Include="..\..\run\OoMisc.pas"/>
+			<DCCReference Include="..\..\run\AdExcept.pas"/>
+			<DCCReference Include="..\..\run\AdStrMap.pas"/>
+			<DCCReference Include="..\..\run\awuser.pas"/>
+			<DCCReference Include="..\..\run\LnsQueue.pas"/>
+			<DCCReference Include="..\..\run\AdPort.pas"/>
+			<DCCReference Include="..\..\run\LNSWin32.pas"/>
+			<DCCReference Include="..\..\run\AdSelCom.pas">
 				<Form>ComSelectForm</Form>
 			</DCCReference>
-			<DCCReference Include="..\source\AdSocket.pas"/>
-			<DCCReference Include="..\source\AdStatLt.pas"/>
-			<DCCReference Include="..\source\AdStrMap.pas"/>
-			<DCCReference Include="..\source\AdTapi.pas"/>
-			<DCCReference Include="..\source\adtsel.pas">
+			<DCCReference Include="..\..\run\AdTapi.pas"/>
+			<DCCReference Include="..\..\run\AdTUtil.pas"/>
+			<DCCReference Include="..\..\run\adtsel.pas">
 				<Form>DeviceSelectionForm</Form>
 			</DCCReference>
-			<DCCReference Include="..\source\AdTStat.pas">
+			<DCCReference Include="..\..\run\AdTStat.pas">
 				<Form>ApdStandardTapiDisplay</Form>
 			</DCCReference>
-			<DCCReference Include="..\source\AdTUtil.pas"/>
-			<DCCReference Include="..\source\Adwutil.pas"/>
-			<DCCReference Include="..\source\AdXBase.pas"/>
-			<DCCReference Include="..\source\AdXChrFlt.pas"/>
-			<DCCReference Include="..\source\AdXLbMdm.pas"/>
-			<DCCReference Include="..\source\AdXParsr.pas"/>
-			<DCCReference Include="..\source\awuser.pas"/>
-			<DCCReference Include="..\source\AwWin32.pas"/>
-			<DCCReference Include="..\source\LnsQueue.pas"/>
-			<DCCReference Include="..\source\LNSWin32.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -112,7 +89,7 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">A500_R2010.dpk</Source>
+						<Source Name="MainSource">AsyncPro.dpk</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
@@ -131,7 +108,7 @@
 						<VersionInfo Name="Special">False</VersionInfo>
 						<VersionInfo Name="Private">False</VersionInfo>
 						<VersionInfo Name="DLL">False</VersionInfo>
-						<VersionInfo Name="Locale">1033</VersionInfo>
+						<VersionInfo Name="Locale">3081</VersionInfo>
 						<VersionInfo Name="CodePage">1252</VersionInfo>
 					</VersionInfo>
 					<VersionInfoKeys>
@@ -146,10 +123,6 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
-					<Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k140.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\dclofficexp140.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
