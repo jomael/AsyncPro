@@ -51,8 +51,14 @@
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="AsyncPro.dcp"/>
+			<DCCReference Include="designide.dcp"/>
 			<DCCReference Include="..\..\design\adabout.pas">
 				<Form>ApdAboutForm</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\design\AdPropEd.pas"/>
+			<DCCReference Include="..\..\design\AproReg.pas"/>
+			<DCCReference Include="..\..\design\Adpedit0.pas">
+				<Form>AdPEdit</Form>
 			</DCCReference>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

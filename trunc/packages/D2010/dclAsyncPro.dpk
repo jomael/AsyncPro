@@ -29,9 +29,13 @@ package dclAsyncPro;
 
 requires
   rtl,
-  AsyncPro;
+  AsyncPro,
+  designide;
 
 contains
-  adabout in '..\..\design\adabout.pas' {ApdAboutForm};
+  adabout in '..\..\design\adabout.pas' {ApdAboutForm},
+  AdPropEd in '..\..\design\AdPropEd.pas',
+  AproReg in '..\..\design\AproReg.pas',
+  Adpedit0 in '..\..\design\Adpedit0.pas' {AdPEdit};
 
 end.

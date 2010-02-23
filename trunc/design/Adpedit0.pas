@@ -31,10 +31,7 @@
 {*********************************************************}
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
-
-{Options required for this unit}
-{$G+,X+,F+}
+{$I ..\includes\AWDEFINE.INC}
 
 unit AdPEdit0;
 
@@ -49,12 +46,8 @@ uses
   Controls,
   Forms,
   Dialogs,
-{$IFDEF Delphi6}
   DesignIntf,
   DesignEditors,
-{$ELSE}
-  DsgnIntf,
-{$ENDIF}
   StdCtrls;
 
 type
