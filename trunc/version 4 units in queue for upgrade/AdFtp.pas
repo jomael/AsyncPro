@@ -41,7 +41,7 @@
 }
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {Options required for this unit}
 {$G+,X+,F+,B-,J+}
@@ -1301,7 +1301,7 @@ var
   PReply : PAnsiChar;
 begin
   RCode := StrToIntDef(Copy(Data, 1, 3), 0);
-{$IFDEF DELPHI_2005_UP}
+{$IFDEF DELPHI_2009_UP}
   PReply := AnsiStrAlloc(Length(Data)+ 1);
 {$ELSE}
   PReply := StrAlloc(Length(Data)+ 1);       // Delphi 7 case.
@@ -1333,7 +1333,7 @@ var
 begin
   if (Socket = DataSocket) then begin
     if (ProcessState = psDir) then begin
-{$IFDEF DELPHI_2005_UP}
+{$IFDEF DELPHI_2009_UP}
       PInfo := AnsiStrAlloc(SizeOf(DataBuffer));
 {$ELSE}
       PInfo := StrAlloc(SizeOf(DataBuffer));

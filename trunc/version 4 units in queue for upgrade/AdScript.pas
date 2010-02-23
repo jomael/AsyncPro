@@ -34,7 +34,7 @@
 {*********************************************************}
 
 {Conditional defines that may affect this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {Required options}
 {$G+,X+,F+,I+}

@@ -34,7 +34,7 @@
 {*********************************************************}
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 unit AdFIDlg;
 

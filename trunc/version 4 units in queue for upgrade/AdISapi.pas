@@ -31,7 +31,7 @@
 {*********************************************************}
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {$UNDEF LIVE_SERVER_AT_DESIGN_TIME}
 {$A+}

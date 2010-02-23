@@ -66,7 +66,7 @@ BuildPDUMessage will build a PDU message before sending.
 *)
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 unit adgsm;
 interface

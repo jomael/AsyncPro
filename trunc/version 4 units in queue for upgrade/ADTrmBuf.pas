@@ -147,7 +147,7 @@ interface
         FBeyondMargin boolean.
 }
 
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {$Z-}
 

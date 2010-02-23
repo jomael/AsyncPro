@@ -120,7 +120,7 @@ interface
         the parser can know when unknown sequences terminate.
 }
 
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {$IFOPT R+}
 {$DEFINE UseRangeChecks}

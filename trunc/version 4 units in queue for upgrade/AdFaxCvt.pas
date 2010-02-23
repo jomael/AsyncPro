@@ -37,7 +37,7 @@
 {*********************************************************}
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {Options required for this unit}
 {$G+,X+,F-,V-,P-,T-,B-,I+}
@@ -959,9 +959,10 @@ end;
 
 { Change the default printer if printto don't work, but}
 {      print does work to convert to APF }
-procedure TApdCustomFaxConverter.ChangeDefPrinter(UseFax: Boolean);
-const
+var
   DefPrn : string = '';
+
+procedure TApdCustomFaxConverter.ChangeDefPrinter(UseFax: Boolean);
 var
   Device, Name, Port : array[0..255] of char;
   DevMode : THandle;

@@ -46,7 +46,7 @@
 }
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {Options required for this unit}
 {$X+,F+,K+,B-}

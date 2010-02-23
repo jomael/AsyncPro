@@ -34,7 +34,7 @@
 {*********************************************************}
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {Options required for this unit}
 {$X+,F+,K+,B-,T-}
@@ -1586,14 +1586,10 @@ begin
     lpfnWndProc   := @DispatcherWndFunc;
     cbClsExtra    := 0;
     cbWndExtra    := 0;
-    {$IFDEF VERSION3}
     if ModuleIsLib and not ModuleIsPackage then
       hInstance   := SysInit.hInstance
     else
       hInstance   := System.MainInstance;
-    {$ELSE}
-    hInstance     := System.hInstance;
-    {$ENDIF}
     hIcon         := 0;
     hCursor       := 0;
     hbrBackground := 0;

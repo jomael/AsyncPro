@@ -33,7 +33,7 @@
 {*********************************************************}  
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {Options required for this unit}
 {$V-,I-,B-,F+,X+,Q-,R-,N+}
@@ -1380,11 +1380,7 @@ ExitPoint:
   var
     I : Cardinal;
   begin
-    {$IFDEF HugeStr}
     SetLength(Result, 12);
-    {$ELSE}
-    apOctalStr[0] := #12;
-    {$ENDIF}
     for I := 0 to 11 do begin
       apOctalStr[12-I] := Digits[L and 7];
       L := L shr 3;
@@ -1674,14 +1670,10 @@ ExitPoint:
       lpfnWndProc   := @DefWindowProc;
       cbClsExtra    := 0;
       cbWndExtra    := SizeOf(Pointer);
-      {$IFDEF VERSION3}
       if ModuleIsLib and not ModuleIsPackage then
         hInstance     := SysInit.hInstance
       else
         hInstance     := System.MainInstance;
-      {$ELSE}
-      hInstance     := System.hInstance;
-      {$ENDIF}
       hIcon         := 0;
       hCursor       := LoadCursor(0, idc_Arrow);
       hbrBackground := hBrush(color_Window + 1);

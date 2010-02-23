@@ -20,6 +20,9 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_DcuOutput>$(DCU)</DCC_DcuOutput>
+			<DCC_BplOutput>$(BPL)</DCC_BplOutput>
+			<DCC_DcpOutput>$(DCP)</DCC_DcpOutput>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<DllSuffix>_D2010</DllSuffix>

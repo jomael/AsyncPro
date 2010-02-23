@@ -34,7 +34,7 @@
 {*              adapted from SRMGR.PAS 1.03              *}
 {*********************************************************}
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 
 {
@@ -247,7 +247,7 @@ begin
       OLen := P^.len;
       if OLen >= BufChars then
         OLen := BufChars-1;
-{$IFDEF DELPHI_2005_UP}
+{$IFDEF DELPHI_2009_UP}
       WideCopy(Buffer, PWideChar(PByte(srP)+P^.ofs), OLen);
 {$ELSE}
       WideCopy(Buffer, PWideChar(integer(srP)+P^.ofs), OLen);
@@ -274,7 +274,7 @@ begin
       OLen := 0
 
     else begin
-{$IFDEF DELPHI_2005_UP}
+{$IFDEF DELPHI_2009_UP}
       Src := PWideChar(PByte(srP)+P^.ofs);
 {$ELSE}
       Src := PWideChar(integer(srP)+P^.ofs);
@@ -315,7 +315,7 @@ begin
       Result := ''
 
     else begin
-{$IFDEF DELPHI_2005_UP}
+{$IFDEF DELPHI_2009_UP}
       Src := PWideChar(PByte(srP)+P^.ofs);
 {$ELSE}
       Src := PWideChar(integer(srP)+P^.ofs);

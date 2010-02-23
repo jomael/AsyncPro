@@ -33,7 +33,7 @@
 {*********************************************************}
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {Options required for this unit}
 {$G+,X+,F+,J+}

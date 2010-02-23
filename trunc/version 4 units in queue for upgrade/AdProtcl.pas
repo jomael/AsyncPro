@@ -39,7 +39,7 @@
 }
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {Options required for this unit}
 {$I+,G+,X+,F+,V-,Q-}
@@ -1013,14 +1013,10 @@ var
       lpfnWndProc   := @MessageHandler;
       cbClsExtra    := 0;
       cbWndExtra    := 0;
-      {$IFDEF VERSION3}
       if ModuleIsLib and not ModuleIsPackage then
         hInstance   := SysInit.hInstance
       else
         hInstance   := System.MainInstance;
-      {$ELSE}
-      hInstance     := System.hInstance;
-      {$ENDIF}                                                      
       hIcon         := 0;
       hCursor       := 0;
       hbrBackground := 0;
@@ -1038,14 +1034,10 @@ var
     Node : PProtocolWindowNode;
     hInstance : THandle;
   begin
-    {$IFDEF VERSION3}
     if ModuleIsLib and not ModuleIsPackage then
       hInstance   := SysInit.hInstance
     else
       hInstance   := System.MainInstance;
-    {$ELSE}
-    hInstance := System.hInstance;
-    {$ENDIF}                                                        
     FMsgHandler :=
       CreateWindow(MessageHandlerClassName,   {window class name}
       '',                         {caption}

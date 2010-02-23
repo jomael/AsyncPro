@@ -73,7 +73,7 @@ unit ADTrmEmu;
 { several preliminary code changes are left in the code, marked by !!.!! }
 { comments.  They should be invisible to current applications }
 
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {$Z-}
 

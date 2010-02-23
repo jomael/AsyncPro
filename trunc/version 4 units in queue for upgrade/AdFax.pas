@@ -44,7 +44,7 @@
 {*********************************************************}
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {Options required for this unit}
 {$I+,G+,X+,F+,V-,J+}
@@ -852,14 +852,10 @@ var
       lpfnWndProc   := @FaxMessageHandler;
       cbClsExtra    := 0;
       cbWndExtra    := 0;
-      {$IFDEF VERSION3}
       if ModuleIsLib and not ModuleIsPackage then
         hInstance   := SysInit.hInstance
       else
         hInstance   := System.MainInstance;
-      {$ELSE}
-      hInstance := System.hInstance;
-      {$ENDIF}                                                       
       hIcon         := 0;
       hCursor       := 0;
       hbrBackground := 0;
@@ -1533,16 +1529,12 @@ var
     {-Create message handler window}
   var
     Node : PFaxWindowNode;
-    {$IFDEF VERSION3}
     Instance : Integer;
-    {$ENDIF}
   begin
-    {$IFDEF VERSION3}
     if ModuleIsLib and not ModuleIsPackage then
       Instance   := SysInit.hInstance
     else
       Instance   := System.MainInstance;
-    {$ENDIF}
     MsgHandler :=
       CreateWindow(FaxHandlerClassName,        {window class name}
                    '',                         {caption}
@@ -1553,11 +1545,7 @@ var
                    0,                          {height}
                    0,                          {parent}
                    0,                          {menu}
-                   {$IFDEF VERSION3}
                    Instance,
-                   {$ELSE}
-                   System.hInstance,
-                   {$ENDIF}
                    nil);                       {parameter}
 
     if MsgHandler = 0 then

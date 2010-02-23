@@ -41,7 +41,7 @@
 }
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 { Changes too numerous for !!.01 markings to be effective }
 { Many changes for .02 also to fix several known problems, there are still     }

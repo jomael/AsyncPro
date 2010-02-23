@@ -1,9 +1,9 @@
 object ApdFaxJobInfoDialog: TApdFaxJobInfoDialog
   Left = 280
   Top = 174
+  Width = 387
+  Height = 465
   Caption = 'ApdFaxJobInfoDialog'
-  ClientHeight = 414
-  ClientWidth = 362
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

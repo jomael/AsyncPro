@@ -20,6 +20,9 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_BplOutput>$(BPL)</DCC_BplOutput>
+			<DCC_DcpOutput>$(DCP)</DCC_DcpOutput>
+			<DCC_DcuOutput>$(DCU)</DCC_DcuOutput>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_DependencyCheckOutputName>C:\Program Files\Common Files\BPL\AsyncPro_D2010.bpl</DCC_DependencyCheckOutputName>
 			<DllSuffix>_D2010</DllSuffix>

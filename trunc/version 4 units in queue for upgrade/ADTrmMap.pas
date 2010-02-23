@@ -69,7 +69,7 @@ interface
          C:\APRO\VT100.MAP will be used in that compilation.
 }
 
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {$IFOPT D+}
 {$DEFINE CompileDebugCode}

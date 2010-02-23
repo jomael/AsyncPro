@@ -41,7 +41,7 @@
 }
 
 {Global defines potentially affecting this unit}
-{$I AWDEFINE.INC}
+{$I ..\includes\AWDEFINE.INC}
 
 {Options required for this unit}
 {$S-,R-,V-,I-,B-,X+,Q-,J+}
@@ -3108,13 +3108,8 @@ implementation
       lpfnWndProc   := @vFaxViewerWndFunc;
       cbClsExtra    := 0;
       cbWndExtra    := SizeOf(Pointer);
-      {$IFDEF VERSION3}
       hInstance     := System.MainInstance;
       hIcon         := LoadIcon(System.MainInstance, 'DEFICON');
-      {$ELSE}
-      hInstance     := System.hInstance;
-      hIcon         := LoadIcon(System.hInstance, 'DEFICON');
-      {$ENDIF}
       hCursor       := LoadCursor(0, idc_Arrow);
       hbrBackground := GetStockObject(White_Brush);
       lpszMenuName  := nil;

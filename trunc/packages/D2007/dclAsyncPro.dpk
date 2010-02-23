@@ -36,8 +36,9 @@ contains
   adabout in '..\..\design\adabout.pas' {ApdAboutForm},
   AdPropEd in '..\..\design\AdPropEd.pas',
   AproReg in '..\..\design\AproReg.pas',
-  AdStatEd in '..\..\design\AdStatEd.pas', {AdPEdit}
-  AdStatE0 in '..\..\design\AdStatE0.pas', {AdPEdit}
-  Adpedit0 in '..\..\design\Adpedit0.pas' {AdPEdit};
+  AdStatEd in '..\..\design\AdStatEd.pas',
+  AdStatE0 in '..\..\design\AdStatE0.pas',
+  Adpedit0 in '..\..\design\Adpedit0.pas' {AdPEdit},
+  Adpacked in '..\..\design\Adpacked.pas';
 
 end.
