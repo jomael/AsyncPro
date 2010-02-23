@@ -196,6 +196,15 @@ begin
     inherited Destroy;
 end;
 
+{$IFNDEF DELPHI_2005_UP}
+// The following is borrowed from Delphi 2010 StrUtils unit.
+// StartsText is not defined in Delphi 7.
+function StartsText(const ASubText, AText: string): Boolean;
+begin
+result := AnsiStartsText(ASubText, AText);
+end;
+{$ENDIF}
+
 function TApdWin32Dispatcher.CheckPort( const ComName: string): Boolean;
 // Returns true if a port exists
 var

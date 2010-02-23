@@ -43,7 +43,7 @@ options in the source file.}
 
 
  {$ifdef conditionalexpressions}
-   {$if Declared( RTLVersion) and (RTLVersion >= 22)}
+   {$if Declared( RTLVersion) and (RTLVersion >= +22)}
      {$define DELPHI_Future}
    {$ifend}
  {$endif}

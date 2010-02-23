@@ -1,0 +1,49 @@
+package AsyncPro;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'TurboPower AsyncPro 5 run-time package'}
+{$LIBSUFFIX '_D7'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl;
+
+contains
+  OoMisc in '..\..\run\OoMisc.pas',
+  AdExcept in '..\..\run\AdExcept.pas',
+  AdStrMap in '..\..\run\AdStrMap.pas',
+  awuser in '..\..\run\awuser.pas',
+  LnsQueue in '..\..\run\LnsQueue.pas',
+  AdPort in '..\..\run\AdPort.pas',
+  LNSWin32 in '..\..\run\LNSWin32.pas',
+  AdSelCom in '..\..\run\AdSelCom.pas' {ComSelectForm},
+  AdTapi in '..\..\run\AdTapi.pas',
+  AdTUtil in '..\..\run\AdTUtil.pas',
+  adtsel in '..\..\run\adtsel.pas' {DeviceSelectionForm},
+  AdTStat in '..\..\run\AdTStat.pas' {ApdStandardTapiDisplay},
+  AdStatLt in '..\..\run\AdStatLt.pas';
+
+end.
