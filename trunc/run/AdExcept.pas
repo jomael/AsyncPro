@@ -32,9 +32,6 @@
 {Global defines potentially affecting this unit}
 {$I ..\includes\AWDEFINE.INC}
 
-{Options required for this unit}
-{$G+,X+,F-,V-,P-,T-,B-}
-
 unit AdExcept;
   {-Apro exceptions}
 
