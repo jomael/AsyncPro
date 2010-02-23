@@ -62,7 +62,7 @@ object StandardDisplay: TStandardDisplay
     object psLabel6: TLabel
       Left = 8
       Top = 89
-      Width = 69
+      Width = 70
       Height = 15
       Caption = 'Total Blocks:'
     end
@@ -223,7 +223,7 @@ object StandardDisplay: TStandardDisplay
     object psLabel18: TLabel
       Left = 8
       Top = 88
-      Width = 65
+      Width = 66
       Height = 15
       Caption = 'Total errors:'
     end

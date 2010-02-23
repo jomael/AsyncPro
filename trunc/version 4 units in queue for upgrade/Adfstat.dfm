@@ -48,7 +48,7 @@ object StandardFaxDisplay: TStandardFaxDisplay
     object fsLabel4: TLabel
       Left = 8
       Top = 56
-      Width = 67
+      Width = 68
       Height = 15
       Caption = 'Total pages:'
     end

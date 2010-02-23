@@ -1,3 +1,6 @@
+{$IFDEF UNICODE}
+   ERROR !!! This unit is not yet upgraded for unicode.
+{$ENDIF}
 (***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1
  *

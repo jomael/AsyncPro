@@ -388,7 +388,7 @@ type
 
   function AproLoadStr(const ErrorCode : SmallInt) : string;
 
-//  function AproLoadZ(P : PChar; Code : Integer) : PChar;
+  function AproLoadZ( P : PChar; Code : Integer) : PChar;
 
   function ErrorMsg(const ErrorCode : SmallInt) : string;
   function MessageNumberToString(MessageNumber : SmallInt) : string;
@@ -400,10 +400,10 @@ implementation
 uses
   AdStrMap;
 
-//  function AproLoadZ(P : PChar; Code : Integer) : PChar;
-//  begin
-//    Result := StrPCopy(P, AproLoadStr(Code));
-//  end;
+  function AproLoadZ( P : PChar; Code : Integer) : PChar;
+  begin
+  result := StrPCopy( P, AproLoadStr(Code))
+  end;
 
   function AproLoadStr(const ErrorCode : SmallInt) : string;
     {-Return an error message for ErrorCode}

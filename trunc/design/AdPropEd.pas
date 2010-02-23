@@ -50,25 +50,35 @@ uses
 procedure Register;
 
 type
-//  TApdPacketStringProperty = class(TStringProperty)
-//  public
-//    function GetValue: string; override;
-//    procedure SetValue(const Value: string); override;
-//  end;
-//
-//  TApdPacketEditor = class(TDefaultEditor)
-//  public
-//    procedure ExecuteVerb(Index: Integer); override;
-//    function GetVerb(Index: Integer): string; override;
-//    function GetVerbCount: Integer; override;
-//  end;
-//
-//  TApdVoipAudioVideoEditor = class (TDefaultEditor)
-//  public
-//    procedure ExecuteVerb(Index: Integer); override;
-//    function GetVerb(Index: Integer): string; override;
-//    function GetVerbCount: Integer; override;
-//  end;
+{$IFNDEF UNICODE}
+// SBD! To be upgraded.
+  TApdPacketStringProperty = class(TStringProperty)
+  public
+    function GetValue: string; override;
+    procedure SetValue(const Value: string); override;
+  end;
+
+  TApdPacketEditor = class(TDefaultEditor)
+  public
+    procedure ExecuteVerb(Index: Integer); override;
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
+  TApdVoipAudioVideoEditor = class (TDefaultEditor)
+  public
+    procedure ExecuteVerb(Index: Integer); override;
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
+  TApdStateEditor = class(TDefaultEditor)
+  public
+    procedure ExecuteVerb(Index: Integer); override;
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+{$ENDIF}
 
   TApdVersionProperty = class(TStringProperty)
   public
@@ -82,13 +92,6 @@ type
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
-//  TApdStateEditor = class(TDefaultEditor)
-//  public
-//    procedure ExecuteVerb(Index: Integer); override;
-//    function GetVerb(Index: Integer): string; override;
-//    function GetVerbCount: Integer; override;
-//  end;
-//
   TApdGenericFileNameProperty = class(TStringProperty)
   protected
   public
@@ -119,12 +122,14 @@ type
     procedure Edit; override;
   end;
 
-//  { Voip Properties }
-//  TApdVoipAudioVideoProperty = class (TStringProperty)
-//  public
-//    function GetAttributes: TPropertyAttributes; override;
-//    procedure Edit; override;
-//  end;
+{$IFNDEF UNICODE}
+  { Voip Properties }
+  TApdVoipAudioVideoProperty = class (TStringProperty)
+  public
+    function GetAttributes: TPropertyAttributes; override;
+    procedure Edit; override;
+  end;
+{$ENDIF}
 
 implementation
 
@@ -134,29 +139,32 @@ uses
   Dialogs,
   TypInfo,
   FileCtrl,
-// SBD! Add the following units as we upgrade them.
-//  AdFax,
-//  AdFaxCtl,
-//  AdFaxCvt,
-//  AdFaxPrn,
-//  AdFaxSrv,
-//  AdFtp,
-//  AdFView,
-//  AdMdm,
   AdPort,
   AdPEdit0,
-//  AdPacket,
-//  AdPackEd,
-//  AdPager,
-//  AdProtcl,
-//  AdScript,
-//  AdStatLt,
-//  AdStMach,
-//  AdStatEd,
   AdTapi
-//  AdTrmEmu,
-//  AdVoip,
-//  AdVoipEd;
+// SBD! Add the following units as we upgrade them.
+{$IFNDEF UNICODE}
+   ,
+  AdFax,
+  AdFaxCtl,
+  AdFaxCvt,
+  AdFaxPrn,
+  AdFaxSrv,
+  AdFtp,
+  AdFView,
+  AdMdm,
+  AdPacket,
+  AdPackEd,
+  AdPager,
+  AdProtcl,
+  AdScript,
+  AdStatLt,
+  AdStMach,
+  AdStatEd,
+  AdTrmEmu,
+  AdVoip,
+  AdVoipEd
+{$ENDIF}
    ;
 
 procedure Register;
@@ -181,102 +189,111 @@ begin
 
 // SBD! Add the following registrations as we upgrade the classes.
 
+{$IFNDEF UNICODE}
   { property editors for the TApdDataPacket and TApdCustomState }
-//  RegisterPropertyEditor(TypeInfo(string), TApdDataPacket,
-//                         'StartString', TApdPacketStringProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdDataPacket,
-//                         'EndString', TApdPacketStringProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomState,
-//                         'OutputOnActivate', TApdPacketStringProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdDataPacket,
+                         'StartString', TApdPacketStringProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdDataPacket,
+                         'EndString', TApdPacketStringProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomState,
+                         'OutputOnActivate', TApdPacketStringProperty);
 
   { property editors for the TApdCustomModemPager }
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomModemPager,         {!!.01}
-//                         'ModemHangup', TApdPacketStringProperty);       {!!.01}
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomModemPager,         {!!.01}
-//                         'ModemInit', TApdPacketStringProperty);         {!!.01}
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomModemPager,         {!!.01}
+                         'ModemHangup', TApdPacketStringProperty);       {!!.01}
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomModemPager,         {!!.01}
+                         'ModemInit', TApdPacketStringProperty);         {!!.01}
 
   { property editor for TApdState strings }
-//  RegisterPropertyEditor(TypeInfo(string), TApdStateCondition,           {!!.06}
-//                         'StartString', TApdPacketStringProperty);       {!!.06}
-//  RegisterPropertyEditor(TypeInfo(string), TApdStateCondition,           {!!.06}
-//                         'EndString', TApdPacketStringProperty);         {!!.06}
+  RegisterPropertyEditor(TypeInfo(string), TApdStateCondition,           {!!.06}
+                         'StartString', TApdPacketStringProperty);       {!!.06}
+  RegisterPropertyEditor(TypeInfo(string), TApdStateCondition,           {!!.06}
+                         'EndString', TApdPacketStringProperty);         {!!.06}
 
   { Property editors for the TApdVoip }
-//  RegisterPropertyEditor (TypeInfo (string), TApdCustomVoip,
-//                          'AudioInDevice', TApdVoipAudioVideoProperty);
-//  RegisterPropertyEditor (TypeInfo (string), TApdCustomVoip,
-//                          'AudioOutDevice', TApdVoipAudioVideoProperty);
-//  RegisterPropertyEditor (TypeInfo (string), TApdCustomVoip,
-//                          'VideoInDevice', TApdVoipAudioVideoProperty);
-//  RegisterPropertyEditor (TypeInfo (string), TApdCustomVoip,
-//                          'VideoOutDevice', TApdVoipAudioVideoProperty);
+  RegisterPropertyEditor (TypeInfo (string), TApdCustomVoip,
+                          'AudioInDevice', TApdVoipAudioVideoProperty);
+  RegisterPropertyEditor (TypeInfo (string), TApdCustomVoip,
+                          'AudioOutDevice', TApdVoipAudioVideoProperty);
+  RegisterPropertyEditor (TypeInfo (string), TApdCustomVoip,
+                          'VideoInDevice', TApdVoipAudioVideoProperty);
+  RegisterPropertyEditor (TypeInfo (string), TApdCustomVoip,
+                          'VideoOutDevice', TApdVoipAudioVideoProperty);
+{$ENDIF}
 
   { property editors for file properties }
   RegisterPropertyEditor(TypeInfo(TPassString), TApdCustomComPort,
                          'LogName', TApdLogNameProperty);
   RegisterPropertyEditor(TypeInfo(TPassString), TApdCustomComPort,
                          'TraceName', TApdTraceNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdFTPLog,
-//                         'FTPHistoryName', TApdGenericFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomScript,
-//                         'ScriptFile', TApdGenericFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(TFileName), TApdCustomProtocol,
-//                         'FileMask', TApdGenericFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomProtocol,
-//                         'FileName', TApdGenericFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdProtocolLog,
-//                         'HistoryName', TApdHistoryNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdPagerLog,
-//                         'HistoryName', TApdHistoryNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TAdCustomTerminal,
-//                         'CaptureFile', TApdCaptureNameProperty);
+{$IFNDEF UNICODE}
+// SBD! To be upgraded.
+  RegisterPropertyEditor(TypeInfo(string), TApdFTPLog,
+                         'FTPHistoryName', TApdGenericFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomScript,
+                         'ScriptFile', TApdGenericFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(TFileName), TApdCustomProtocol,
+                         'FileMask', TApdGenericFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomProtocol,
+                         'FileName', TApdGenericFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdProtocolLog,
+                         'HistoryName', TApdHistoryNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdPagerLog,
+                         'HistoryName', TApdHistoryNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TAdCustomTerminal,
+                         'CaptureFile', TApdCaptureNameProperty);
+{$ENDIF}
+
   RegisterPropertyEditor(TypeInfo(string), TApdTapiLog,
                          'TapiHistoryName', TApdHistoryNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxConverter,
-//                         'DocumentFile', TApdConverterNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxConverter,
-//                         'OutFileName', TApdAPFFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxUnpacker,
-//                         'InFileName', TApdAPFFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxUnpacker,
-//                         'OutFileName', TApdGenericFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxViewer,
-//                         'FileName', TApdAPFFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(TPassString), TApdCustomAbstractFax,
-//                         'FaxFile', TApdAPFFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(TPassString), TApdCustomSendFax,
-//                         'CoverFile', TApdFaxCoverNameProperty);
-//  RegisterPropertyEditor(TypeInfo(TPassString), TApdFaxLog,
-//                         'FaxHistoryName', TApdHistoryNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxPrinter,
-//                         'FileName', TApdAPFFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxPrinterLog,
-//                         'LogFileName', TApdHistoryNameProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdFaxDriverInterface,
-//                         'FileName', TApdAPFFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(TPassString), TApdFaxClient,
-//                         'CoverFileName', TApdGenericFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(TPassString), TApdFaxClient,
-//                         'FaxFileName', TApdAPFFileNameProperty);
-//  RegisterPropertyEditor(TypeInfo(TPassString), TApdFaxClient,
-//                         'JobFileName', TApdAPJNameProperty);
+{$IFNDEF UNICODE}
+// SBD! To be upgraded.
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxConverter,
+                         'DocumentFile', TApdConverterNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxConverter,
+                         'OutFileName', TApdAPFFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxUnpacker,
+                         'InFileName', TApdAPFFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxUnpacker,
+                         'OutFileName', TApdGenericFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxViewer,
+                         'FileName', TApdAPFFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(TPassString), TApdCustomAbstractFax,
+                         'FaxFile', TApdAPFFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(TPassString), TApdCustomSendFax,
+                         'CoverFile', TApdFaxCoverNameProperty);
+  RegisterPropertyEditor(TypeInfo(TPassString), TApdFaxLog,
+                         'FaxHistoryName', TApdHistoryNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxPrinter,
+                         'FileName', TApdAPFFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomFaxPrinterLog,
+                         'LogFileName', TApdHistoryNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdFaxDriverInterface,
+                         'FileName', TApdAPFFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(TPassString), TApdFaxClient,
+                         'CoverFileName', TApdGenericFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(TPassString), TApdFaxClient,
+                         'FaxFileName', TApdAPFFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(TPassString), TApdFaxClient,
+                         'JobFileName', TApdAPJNameProperty);
 
   { property editors for directory properties }
-//  RegisterPropertyEditor(TypeInfo(string), TAdCustomModem,
-//                         'ModemCapFolder', TApdDirectoryProperty);
-//  RegisterPropertyEditor(TypeInfo(string), TApdCustomProtocol,
-//                         'DestinationDirectory', TApdDirectoryProperty);
-//  RegisterPropertyEditor(TypeInfo(TPassString), TApdCustomReceiveFax,
-//                         'DestinationDir', TApdDirectoryProperty);
-//  RegisterPropertyEditor(TypeInfo(TPassString), TApdCustomFaxServer,
-//                         'DestinationDir', TApdDirectoryProperty);
-//  RegisterPropertyEditor(TypeInfo(TPassString), TApdFaxServerManager,
-//                         'MonitorDir', TApdDirectoryProperty);
+  RegisterPropertyEditor(TypeInfo(string), TAdCustomModem,
+                         'ModemCapFolder', TApdDirectoryProperty);
+  RegisterPropertyEditor(TypeInfo(string), TApdCustomProtocol,
+                         'DestinationDirectory', TApdDirectoryProperty);
+  RegisterPropertyEditor(TypeInfo(TPassString), TApdCustomReceiveFax,
+                         'DestinationDir', TApdDirectoryProperty);
+  RegisterPropertyEditor(TypeInfo(TPassString), TApdCustomFaxServer,
+                         'DestinationDir', TApdDirectoryProperty);
+  RegisterPropertyEditor(TypeInfo(TPassString), TApdFaxServerManager,
+                         'MonitorDir', TApdDirectoryProperty);
 
   { component editors }
-//  RegisterComponentEditor(TApdDataPacket, TApdPacketEditor);
-//  RegisterComponentEditor(TApdCustomState, TApdStateEditor);
-//  RegisterComponentEditor(TApdCustomVoip, TapdVoipAudioVideoEditor);
+  RegisterComponentEditor(TApdDataPacket, TApdPacketEditor);
+  RegisterComponentEditor(TApdCustomState, TApdStateEditor);
+  RegisterComponentEditor(TApdCustomVoip, TapdVoipAudioVideoEditor);
+{$ENDIF}
 end;
 
 function TApdValidEnumProperty.GetAttributes: TPropertyAttributes;
@@ -303,33 +320,36 @@ end;
 
 // SBD! Add the following method implementations as we upgrade them.
 
-//function TApdPacketStringProperty.GetValue: string;
-//begin
-//  Result := StrToCtrlStr(inherited GetValue);
-//end;
-//
-//procedure TApdPacketStringProperty.SetValue(const Value: string);
-//begin
-//  inherited SetValue(CtrlStrToStr(Value));
-//end;
-//
+{$IFNDEF UNICODE}
+// SBD! To be upgraded.
+function TApdPacketStringProperty.GetValue: string;
+begin
+  Result := StrToCtrlStr(inherited GetValue);
+end;
+
+procedure TApdPacketStringProperty.SetValue(const Value: string);
+begin
+  inherited SetValue(CtrlStrToStr(Value));
+end;
+
 {*** TApdPacketEditor ***}
 
-//procedure TApdPacketEditor.ExecuteVerb(Index: Integer);
-//begin
-//  if EditPacket(Component as TApdDataPacket,Component.Name) then
-//    Designer.Modified;
-//end;
-//
-//function TApdPacketEditor.GetVerb(Index: Integer): string;
-//begin
-//  Result := 'Edit properties...';
-//end;
-//
-//function TApdPacketEditor.GetVerbCount: Integer;
-//begin
-//  Result := 1;
-//end;
+procedure TApdPacketEditor.ExecuteVerb(Index: Integer);
+begin
+  if EditPacket(Component as TApdDataPacket,Component.Name) then
+    Designer.Modified;
+end;
+
+function TApdPacketEditor.GetVerb(Index: Integer): string;
+begin
+  Result := 'Edit properties...';
+end;
+
+function TApdPacketEditor.GetVerbCount: Integer;
+begin
+  Result := 1;
+end;
+{$ENDIF}
 
 {*** TApdVersionProperty ***}
 
@@ -350,23 +370,26 @@ begin
 end;
 
 {*** TApdStateEditor ***}
+{$IFNDEF UNICODE}
+// SBD! To be upgraded.
 
-//procedure TApdStateEditor.ExecuteVerb(Index: Integer);
-//begin
-//  if EditState(Component as TApdCustomState,Component.Name) then
-//    Designer.Modified;
-//end;
-//
-//function TApdStateEditor.GetVerb(Index: Integer): string;
-//begin
-//  Result := 'Edit conditions...';
-//end;
-//
-//function TApdStateEditor.GetVerbCount: Integer;
-//begin
-//  Result := 1;
-//end;
-//
+procedure TApdStateEditor.ExecuteVerb(Index: Integer);
+begin
+  if EditState(Component as TApdCustomState,Component.Name) then
+    Designer.Modified;
+end;
+
+function TApdStateEditor.GetVerb(Index: Integer): string;
+begin
+  Result := 'Edit conditions...';
+end;
+
+function TApdStateEditor.GetVerbCount: Integer;
+begin
+  Result := 1;
+end;
+
+{$ENDIF}
 {*** TApdGenericFileNameProperty ***}
 
 function TApdGenericFileNameProperty.GetAttributes: TPropertyAttributes;
@@ -442,39 +465,41 @@ begin
     Value := Dir;
 end;
 
-//procedure TApdVoipAudioVideoEditor.ExecuteVerb(Index: Integer);
-//begin
-//  if EditVoipAudioVideo (Component as TApdVoip, Component.Name) then
-//    Designer.Modified;
-//end;
-//
-//function TApdVoipAudioVideoEditor.GetVerb(Index: Integer): string;
-//begin
-//  Result := 'Edit properties...';
-//end;
-//
-//function TApdVoipAudioVideoEditor.GetVerbCount: Integer;
-//begin
-//  Result := 1;
-//end;
-//
-//function TApdVoipAudioVideoProperty.GetAttributes: TPropertyAttributes;
-//begin
-//  Result := [paDialog];
-//end;
-//
-//procedure TApdVoipAudioVideoProperty.Edit;
-//var
-//  VoipComponent : TApdVoip;
-//  CompName : string;
-//begin
-//  VoipComponent := GetComponent (0) as TApdVoip;
-//  CompName := VoipComponent.Name;
-//  if PropCount > 1 then
-//    CompName := CompName + '...';
-//  if EditVoipAudioVideo (VoipComponent, CompName) then begin
-////    Modified;
-//  end;
-//end;
+{$IFNDEF UNICODE}
+// SBD! To be upgraded.
+procedure TApdVoipAudioVideoEditor.ExecuteVerb(Index: Integer);
+begin
+  if EditVoipAudioVideo (Component as TApdVoip, Component.Name) then
+    Designer.Modified;
+end;
 
+function TApdVoipAudioVideoEditor.GetVerb(Index: Integer): string;
+begin
+  Result := 'Edit properties...';
+end;
+
+function TApdVoipAudioVideoEditor.GetVerbCount: Integer;
+begin
+  Result := 1;
+end;
+
+function TApdVoipAudioVideoProperty.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paDialog];
+end;
+
+procedure TApdVoipAudioVideoProperty.Edit;
+var
+  VoipComponent : TApdVoip;
+  CompName : string;
+begin
+  VoipComponent := GetComponent (0) as TApdVoip;
+  CompName := VoipComponent.Name;
+  if PropCount > 1 then
+    CompName := CompName + '...';
+  if EditVoipAudioVideo (VoipComponent, CompName) then begin
+//    Modified;
+  end;
+end;
+{$ENDIF}
 end.

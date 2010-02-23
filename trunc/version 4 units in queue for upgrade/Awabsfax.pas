@@ -1,3 +1,6 @@
+{$IFDEF UNICODE}
+   ERROR !!! This unit is not yet upgraded for unicode.
+{$ENDIF}
 (***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1
  *
@@ -1009,6 +1012,9 @@ implementation
   begin
     case Status of
       fpInitModem..fpFinished :
+        // Warning: AproLoadZ is defined as ....
+        //   function AproLoadZ( P : PChar; Code : Integer) : PChar;
+        // Need to adjust the following line for UNICODE case.
         AproLoadZ(P, Status);
       else
         P[0] := #0;

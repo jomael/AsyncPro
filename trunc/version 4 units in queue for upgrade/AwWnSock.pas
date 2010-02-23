@@ -1,3 +1,6 @@
+{$IFDEF UNICODE}
+   ERROR !!! This unit is not yet upgraded for unicode.
+{$ENDIF}
 (***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1
  *
@@ -229,10 +232,11 @@ type
     function CloseCom : Integer; override;
     procedure InitSocketData(LocalAddress, Address : Longint; Port : Cardinal;
       IsClient, IsTelnet : Boolean);
-    function OpenCom(ComName: PChar; InQueue,
-      OutQueue : Cardinal) : Integer; override;
     function ProcessCommunications : Integer; override;
-    function CheckPort(ComName: PChar): Boolean; override;
+    function OpenCom( const ComName: string; InQueue,
+        OutQueue : Cardinal) : Integer; override;
+    function CheckPort( const ComName: string): Boolean; override;
+
   end;
 
 var
@@ -1231,7 +1235,7 @@ begin
   {$ENDIF}
 end;
 
-function TApdWinsockDispatcher.CheckPort(ComName: PChar): Boolean;
+function TApdWinsockDispatcher.CheckPort( const ComName: string): Boolean;
 // Returns true if a port exists (this is basically untested)
 begin
    Result := OpenCom(ComName, 64, 64) <> 0;
@@ -1326,7 +1330,8 @@ begin
   Result := 0;
 end;
 
-function TApdWinsockDispatcher.OpenCom(ComName : PChar; InQueue, OutQueue : Cardinal) : Integer;
+function TApdWinsockDispatcher.OpenCom(
+  const ComName: string; InQueue, OutQueue : Cardinal) : Integer;
   { -Open the socket specified by ComName }
 begin
   try

@@ -1,3 +1,6 @@
+{$IFDEF UNICODE}
+   ERROR !!! This unit is not yet upgraded for unicode.
+{$ENDIF}
 (***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1
  *
@@ -84,17 +87,17 @@ type
     function OutBufUsed: Cardinal; override;                                // SWB
   public
     function CloseCom : Integer; override;
-    function OpenCom(ComName: PChar; InQueue,
-      OutQueue : Cardinal) : Integer; override;
     function ProcessCommunications : Integer; override;
-    function CheckPort(ComName: PChar): Boolean; override;
+    function OpenCom( const ComName: string; InQueue,
+        OutQueue : Cardinal) : Integer; override;
+    function CheckPort( const ComName: string): Boolean; override;  //SZ
   end;
 
   TApdTAPI32Dispatcher = class(TApdWin32Dispatcher)
   public
     constructor Create(Owner : TObject; InCid : Integer);
-    function OpenCom(ComName: PChar; InQueue,
-      OutQueue : Cardinal) : Integer; override;
+    function OpenCom( const ComName: string; InQueue,
+        OutQueue : Cardinal) : Integer; override;
   end;
 
 implementation
@@ -102,7 +105,7 @@ implementation
 uses
   StrUtils;
 
-function TApdWin32Dispatcher.CheckPort(ComName: PChar): Boolean; //SZ
+function TApdWin32Dispatcher.CheckPort( const ComName: string): Boolean; //SZ
 // Returns true if a port exists
 var
   Tmp: string;
@@ -254,11 +257,13 @@ end;
       Result := -1;
   end;
 
-  function TApdWin32Dispatcher.OpenCom(ComName: PChar; InQueue, OutQueue: Cardinal): Integer;
+  function TApdWin32Dispatcher.OpenCom(
+    const ComName: string; InQueue,
+          OutQueue : Cardinal): Integer;
     {-Open the comport specified by ComName}
   begin
     {Open the device}
-    Result := CreateFile(ComName,                       {name}
+    Result := CreateFile( PChar(ComName),               {name}
                          GENERIC_READ or GENERIC_WRITE, {access attributes}
                          0,                             {no sharing}
                          nil,                           {no security}
@@ -519,7 +524,9 @@ end;
     inherited Create(Owner);
   end;
 
-  function TApdTAPI32Dispatcher.OpenCom(ComName: PChar; InQueue, OutQueue : Cardinal) : Integer;
+  function TApdTAPI32Dispatcher.OpenCom(
+        const ComName: string; InQueue,
+        OutQueue : Cardinal) : Integer;
   begin
     ReadOL.hEvent := CreateEvent(nil, True, False, nil);
     WriteOL.hEvent := CreateEvent(nil, True, False, nil);

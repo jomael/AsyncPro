@@ -1,3 +1,6 @@
+{$IFDEF UNICODE}
+   ERROR !!! This unit is not yet upgraded for unicode.
+{$ENDIF}
 (***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1
  *
@@ -244,7 +247,11 @@ begin
       OLen := P^.len;
       if OLen >= BufChars then
         OLen := BufChars-1;
+{$IFDEF DELPHI_2005_UP}
       WideCopy(Buffer, PWideChar(PByte(srP)+P^.ofs), OLen);
+{$ELSE}
+      WideCopy(Buffer, PWideChar(integer(srP)+P^.ofs), OLen);
+{$ENDIF}
     end;
   finally
     srUnLock;
@@ -267,7 +274,11 @@ begin
       OLen := 0
 
     else begin
+{$IFDEF DELPHI_2005_UP}
       Src := PWideChar(PByte(srP)+P^.ofs);
+{$ELSE}
+      Src := PWideChar(integer(srP)+P^.ofs);
+{$ENDIF}
       Len := P^.len;
 
       {see if entire string fits in Buffer}
@@ -304,7 +315,11 @@ begin
       Result := ''
 
     else begin
+{$IFDEF DELPHI_2005_UP}
       Src := PWideChar(PByte(srP)+P^.ofs);
+{$ELSE}
+      Src := PWideChar(integer(srP)+P^.ofs);
+{$ENDIF}
 //      Len := P^.len;
       Result := Src;
 //      OLen :=  WideCharToMultiByte(CP_ACP, 0, Src, Len, nil, 0, nil, nil);

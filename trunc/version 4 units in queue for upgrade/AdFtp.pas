@@ -1,3 +1,6 @@
+{$IFDEF UNICODE}
+   ERROR !!! This unit is not yet upgraded for unicode.
+{$ENDIF}
 (***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1
  *
@@ -1298,7 +1301,11 @@ var
   PReply : PAnsiChar;
 begin
   RCode := StrToIntDef(Copy(Data, 1, 3), 0);
+{$IFDEF DELPHI_2005_UP}
   PReply := AnsiStrAlloc(Length(Data)+ 1);
+{$ELSE}
+  PReply := StrAlloc(Length(Data)+ 1);       // Delphi 7 case.
+{$ENDIF}
   StrPCopy(PReply, Data);
   PostMessage(hwndFtpEvent, FtpReplyMsg, RCode, Longint(PReply));
 end;
@@ -1326,7 +1333,11 @@ var
 begin
   if (Socket = DataSocket) then begin
     if (ProcessState = psDir) then begin
+{$IFDEF DELPHI_2005_UP}
       PInfo := AnsiStrAlloc(SizeOf(DataBuffer));
+{$ELSE}
+      PInfo := StrAlloc(SizeOf(DataBuffer));
+{$ENDIF}
       StrCopy(PInfo, @DataBuffer);
       PostStatus(scDataAvail, PInfo);
     end else if (ProcessState = psGet) or (ProcessState = psPut) then
