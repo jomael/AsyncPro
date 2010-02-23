@@ -2990,7 +2990,11 @@ begin
   if NewLen > FMaxLen then         { if new text will be longer than allocated }
     Resize(NewLen);              { reallocate }
 
+{$IFDEF UNICODE}
   Buff := ansiStrAlloc(Length(Text) + 1);
+{$ELSE}
+  Buff := StrAlloc(Length(Text) + 1);
+{$ENDIF}
   StrPCopy(Buff,Text);
   StrCat(FString, Buff);
   StrDispose(Buff);
@@ -3052,13 +3056,13 @@ begin
   if Index + (SegLen - 1) > FLen then  { requested segment runs past end of string }
     NewLen := FLen - Index;  { just return up to end of string }
 
-{$ifndef WIN32 }
-  if NewLen > 255 then  { old Pascal strings can contain no more than 255 chars }
-    NewLen := 255;
-{$endif }
   GotoPos(Index);
 
+{$IFDEF UNICODE}
   P := ansiStrAlloc(NewLen + 1);
+{$ELSE}
+  P := StrAlloc(NewLen + 1);
+{$ENDIF}
   StrLCopy(P, FCur, NewLen);
   Result := StrPas(P);
   StrDispose(P);
@@ -3178,7 +3182,11 @@ function TAdStr.Pos(const SubStr: ansistring): Cardinal;
 var
   Buff: PansiChar;
 begin
+{$IFDEF UNICODE}
   Buff := ansiStrAlloc(Length(SubStr) + 1);
+{$ELSE}
+  Buff := StrAlloc(Length(SubStr) + 1);
+{$ENDIF}
   StrPCopy(Buff,SubStr);
   FCur := StrPos(FString, Buff);
   StrDispose(Buff);
@@ -3548,19 +3556,48 @@ type
     Result := Dest;
   end;
 
-  function StrStCopy(Dest : PWideChar; S : PWideChar; Pos, Count : Cardinal) : PWideChar;
+{$IFNDEF UNICODE}
+function StrLenW( const Str: PWideChar): Cardinal;
+asm
+  {Check the first byte}
+  cmp word ptr [eax], 0
+  je @ZeroLength
+  {Get the negative of the string start in edx}
+  mov edx, eax
+  neg edx
+@ScanLoop:
+  mov cx, word ptr [eax]
+  add eax, 2
+  test cx, cx
+  jnz @ScanLoop
+  lea eax, [eax + edx - 2]
+  shr eax, 1
+  ret
+@ZeroLength:
+  xor eax, eax
+end;
+{$ENDIF}
+
+
+  function StrStCopy( Dest : PWideChar; S : PWideChar; Pos, Count : Cardinal) : PWideChar;
   var
-    Len : Cardinal;
+    Len : Cardinal; // Length in code points.
   begin
+{$IFDEF UNICODE}
     Len := StrLen(S);
-    if Pos < Len then begin
+{$ELSE}
+    Len := StrLenW(S);
+{$ENDIF}
+  if Pos < Len then
+      begin
       if (Len-Pos) < Count then
         Count := Len-Pos;
       Move(S[Pos], Dest^, Count * SizeOf(WideChar));
       Dest[Count] := #0;
-    end else
+      end
+    else
       Dest[0] := #0;
-    StrStCopy := Dest;
+  StrStCopy := Dest
   end;
 
 
@@ -3702,13 +3739,21 @@ function PayloadLengthInBytes( const s: string): integer;
     Dec( L);
     SetLength( result, L)
     end;
+{$IF CompilerVersion >= 21}
   if not CharInSet( result[L], DosDelimSet) then
+{$ELSE}
+  {$IFDEF UNICODE}
+    if not (result[L] < #$0100) and (AnsiChar(result[L]) in DosDelimSet) then
+  {$ELSE}
+    if not (result[L] in DosDelimSet) then
+  {$ENDIF}
+{$IFEND}
     result := result + '\';
   if IsQuoted then
     result := result + '"';
   end;
 
-function IsWin2000 : Boolean;                                          
+function IsWin2000 : Boolean;
 //var
 // Osi : TOSVersionInfo;
 begin
