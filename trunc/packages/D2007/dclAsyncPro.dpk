@@ -33,12 +33,12 @@ requires
   designide;
 
 contains
-  adabout in '..\..\design\adabout.pas' {ApdAboutForm},
+  adabout in '..\..\design\D2006,7 dfm\adabout.pas' {ApdAboutForm},
   AdPropEd in '..\..\design\AdPropEd.pas',
   AproReg in '..\..\design\AproReg.pas',
-  AdStatEd in '..\..\design\AdStatEd.pas',
-  AdStatE0 in '..\..\design\AdStatE0.pas',
+  AdStatEd in '..\..\design\AdStatEd.pas' {frmStateEdit},
+  AdStatE0 in '..\..\design\AdStatE0.pas' {frmConditionEdit},
   Adpedit0 in '..\..\design\Adpedit0.pas' {AdPEdit},
-  Adpacked in '..\..\design\Adpacked.pas';
+  Adpacked in '..\..\design\Adpacked.pas' {PacketEditor};
 
 end.

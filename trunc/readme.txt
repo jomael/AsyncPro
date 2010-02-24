@@ -67,6 +67,16 @@ To install TurboPower AsyncPro into your IDE, take the following steps:
      This step needs to be repeated for each compiler that you want to install
      AsyncPro into.
 
+     3.1 For Delphi 7 and Delphi 2005, you also need to add the
+       '<YourAproPath>\run\D2005- dfm' directory. This needs to come ealier in the
+       library path list than the run directory.
+
+     3.2 For Delphi 2006 and Delphi 2007, you also need to add the
+       '<YourAproPath>\run\D2006,7 dfm' directory. This needs to come ealier in the
+       library path list than the run directory.
+
+     NOTE: For Delphi 2009 and higher, steps 3.1 and 3.2 are unnecessary.
+
   4. For both packages, run-time and design-time, open the project options and set
      the DCU, DCP and BPL output directories, as indicated in the notes below,
      according to your local developmental environment.
