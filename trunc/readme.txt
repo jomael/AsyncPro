@@ -55,20 +55,55 @@ TurboPower AsyncPro compiled package names (*.bpl) have the following form
 
 To install TurboPower AsyncPro into your IDE, take the following steps:
 
-  1. Unzip the release files into a directory (e.g., v:\Projects\TurboPower\APRO\5.0.0).
+  1. Unzip the release files into a directory (e.g., v:\Projects\TurboPower\AsyncPro\5).
 
   2. Start Delphi.
+     This step needs to be repeated for each compiler that you want to install
+     AsyncPro into.
 
   3. If you wish to debug-step into AsycPro source, then you can add the
-     source subdirectory (e.g., v:\Projects\TurboPower\APRO\5.0.0\run) to the IDE's
+     source subdirectory (e.g., v:\Projects\TurboPower\AsyncPro\5\run) to the IDE's
      library path. This step is optional.
+     This step needs to be repeated for each compiler that you want to install
+     AsyncPro into.
 
-  4. Open & compile the runtime package specific to the IDE being
-     used.
+  4. For both packages, run-time and design-time, open the project options and set
+     the DCU, DCP and BPL output directories, as indicated in the notes below,
+     according to your local developmental environment.
+     This step needs to be repeated for each compiler that you want to install
+     AsyncPro into.
 
-  5. Open & install the designtime package specific to the IDE being
-     used. The IDE should notify you the components have been
-     installed.
+  5. Build the runtime package.
+     This step needs to be repeated for each compiler that you want to install
+     AsyncPro into.
+
+  6. Compile & install the designtime package.
+     This step needs to be repeated for each compiler that you want to install
+     AsyncPro into.
+
+  7. Set up the default run-time packages list to include AsyncPro. This step is only
+      needed if you want to compile your applications with "Build-with-packages" checked.
+     Close all packages, projects and files. Open the project default options as
+     indicated in the notes below.
+     This step needs to be repeated for each compiler that you want to install
+     AsyncPro into. If Build-with-packages is unchecked, you may need to temporarily
+     check it. Once checked, add AsyncPro to the list, if it is not already there.
+
+
+Setting the work-product output directories.
+--------------------------------------------
+Compiler          Active-project-condition  Options-to-set                                                                        Default-value
+Delphi 7          <Package active>          Project | Options | Directories/Conditions | Directories | Unit output directory      $(DCU)
+Delphi 7          <Package active>          Project | Options | Directories/Conditions | Directories | DCP output directory       $(DCP)
+Delphi 7          <Package active>          Project | Options | Directories/Conditions | Directories | Output directory           $(BPL)
+Delphi 7          <No projects open>        Project | Options | Packages | Runtime packages                                       AsyncPro
+Delphi 2007/2010  <Package active>          Project | Options | Directories/Conditions | (all configs) | Unit output directory    $(DCU)
+Delphi 2007/2010  <Package active>          Project | Options | Directories/Conditions | (all configs) | DCP output directory     $(DCP)
+Delphi 2007/2010  <Package active>          Project | Options | Directories/Conditions | (all configs) | Output directory         $(BPL)
+Delphi 2007/2010  <No projects open>        Project | Default Options | Delphi for win32 | Packages | Runtime packages            AsyncPro
+
+Similar for other compilers.
+
 
 ==============================================
 
