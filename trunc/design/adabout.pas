@@ -61,6 +61,7 @@ type
     Label6: TLabel;
     Label5: TLabel;
     Label7: TLabel;
+    imgAboutAsyncPro: TImage;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Label6Click(Sender: TObject);
