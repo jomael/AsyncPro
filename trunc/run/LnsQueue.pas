@@ -153,7 +153,7 @@ begin
     if (FDataSize > 0) then
     begin
         GetMem(FBuffer, FDataSize);
-        Move(bfr^, FBuffer^, SizeOf( FDataSize));
+        Move(bfr^, FBuffer^, FDataSize);
     end;
 end;
 

@@ -214,13 +214,13 @@ type
       FQueue         : TIOQueue;               {Input queue}                // SWB
 
       { Output buffer -- protected by OutputSection }
-      OBuffer       : pointer;          {Output buffer}
+      OBuffer       : POBuffer;          {Output buffer}
       OBufHead      : Cardinal;          {Head offset in OBuffer}
       OBufTail      : Cardinal;          {Tail offset in OBuffer}
       OBufFull      : Boolean;           {True when output buffer full}
 
       { Dispatcher stuff -- protected by DispSection }
-      DBuffer       : pointer;          {Dispatcher buffer}
+      DBuffer       : PDBuffer;          {Dispatcher buffer}
       DBufHead      : Cardinal;          {Head offset in DBuffer}
       DBufTail      : Cardinal;          {Tail offset in DBuffer}
       fEventBusy    : Boolean;           {True if we're processing a COM event}
@@ -1546,8 +1546,7 @@ end;
         NewTail := DBufTail + (Count - 1);
         if NewTail >= DispatchBufferSize then
           NewTail := (NewTail - DispatchBufferSize);
-//        C := DBuffer^[NewTail];
-        C := PAnsiChar( AddWordToPtr( DBuffer, NewTail))^;
+        C := DBuffer^[NewTail];
       end else
         Result := ecBufferIsEmpty;
     finally
@@ -1635,15 +1634,15 @@ end;
 
         if EndCount <> 0 then begin
           {Move data from end of dispatch buffer}
-          Move( GetPtr(DBuffer, NewTail)^, Pointer(Block)^, SizeOf( EndCount));
+          Move(DBuffer^[NewTail], Pointer(Block)^, EndCount);
           Inc(NewTail, EndCount);
         end;
 
         if BeginCount <> 0 then begin
           {Move data from beginning of dispatch buffer}
-          Move(DBuffer^,
-               GetPtr(Block, EndCount+1)^,
-               SizeOf( BeginCount));
+          Move(DBuffer^[0],
+               PByteBuffer(Block)^[EndCount+1],
+               BeginCount);
           NewTail := BeginCount;
         end;
 
@@ -2437,8 +2436,7 @@ end;
 
       {Loop through new data in dispatch buffer}
       while I <> DBufHead do begin
-//        C := DBuffer^[I];
-        C := PAnsiChar( AddWordToPtr( DBuffer, I))^;
+        C := DBuffer^[I];
 
         {Check each trigger for a match on this character}
         AnyMatch := False;
@@ -2611,8 +2609,7 @@ end;
 
         {Move data to end of dispatch buffer}
         if EndFree <> 0 then begin
-//          Len := ReadCom(PAnsiChar(@DBuffer^[DBufHead]), EndFree);
-          Len := ReadCom(PAnsiChar(AddWordToPtr(@DBuffer,DBufHead)), EndFree);
+          Len := ReadCom(PAnsiChar(@DBuffer^[DBufHead]), EndFree);
 
           {Restore data count on errors}
           if Len < 0 then begin
@@ -2624,11 +2621,8 @@ end;
             if Len = 0 then
               AddDispatchEntry(dtDispatch, dstReadCom, Len, nil, 0)
             else
-//              AddDispatchEntry(dtDispatch, dstReadCom, Len,
-//                                @DBuffer^[DBufHead], Len);
-
               AddDispatchEntry(dtDispatch, dstReadCom, Len,
-                                PAnsiChar( AddWordToPtr( DBuffer, DBufHead)), Len);
+                                @DBuffer^[DBufHead], Len);
 
           {Increment buffer head}
           Inc(DBufHead, Len);
@@ -2649,8 +2643,7 @@ end;
 
         {Move data to beginning of dispatch buffer}
         if BeginFree <> 0 then begin
-//          Len := ReadCom(PAnsiChar(@DBuffer^[DBufHead]), BeginFree);
-          Len := ReadCom(PAnsiChar(AddWordToPtr( DBuffer, DBufHead)), BeginFree);
+          Len := ReadCom(PAnsiChar(@DBuffer^[DBufHead]), BeginFree);
 
           {Restore data count on errors}
           if Len < 0 then begin
@@ -2662,12 +2655,8 @@ end;
             if Len = 0 then
               AddDispatchEntry(dtDispatch, dstReadCom, Len, nil, 0)
             else
-//              AddDispatchEntry(dtDispatch, dstReadCom, Len,
-//                                @DBuffer^[DBufHead], Len);
-
               AddDispatchEntry(dtDispatch, dstReadCom, Len,
-                                AddWordToPtr( DBuffer, DBufHead), Len);
-
+                                @DBuffer^[DBufHead], Len);
 
           {Increment buffer head}
           Inc(DBufHead, Len);
@@ -4314,11 +4303,9 @@ end;
                 NumToWrite := OutQue - OBufTail
               else begin
                 GetMem(TempBuff, OBufHead);
-                Move(OBuffer^, TempBuff^, SizeOf( OBufHead));
-//                Move(OBuffer^[OBufTail], OBuffer^, OutQue - OBufTail);
-                Move(GetPtr(OBuffer, OBufTail)^, OBuffer^, (OutQue - OBufTail));
-//                Move(TempBuff^, OBuffer^[OutQue - OBufTail], OBufHead);
-                Move(TempBuff^, GetPtr(OBuffer, (OutQue - OBufTail))^, OBufHead);
+                Move(OBuffer^, TempBuff^, OBufHead);
+                Move(OBuffer^[OBufTail], OBuffer^, OutQue - OBufTail);
+                Move(TempBuff^, OBuffer^[OutQue - OBufTail], OBufHead);
                 FreeMem(TempBuff);
                 Inc(OBufHead, OutQue - OBufTail);
                 NumToWrite := OBufHead;
@@ -4334,7 +4321,7 @@ end;
 //                          NumWritten,
 //                          @OutOL);
           Ok := WriteFile(CidEx,
-                          GetPtr(OBuffer, OBufTail)^,
+                          OBuffer^[OBufTail],
                           NumToWrite,
                           NumWritten,
                           @OutOL);
@@ -4443,6 +4430,10 @@ end;
     try
       FillChar(OutOL, SizeOf(OutOL), #0);
       with H do begin
+        {$IFDEF DebugThreads}
+        if DLoggingOn then
+          AddDispatchEntry(dtThread, dstThreadStart, 3, nil, 0);
+        {$ENDIF}
 
         {set the event used for overlapped i/o to signal completion}
         OutOL.hEvent := SentEvent;
@@ -4452,6 +4443,10 @@ end;
 
         {Repeat until port is closed}
         repeat
+          {$IFDEF DebugThreads}
+          if DLoggingOn then
+            AddDispatchEntry(dtThread, dstThreadSleep, 3, nil, 0);
+          {$ENDIF}
 
           {Wait for either an output event or a flush event}
           {$IFDEF DebugThreadConsole}
@@ -4464,6 +4459,10 @@ end;
           {$IFDEF DebugThreadConsole}
           Writeln(ThreadStatus(OutWake));
           {$ENDIF}
+          {$IFDEF DebugThreads}
+          if DLoggingOn then
+            AddDispatchEntry(dtThread, dstThreadWake, 3, nil, 0);
+          {$ENDIF}
 
           case Res of
             WAIT_OBJECT_0 :
@@ -4471,6 +4470,10 @@ end;
                 {output event}
                 {Exit immediately if thread was killed while waiting}
                 if KillThreads then begin
+                  {$IFDEF DebugThreads}
+                  if DLoggingOn then
+                    AddDispatchEntry(dtThread, dstThreadExit, 3, nil, 0);
+                  {$ENDIF}
                   {Finished here, okay to close the port}
                   H.ThreadGone(Self);
                   Exit;
@@ -4488,6 +4491,10 @@ end;
             {unexpected problem with WaitFor}
           end;
         until KillThreads or ClosePending;
+        {$IFDEF DebugThreads}
+        if DLoggingOn then
+          AddDispatchEntry(dtThread, dstThreadExit, 3, nil, 0);
+        {$ENDIF}
       end;
       H.ThreadGone(Self);
     except
@@ -4508,6 +4515,10 @@ end;
     try
       FillChar(ComOL, SizeOf(ComOL), #0);
       with H do begin
+        {$IFDEF DebugThreads}
+        if DLoggingOn then
+          AddDispatchEntry(dtThread, dstThreadStart, 1, nil, 0);
+        {$ENDIF}
 
         ComOL.hEvent := CreateEvent(nil, True, False, nil);
 
@@ -4531,6 +4542,10 @@ end;
 
         {Repeat until port is closed}
         repeat
+          {$IFDEF DebugThreads}
+          if DLoggingOn then
+            AddDispatchEntry(dtThread, dstThreadSleep, 1, nil, 0);
+          {$ENDIF}
 
           {$IFDEF DebugThreadConsole}
           Writeln(ThreadStatus(ComSleep));
@@ -4576,6 +4591,10 @@ end;
           {Exit immediately if thread was killed while waiting}
           if KillThreads then begin
             SetEvent(GeneralEvent);
+            {$IFDEF DebugThreads}
+            if DLoggingOn then
+              AddDispatchEntry(dtThread, dstThreadExit, 1, nil, 0);
+            {$ENDIF}
             CloseHandle(ComOL.hEvent);
             H.ThreadGone(Self);
             Exit;
@@ -4583,6 +4602,10 @@ end;
 
           {$IFDEF DebugThreadConsole}
           Writeln(ThreadStatus(ComWake));
+          {$ENDIF}
+          {$IFDEF DebugThreads}
+          if DLoggingOn then
+            AddDispatchEntry(dtThread, dstThreadWake, 1, @CurrentEvent, 2);
           {$ENDIF}
 
           {Signal com event}
@@ -4600,6 +4623,11 @@ end;
           {$ENDIF}
 
         until KillThreads;
+
+        {$IFDEF DebugThreads}
+        if DLoggingOn then
+          AddDispatchEntry(dtThread, dstThreadExit, 1, nil, 0);
+        {$ENDIF}
 
         {Finished here, okay to close the port}
         SetEvent(GeneralEvent);
@@ -4652,6 +4680,11 @@ end;
           {A modem status event...}
           MapEventsToMS(CurrentEvent);
 
+          {$IFDEF DebugThreads}
+          if DLoggingOn then
+            AddDispatchEntry(dtDispatch, dstModemStatus,
+                              ModemStatus, @CurrentEvent, 2);
+          {$ENDIF}
 
           {Check for status triggers}
           if not fEventBusy then begin
@@ -4669,6 +4702,12 @@ end;
         if CurrentEvent and LineEvent <> 0 then begin
           {A line status/error event}
           RefreshStatus;
+
+          {$IFDEF DebugThreads}
+          if DLoggingOn then
+            AddDispatchEntry(dtDispatch, dstLineStatus,
+                              0, @CurrentEvent, 2);
+          {$ENDIF}
 
           {Check for status triggers}
           if not fEventBusy then begin
@@ -4720,6 +4759,10 @@ end;
           if GlobalStatHit then
             ResetStatusHits;
         end else begin
+          {$IFDEF DebugThreads}
+          if DLoggingOn then
+            AddDispatchEntry(dtError, dstNone, 0, nil, 0);
+          {$ENDIF}
         end;
       end;
     end;
@@ -4728,6 +4771,10 @@ end;
     InterLockedIncrement(H.ActiveThreads);
     try
       with H do begin
+        {$IFDEF DebugThreads}
+        if DLoggingOn then
+          AddDispatchEntry(dtThread, dstThreadStart, 2, nil, 0);
+        {$ENDIF}
 
         try
           {Ready to go, set the general event}
@@ -4735,6 +4782,10 @@ end;
 
           {Repeat until port is closed}
           repeat
+            {$IFDEF DebugThreads}
+            if DLoggingOn then
+              AddDispatchEntry(dtThread, dstThreadSleep, 2, nil, 0);
+            {$ENDIF}
 
             {$IFDEF DebugThreadConsole}
             Writeln(ThreadStatus(DispSleep));
@@ -4752,9 +4803,18 @@ end;
 
             {Exit immediately if thread was killed while waiting}
             if KillThreads then begin
+              {$IFDEF DebugThreads}
+              if DLoggingOn then
+                AddDispatchEntry(dtThread, dstThreadExit, 2, nil, 0);
+              {$ENDIF}
               {Finished here, okay to close the port}
               Exit;
             end;
+
+            {$IFDEF DebugThreads}
+            if DLoggingOn then
+              AddDispatchEntry(dtThread, dstThreadWake, 2, nil, 0);
+            {$ENDIF}
 
             {Process it...}
             ProcessComEvent(H);
@@ -4762,6 +4822,10 @@ end;
 
           until KillThreads or ClosePending;
 
+          {$IFDEF DebugThreads}
+          if DLoggingOn then
+            AddDispatchEntry(dtThread, dstThreadExit, 2, nil, 0);
+          {$ENDIF}
 
           {Finished here, okay to close the port}
           SetEvent(GeneralEvent);
