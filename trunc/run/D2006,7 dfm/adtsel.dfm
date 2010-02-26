@@ -26,7 +26,7 @@ object DeviceSelectionForm: TDeviceSelectionForm
     Width = 209
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 2
   end
   object dsfOkBitBtn: TBitBtn

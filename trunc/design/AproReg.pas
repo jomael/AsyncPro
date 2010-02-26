@@ -64,49 +64,62 @@ uses
 
 // SBD! Add the following units as we upgrade them.
 
-
-//  AdProtcl,    {TApdProtocol}
-//  AdPStat,     {TApdProtocolStatus}
+{$IFNDEF UNICODE}
+  AdProtcl,    {TApdProtocol}
+  AdPStat,     {TApdProtocolStatus}
+{$ENDIF}
   AdStatLt,    {TApdSLController, TApdStatusLight}
-//  AdWnPort,    {TApdWinsockPort}
+{$IFNDEF UNICODE}
+  AdWnPort,    {TApdWinsockPort}
+{$ENDIF}
   AdSelCom,    {port selection dialog}
-//  AdPacket,    {TApdDataPacket}
+{$IFNDEF UNICODE}
+  AdPacket,    {TApdDataPacket}
+{$ENDIF}
   AdPropEd,    {design-time property editors}
-//  AdPager,     {TApdTapPager, TApdSNPPPager, TApdSMSPager}
-//  AdPgr,       {TApdPager (replaces TApdTAPPager and TApdSNPPPager)}     {!!.04}
-//  AdGSM,       {TApdGSMPhone}
-//  AdFtp,       {TApdFTPClient}
-//  AdScript,    {TApdScript}
-//  AdTrmEmu,    {TAdVT100Emulator, TAdTTYEmulator}
-//  AdRas,       {TApdRasDialer}
-//  AdRStat,     {TApdRasStatus}
-//  AdMdm,       {TAdModem}
+{$IFNDEF UNICODE}
+  AdPager,     {TApdTapPager, TApdSNPPPager, TApdSMSPager}
+  AdPgr,       {TApdPager (replaces TApdTAPPager and TApdSNPPPager)}     {!!.04}
+  AdGSM,       {TApdGSMPhone}
+  AdFtp,       {TApdFTPClient}
+  AdScript,    {TApdScript}
+  AdTrmEmu,    {TAdVT100Emulator, TAdTTYEmulator}
+  AdRas,       {TApdRasDialer}
+  AdRStat,     {TApdRasStatus}
+  AdMdm,       {TAdModem}
+{$ENDIF}
 
+{$IFNDEF UNICODE}
   {State Machine Units}
-//  AdStMach,    {TApdStateMachine, TApdState}
-//  AdStDS,      {Additional data sources}                                 {!!.04}
-//  AdStSt,      {Additional States}                                       {!!.04}
-//  AdStProt,    {Protocol States}                                         {!!.04}
-//  AdStFax,     {Fax States}                                              {!!.04}
-//  AdStSapi,    {SAPI States}                                             {!!.04}
+  AdStMach,    {TApdStateMachine, TApdState}
+  AdStDS,      {Additional data sources}                                 {!!.04}
+  AdStSt,      {Additional States}                                       {!!.04}
+  AdStProt,    {Protocol States}                                         {!!.04}
+  AdStFax,     {Fax States}                                              {!!.04}
+  AdStSapi,    {SAPI States}                                             {!!.04}
+{$ENDIF}
 
+{$IFNDEF UNICODE}
   { Fax Units }
-//  AdFaxCvt,    {TApdFaxConverter, TApdFaxUnpacker}
-//  AdFView,     {TApdFaxViewer}
-//  AdFax,       {TApdSendFax, TApdReceiveFax}
-//  AdFStat,     {TApdFaxStatus}
-//  AdFaxPrn,    {TApdFaxPrinter}
-//  AdFPStat,    {TApdFaxPrinterStatus}
-//  AdFaxCtl,    {TApdFaxDriverInterface}
-//  AdFaxSrv,    {TApdFaxServer, TApdFaxServerManager, TApdFaxClient}
+  AdFaxCvt,    {TApdFaxConverter, TApdFaxUnpacker}
+  AdFView,     {TApdFaxViewer}
+  AdFax,       {TApdSendFax, TApdReceiveFax}
+  AdFStat,     {TApdFaxStatus}
+  AdFaxPrn,    {TApdFaxPrinter}
+  AdFPStat,    {TApdFaxPrinterStatus}
+  AdFaxCtl,    {TApdFaxDriverInterface}
+  AdFaxSrv,    {TApdFaxServer, TApdFaxServerManager, TApdFaxClient}
+{$ENDIF}
 
   { Telephony Units }
   AdTapi,      {TApdTapiDevice}
   AdTStat     {TApdTapiStatus}
-//  AdPEditT,    {select device dialog}
-//  AdSapiEn,    {TApdSapiEngine}
-//  AdSapiPh,    {TApdSapiPhone}
-//  AdVoIP;      {IP Telephony components}
+{$IFNDEF UNICODE}
+  ,AdPEditT    {select device dialog}
+  ,AdSapiEn    {TApdSapiEngine}
+  ,AdSapiPh    {TApdSapiPhone}
+  ,AdVoIP      {IP Telephony components}
+{$ENDIF}
    ;
 
 procedure Register;
@@ -114,59 +127,68 @@ begin
   { Register standard components }
   RegisterComponents(APROTabName,
                      [TApdComPort,
-//                      TApdWinsockPort,
-//                      TApdRasDialer,
-//                      TApdRasStatus,
-//                      TApdFtpClient,
-//                      TApdFtpLog,
-//                      TApdDataPacket,
-//                      TApdScript,
+{$IFNDEF UNICODE}
+                      TApdWinsockPort,
+                      TApdRasDialer,
+                      TApdRasStatus,
+                      TApdFtpClient,
+                      TApdFtpLog,
+                      TApdDataPacket,
+                      TApdScript,
                       {TApdStateMachine,} { installed to APRO State Machine tab below }
                       {TApdState,}
-//                      TAdModem,
-//                      TAdModemStatus,
+                      TAdModem,
+                      TAdModemStatus,
+{$ENDIF}
                       TApdSLController,
                       TApdStatusLight
-//                      TApdProtocol,
-//                      TApdProtocolLog,
-//                      TApdProtocolStatus,
-//                      TApdPager,
-//                      TApdTAPPager,
-//                      TApdSNPPPager,
-//                      TApdGSMPhone,
-//                      TApdPagerLog,
-//                      TAdTerminal,
-//                      TAdTTYEmulator,
-//                      TAdVT100Emulator]);
+{$IFNDEF UNICODE}
+                      ,TApdProtocol
+                      ,TApdProtocolLog
+                      ,TApdProtocolStatus
+                      ,TApdPager
+                      ,TApdTAPPager
+                      ,TApdSNPPPager
+                      ,TApdGSMPhone
+                      ,TApdPagerLog
+                      ,TAdTerminal
+                      ,TAdTTYEmulator
+                      ,TAdVT100Emulator
+{$ENDIF}
                         ]);
   { Register Telephony components }
   RegisterComponents(APROTelephonyTabName,
                      [TApdTapiDevice,
                       TApdTapiStatus,
                       TApdTapiLog
-//                      TApdSapiEngine,
-//                      TApdSapiPhone,
-//                      TApdVoIP]);
+{$IFNDEF UNICODE}
+                      ,TApdSapiEngine
+                      ,TApdSapiPhone
+                      ,TApdVoIP
+{$ENDIF}
                         ]);
 
   { Register Fax Components }
-//  RegisterComponents(APROFaxTabName,
-//                     [TApdFaxConverter,
-//                      TApdFaxUnpacker,
-//                      TApdFaxViewer,
-//                      TApdReceiveFax,
-//                      TApdSendFax,
-//                      TApdFaxStatus,
-//                      TApdFaxLog,
-//                      TApdFaxPrinter,
-//                      TApdFaxPrinterStatus,
-//                      TApdFaxPrinterLog,
-//                      TApdFaxDriverInterface,
-//                      TApdFaxServer,
-//                      TApdFaxServerManager,
-//                      TApdFaxClient]);
+{$IFNDEF UNICODE}
+  RegisterComponents(APROFaxTabName,
+                     [TApdFaxConverter,
+                      TApdFaxUnpacker,
+                      TApdFaxViewer,
+                      TApdReceiveFax,
+                      TApdSendFax,
+                      TApdFaxStatus,
+                      TApdFaxLog,
+                      TApdFaxPrinter,
+                      TApdFaxPrinterStatus,
+                      TApdFaxPrinterLog,
+                      TApdFaxDriverInterface,
+                      TApdFaxServer,
+                      TApdFaxServerManager,
+                      TApdFaxClient]);
+{$ENDIF}
 
   { Register State Machine Components }                                  {!!.04}
+{$IFNDEF UNICODE}
 //  RegisterComponents (APROStateTabName,                                  {!!.04}
 //                      [TApdStateMachine,                                 {!!.04}
 //                       TApdStateComPortSource,                           {!!.04}
@@ -178,7 +200,7 @@ begin
 //                       TApdSendFaxState,                                 {!!.04}
 //                       TApdReceiveFaxState,                              {!!.04}
 //                       TApdSapiSpeakState]);                             {!!.04}
-
+{$ENDIF}
 end;
 
 end.

@@ -64,7 +64,7 @@ object ComSelectForm: TComSelectForm
     Width = 201
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
+    ItemHeight = 0
     TabOrder = 2
   end
 end

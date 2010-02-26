@@ -32,7 +32,7 @@
 {*********************************************************}
 
 {Global defines potentially affecting this unit}
-{$I ..\includes\AWDEFINE.INC}
+{$I ..\..\includes\AWDEFINE.INC}
 
 unit AdTSel;
   {-Property editor, end-user dialog for selecting TAPI devices or ports}
