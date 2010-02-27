@@ -82,72 +82,63 @@ const
   UseDispatcherForAvail : Boolean = True;
   {True to return True even if the port is in use; False to return False
    if the port is in use}
-  ShowPortsInUse : Boolean = True;                                  
+  ShowPortsInUse : Boolean = True;
 implementation
 
 {$R *.DFM}
 
-function IsPortAvailable( ComNum : Cardinal) : Boolean;
-
+function IsPortAvailable(ComNum: Cardinal): Boolean;
 var
-  ComName : string;
-  Res : Integer;
-  DeviceLayer : TApdBaseDispatcher;
+  ComName: string;
+  Res: Integer;
+  DeviceLayer: TApdBaseDispatcher;
   CC: TCommConfig;
   Len: Cardinal;
 begin
-ComName := Format( '\\.\COM%d', [ComNum]);
-DeviceLayer := nil;
-try
-  if ComNum = 0 then
-      result := False
+  ComName := Format('\\.\COM%d', [ComNum]);
+  DeviceLayer := nil;
+  try
+    if ComNum = 0 then
+      Result := False
     else if UseDispatcherForAvail then
-      begin
-      DeviceLayer  := TApdWin32Dispatcher.Create(nil);
+    begin
+      DeviceLayer := TApdWin32Dispatcher.Create(nil);
       if ShowPortsInUse then
-          result := DeviceLayer.CheckPort( ComName)
-        else
-          begin
-          Res := DeviceLayer.OpenCom( ComName, 64, 64);
-          result := (Res >= 0) or (ShowPortsInUse and
-                      (GetLastError = DWORD( ecAccessDenied)));
-          if Res >= 0 then
-            DeviceLayer.CloseCom
-          end;
-      end
-    else
+        Result := DeviceLayer.CheckPort(ComName)
+      else
       begin
-      if ShowPortsInUse then  //SZ: optimize this one - otherwise bluetooth devices may request confirmation
-          begin
-          Len := SizeOf(CC);
-          FillChar(CC, Len, 0);
-          CC.dwSize := Len;
-          result := GetDefaultCommConfig( PChar( ComName), CC, Len)
-          end
-        else
-          begin
-          Res := CreateFile(
-                   PChar( ComName),
-                   GENERIC_READ or GENERIC_WRITE,
-                   0,
-                   nil,
-                   OPEN_EXISTING,
-                   FILE_ATTRIBUTE_NORMAL or
-                   FILE_FLAG_OVERLAPPED,
-                   0);
-          result := (Res >= 0) or (ShowPortsInUse and
-                      (GetLastError = DWORD( ecAccessDenied)));
-          if Res >= 0 then
-            CloseHandle( Res)
-          end
+        Res := DeviceLayer.OpenCom(ComName, 64, 64);
+        Result := (Res >= 0)
+          or (ShowPortsInUse and (GetLastError = DWORD(ecAccessDenied)));
+        if Res >= 0 then
+          DeviceLayer.CloseCom
+      end;
+    end
+    else
+    begin
+      if ShowPortsInUse then
+      begin
+        Len := SizeOf(CC);
+        FillChar(CC, Len, 0);
+        CC.dwSize := Len;
+        Result := GetDefaultCommConfig(PChar(ComName), CC, Len)
       end
-finally
-  if UseDispatcherForAvail then
-    DeviceLayer.Free
-end end;
+      else
+      begin    // SZ: optimize this one - otherwise bluetooth devices may request confirmation
+        Res := CreateFile(PChar(ComName), GENERIC_READ or GENERIC_WRITE, 0, nil,
+          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL or FILE_FLAG_OVERLAPPED, 0);
+        Result := (Res >= 0) or (ShowPortsInUse and (GetLastError = DWORD(ecAccessDenied)));
+        if Res >= 0 then
+          CloseHandle(Res)
+      end;
+  end;
+  finally
+    if UseDispatcherForAvail then
+      DeviceLayer.Free
+  end;
+end;
 
-
-procedure TComSelectForm.FormCreate( Sender: TObject);
+procedure TComSelectForm.FormCreate(Sender: TObject);
 var
   I : Integer;
   S : string;
