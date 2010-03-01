@@ -38,4 +38,13 @@ contains
   AproReg in '..\..\design\AproReg.pas',
   Adpedit0 in '..\..\design\Adpedit0.pas' {AdPEdit};
 
+
+{ NOTE: Add the following units as their underlying runtime friends
+   get upgraded to unicode:
+
+  AdStatEd
+  AdStatE0
+  adpacked
+  Adpeditt
+}
 end.

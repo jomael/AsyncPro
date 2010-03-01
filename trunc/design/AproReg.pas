@@ -44,10 +44,11 @@ uses
 { Constant declarations for IDE palette tab names }
 
 const
-  APROTabName     = 'APRO';
-  APROFaxTabName  = 'APRO Fax';
-  APROTelephonyTabName = 'APRO Telephony';
-  APROStateTabName     = 'APRO State Machine';                           {!!.04}
+  AsyncProfessional_TabBaseName = 'AsyncPro';   // SBD
+  APROTabName          = AsyncProfessional_TabBaseName + ' General';
+  APROFaxTabName       = AsyncProfessional_TabBaseName + ' Fax';
+  APROTelephonyTabName = AsyncProfessional_TabBaseName + ' Telephony';
+  APROStateTabName     = AsyncProfessional_TabBaseName + ' State Machine';
 
 procedure Register;
 
@@ -189,17 +190,17 @@ begin
 
   { Register State Machine Components }                                  {!!.04}
 {$IFNDEF UNICODE}
-//  RegisterComponents (APROStateTabName,                                  {!!.04}
-//                      [TApdStateMachine,                                 {!!.04}
-//                       TApdStateComPortSource,                           {!!.04}
-//                       TApdStateGenericSource,                           {!!.04}
-//                       TApdState,                                        {!!.04}
-//                       TApdActionState,                                  {!!.04}
-//                       TApdSendFileState,                                {!!.04}
-//                       TApdReceiveFileState,                             {!!.04}
-//                       TApdSendFaxState,                                 {!!.04}
-//                       TApdReceiveFaxState,                              {!!.04}
-//                       TApdSapiSpeakState]);                             {!!.04}
+  RegisterComponents (APROStateTabName,                                  {!!.04}
+                      [TApdStateMachine,                                 {!!.04}
+                       TApdStateComPortSource,                           {!!.04}
+                       TApdStateGenericSource,                           {!!.04}
+                       TApdState,                                        {!!.04}
+                       TApdActionState,                                  {!!.04}
+                       TApdSendFileState,                                {!!.04}
+                       TApdReceiveFileState,                             {!!.04}
+                       TApdSendFaxState,                                 {!!.04}
+                       TApdReceiveFaxState,                              {!!.04}
+                       TApdSapiSpeakState]);                             {!!.04}
 {$ENDIF}
 end;
 
