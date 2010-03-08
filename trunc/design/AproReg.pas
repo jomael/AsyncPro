@@ -116,7 +116,7 @@ uses
   AdTapi,      {TApdTapiDevice}
   AdTStat     {TApdTapiStatus}
 {$IFNDEF UNICODE}
-  ,AdPEditT    {select device dialog}
+//  ,AdPEditT    {select device dialog}
   ,AdSapiEn    {TApdSapiEngine}
   ,AdSapiPh    {TApdSapiPhone}
   ,AdVoIP      {IP Telephony components}

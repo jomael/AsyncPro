@@ -43,15 +43,7 @@
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
+      <Excluded_Packages Name="C:\Program Files\Common Files\BPL\dclDCPCrypt10.bpl">DCPcrypt cryptographic component library v2 BETA 3</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\bcboffice2k100.bpl">CodeGear C++Builder Office 2000 Servers Package</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\bcbofficexp100.bpl">CodeGear C++Builder Office XP Servers Package</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -74,9 +66,7 @@
       <Form>AdPEdit</Form>
     </DCCReference>
     <DCCReference Include="..\..\design\Adpeditt.papas" />
-    <DCCReference Include="..\..\design\Adpeditt.pas">
-      <ModuleName>Adpeditt.pas</ModuleName>
-    </DCCReference>
+    <DCCReference Include="..\..\design\Adpeditt.pas" />
     <DCCReference Include="..\..\design\Adpeditt.pas.pas" />
     <DCCReference Include="..\..\design\Adpeditt.paspas" />
     <DCCReference Include="..\..\design\Adpeditt.ppas" />
@@ -95,7 +85,6 @@
     <DCCReference Include="..\..\design\apdedit.pas" />
     <DCCReference Include="..\..\design\apdeditt.pas" />
     <DCCReference Include="..\..\design\AproReg.pas" />
-    <DCCReference Include="..\..\design\AsyncPro.dcp" />
     <DCCReference Include="..\..\design\D2005- dfmadabout.pas">
       <Form>ApdAboutForm</Form>
     </DCCReference>
@@ -111,7 +100,8 @@
     <DCCReference Include="..\..\design\D2006,7 dfm\adabout.pas">
       <Form>ApdAboutForm</Form>
     </DCCReference>
-    <DCCReference Include="..\..\design\designide.dcp" />
-    <DCCReference Include="..\..\design\rtl.dcp" />
+    <DCCReference Include="AsyncPro.dcp" />
+    <DCCReference Include="designide.dcp" />
+    <DCCReference Include="rtl.dcp" />
   </ItemGroup>
 </Project>

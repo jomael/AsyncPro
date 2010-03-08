@@ -32,7 +32,7 @@
 {*********************************************************}
 
 {Global defines potentially affecting this unit}
-{$I ..\includes\AWDEFINE.INC}
+{$I ..\..\includes\AWDEFINE.INC}
 
 
 unit AdSelCom;
