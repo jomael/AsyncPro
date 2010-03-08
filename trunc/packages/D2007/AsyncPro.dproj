@@ -27,6 +27,31 @@
     <Borland.ProjectType>Package</Borland.ProjectType>
     <BorlandProject>
 <BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><Package_Options><Package_Options Name="ImplicitBuild">False</Package_Options><Package_Options Name="DesigntimeOnly">False</Package_Options><Package_Options Name="RuntimeOnly">True</Package_Options><Package_Options Name="PackageDescription">TurboPower AsyncPro 5 run-time package</Package_Options><Package_Options Name="LibSuffix">_D2007</Package_Options></Package_Options><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">5</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">3081</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName">TurboPower AsyncPro FOSS project team</VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">5.0.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">5.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <Excluded_Packages Name="C:\Program Files\Common Files\BPL\dclDCPCrypt10.bpl">DCPcrypt cryptographic component library v2 BETA 3</Excluded_Packages>
+      <Excluded_Packages Name="$(BDS)\bin\bcboffice2k100.bpl">CodeGear C++Builder Office 2000 Servers Package</Excluded_Packages>
+      <Excluded_Packages Name="$(BDS)\bin\bcbofficexp100.bpl">CodeGear C++Builder Office XP Servers Package</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
     </Excluded_Packages><Source><Source Name="MainSource">AsyncPro.dpk</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
@@ -36,9 +61,6 @@
     <DelphiCompile Include="AsyncPro.dpk">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="..\..\..\..\..\AsyncPro\4.07\source\rtl.dcp" />
-    <DCCReference Include="..\..\..\..\..\AsyncPro\4.07\source\vcl.dcp" />
-    <DCCReference Include="..\..\..\..\..\AsyncPro\4.07\source\vclx.dcp" />
     <DCCReference Include="..\..\run\2006,7 dfmadtsel.pas">
       <Form>DeviceSelectionForm</Form>
     </DCCReference>
@@ -76,6 +98,9 @@
     </DCCReference>
     <DCCReference Include="..\..\run\D2006,7 dfm\AdSelCom.pas">
       <Form>ComSelectForm</Form>
+    </DCCReference>
+    <DCCReference Include="..\..\run\D2006,7 dfm\adtsel.pas">
+      <Form>DeviceSelectionForm</Form>
     </DCCReference>
     <DCCReference Include="..\..\run\LnsQueue.pas" />
     <DCCReference Include="..\..\run\LNSWin32.pas" />
@@ -222,5 +247,8 @@
     <DCCReference Include="..\source\AwYmodem.pas" />
     <DCCReference Include="..\source\awzmodem.pas" />
     <DCCReference Include="..\version 4 units in queue for upgrade\AdFax.pas" />
+    <DCCReference Include="rtl.dcp" />
+    <DCCReference Include="vcl.dcp" />
+    <DCCReference Include="vclx.dcp" />
   </ItemGroup>
 </Project>

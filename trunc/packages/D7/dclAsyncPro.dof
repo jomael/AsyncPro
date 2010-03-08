@@ -135,21 +135,36 @@ ProductName=
 ProductVersion=5.0.0.0
 Comments=
 [Excluded Packages]
-C:\WINDOWS\system32\dxPSTeeChartD7.bpl=ExpressPrinting System ReportLink for TeeChart by Developer Express Inc.
-C:\WINDOWS\system32\dxPSDBTeeChartD7.bpl=ExpressPrinting System ReportLink for DBTeeChart by Developer Express Inc.
+V:\Projects\Developer Express\QuantumGrid5\Library\Delphi7\dclcxLibraryVCLD7.bpl=Express Cross Platform Library (VCL Edition) by Developer Express Inc.
+V:\Projects\Developer Express\QuantumGrid5\Library\Delphi7\dclcxEditorsVCLD7.bpl=ExpressEditors Library 5 (VCL Edition) by Developer Express Inc.
+V:\Projects\Developer Express\QuantumGrid5\Library\Delphi7\dclcxExtEditorsVCLD7.bpl=ExpressExtendedEditors Library 5 (VCL Edition) by Developer Express Inc.
+V:\Projects\Developer Express\QuantumGrid5\Library\Delphi7\dclcxPageControlVCLD7.bpl=Express Cross Platform PageControl (VCL Edition) by Developer Express Inc.
+V:\Projects\Developer Express\QuantumGrid5\Library\Delphi7\dclcxGridVCLD7.bpl=ExpressQuantumGrid 5 (VCL Edition) by Developer Express Inc.
+V:\Projects\Developer Express\QuantumGrid5\Library\Delphi7\dcldxPSCoreD7.bpl=ExpressPrinting System (core 3.1) by Developer Express Inc.
+V:\Projects\Developer Express\ExpressForumLibrary\Lib\dcldxForumLibD7.bpl=Developer Express Forum Library
+V:\Projects\Developer Express\ExpressMemData\Lib\dcldxmdsD7.bpl=ExpressMemData by Developer Express Inc.
+V:\Projects\Developer Express\ExpressPageControl\Lib\dcldxPageControlD7.bpl=ExpressPageControl by Developer Express Inc.
+V:\Projects\Steema\TeeChart 704 D7\Delphi7\Bin\DclTee77.bpl=TeeChart 7 Components
+V:\Projects\Steema\TeeChart 704 D7\Delphi7\Bin\DclTGL77.bpl=TeeChart 7 for OpenGL
+V:\Projects\Steema\TeeChart 704 D7\Delphi7\Bin\DclTQR77.bpl=TeeChart 7 for QuickReport
+V:\Projects\Steema\TeeChart 704 D7\Delphi7\Bin\DclTeePro77.bpl=TeeChart Pro 7 Components
+V:\Projects\Steema\TeeChart 704 D7\Delphi7\System\TeeImage77.bpl=TeeChart Pro 7 Graphic Formats
+V:\Projects\Steema\TeeChart 704 D7\Delphi7\Bin\DclTree2D7Tee7.bpl=TeeTree 2 Components
+V:\Projects\LMD70SE\LIB\D7\lmd70se_D7.BPL=LMD-Tools 7.0 Special Edition
+V:\Projects\TURBOP~1\Abbrevia\B304VD70.BPL=TurboPower Abbrevia 3.04 Design-time package - VCL70
+V:\Projects\TURBOP~1\Abbrevia\B304CD70.BPL=TurboPower Abbrevia 3.04 CLX Design-time package - CLX70
+V:\Projects\Developer Express\ExpressInplaceEditors\Delphi 7\Lib\dcldxEdtrD7.bpl=Express inplace editors
+V:\Projects\Developer Express\ExpressQuantumGrid\Delphi 7\Lib\dclEQTLD7.bpl=ExpressQuantumTreeList by Developer Express Inc.
+V:\Projects\Developer Express\ExpressQuantumGrid\Delphi 7\Lib\dclECQDBCD7.bpl=ExpressQuantumDBControl by Developer Express Inc.
+V:\Projects\Developer Express\ExpressQuantumGrid\Delphi 7\Lib\dclEQDBTLD7.bpl=ExpressQuantumDBTreeList by Developer Express Inc.
+V:\Projects\Developer Express\ExpressQuantumGrid\Delphi 7\Lib\dclEQGridD7.bpl=ExpressQuantumGrid by Developer Express Inc.
+V:\Projects\Developer Express\ExpressQuantumGrid\Delphi 7\Lib\dcldxGrEdD7.bpl=Express extended inplace editors
+V:\Projects\Developer Express\ExpressQuantumGrid\Delphi 7\Lib\dcldxExELD7.bpl=ExpressEditors Library (Extended) by Developer Express Inc.
+V:\Projects\Developer Express\ExpressEditors Library\Delphi 7\Lib\dcldxELibD7.bpl=ExpressEditors Library by Developer Express Inc.
+V:\Projects\tmssoftware\TMS Component Pack\Delphi7\TMSD7.bpl=TMS Component Pack
+V:\Projects\tmssoftware\TMS Component Pack\Delphi7\TMSExD7.bpl=TMS Component Pack Extra
+V:\Projects\tmssoftware\TMS Component Pack\Delphi7\TMSDeD7.bpl=TMS Component Pack design time support
+V:\Projects\tmssoftware\TMS Component Pack\Delphi7\TMSXlsD7.bpl=TMS TAdvStringGrid Excel support
+V:\Projects\tmssoftware\TMS Component Pack\Delphi7\TMSWizD7.bpl=TMS Component Pack Wizards
 C:\WINDOWS\system32\dxPScxGridLnkD7.bpl=ExpressPrinting System ReportLink for ExpressQuantumGrid 5 by Developer Express Inc.
-[HistoryLists\hlUnitAliases]
-Count=1
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlSearchPath]
-Count=1
-Item0=;V:\Projects\Steema\TeeChart 704\d7\Delphi7\Lib
-[HistoryLists\hlUnitOutputDirectory]
-Count=1
-Item0=$(DCU)
-[HistoryLists\hlBPLOutput]
-Count=1
-Item0=$(BPL)
-[HistoryLists\hlDCPOutput]
-Count=1
-Item0=$(DCP)
+c:\program files\borland\delphi7\Bin\dcldss70.bpl=Borland Decision Cube Components
