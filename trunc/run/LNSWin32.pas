@@ -560,6 +560,8 @@ end;
 //  Shutdown the dispatcher
 procedure TApdWin32Dispatcher.StopDispatcher;
 begin
+EnterCriticalSection( DataSection);
+try
     if DispActive then
         CloseCom;
 
@@ -598,7 +600,10 @@ begin
         if CloseHandle(OutFlushEvent) then
             OutFlushEvent := INVALID_HANDLE_VALUE;
     end;
-end;
+finally
+  LeaveCriticalSection( DataSection)
+end end;
+
 
 //  This doesn't apply to WIN32 dispatcher any more
 function TApdWin32Dispatcher.WaitComEvent(var EvtMask : DWORD;
