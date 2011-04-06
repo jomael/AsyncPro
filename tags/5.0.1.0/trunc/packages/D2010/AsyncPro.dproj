@@ -1,0 +1,238 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{51637F97-D7D2-4610-B928-BCB5AB161633}</ProjectGuid>
+			<MainSource>AsyncPro.dpk</MainSource>
+			<ProjectVersion>12.0</ProjectVersion>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_UnitSearchPath>$(BDSCOMMONDIR)\BPL;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<BRCC_IncludePath>$(BDSCOMMONDIR)\BPL;$(BRCC_IncludePath)</BRCC_IncludePath>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<DCC_BplOutput>$(BDSCOMMONDIR)\Bpl</DCC_BplOutput>
+			<DCC_DcpOutput>$(BDSCOMMONDIR)\Dcp</DCC_DcpOutput>
+			<DCC_DcuOutput>$(DCU)</DCC_DcuOutput>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_DependencyCheckOutputName>C:\Documents and Settings\All Users\Documents\RAD Studio\7.0\Bpl\AsyncPro_D2010.bpl</DCC_DependencyCheckOutputName>
+			<DllSuffix>_D2010</DllSuffix>
+			<DesignOnlyPackage>false</DesignOnlyPackage>
+			<DCC_Platform>x86</DCC_Platform>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+			<DCC_Description>TurboPower AsyncPro 5.01 run-time package</DCC_Description>
+			<DCC_S>false</DCC_S>
+			<DCC_N>false</DCC_N>
+			<GenDll>true</GenDll>
+			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
+			<DCC_E>false</DCC_E>
+			<GenPackage>true</GenPackage>
+			<DCC_K>false</DCC_K>
+			<DCC_F>false</DCC_F>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="AsyncPro.dpk">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="vcl.dcp"/>
+			<DCCReference Include="vclx.dcp"/>
+			<DCCReference Include="..\..\run\AdExcept.pas"/>
+			<DCCReference Include="..\..\run\OoMisc.pas"/>
+			<DCCReference Include="..\..\run\AdFax.pas"/>
+			<DCCReference Include="..\..\run\ADFAXCTL.pas"/>
+			<DCCReference Include="..\..\run\AdFaxCvt.pas"/>
+			<DCCReference Include="..\..\run\AdFaxPrn.pas"/>
+			<DCCReference Include="..\..\run\AdFaxSrv.pas"/>
+			<DCCReference Include="..\..\run\AdFIDlg.pas">
+				<Form>ApdFaxJobInfoDialog</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\Adfpstat.pas">
+				<Form>StandardFaxPrinterStatusDisplay</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\Adfstat.pas">
+				<Form>StandardFaxDisplay</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdFtp.pas"/>
+			<DCCReference Include="..\..\run\Adfview.pas"/>
+			<DCCReference Include="..\..\run\AdGSM.pas"/>
+			<DCCReference Include="..\..\run\AdISapi.pas"/>
+			<DCCReference Include="..\..\run\AdITapi3.pas"/>
+			<DCCReference Include="..\..\run\AdLibMdm.pas">
+				<Form>ApdModemSelectionDialog</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdMdm.pas"/>
+			<DCCReference Include="..\..\run\AdMdmCfg.pas">
+				<Form>ApdModemConfigDialog</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdMdmDlg.pas">
+				<Form>ApdModemStatusDialog</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdMeter.pas"/>
+			<DCCReference Include="..\..\run\AdPacket.pas"/>
+			<DCCReference Include="..\..\run\AdPager.pas"/>
+			<DCCReference Include="..\..\run\AdPgr.pas"/>
+			<DCCReference Include="..\..\run\AdPort.pas"/>
+			<DCCReference Include="..\..\run\AdProtcl.pas"/>
+			<DCCReference Include="..\..\run\ADPSTAT.pas">
+				<Form>StandardDisplay</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdRas.pas"/>
+			<DCCReference Include="..\..\run\AdRasUtl.pas"/>
+			<DCCReference Include="..\..\run\AdRStat.pas">
+				<Form>RasStatusDisplay</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdSapiEn.pas"/>
+			<DCCReference Include="..\..\run\AdSapiGr.pas"/>
+			<DCCReference Include="..\..\run\AdSapiPh.pas"/>
+			<DCCReference Include="..\..\run\AdScript.pas"/>
+			<DCCReference Include="..\..\run\AdSelCom.pas">
+				<Form>ComSelectForm</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdSocket.pas"/>
+			<DCCReference Include="..\..\run\AdSrmgr.pas"/>
+			<DCCReference Include="..\..\run\AdStatLt.pas"/>
+			<DCCReference Include="..\..\run\AdStDS.pas"/>
+			<DCCReference Include="..\..\run\AdStFax.pas"/>
+			<DCCReference Include="..\..\run\AdStMach.pas"/>
+			<DCCReference Include="..\..\run\AdStProt.pas"/>
+			<DCCReference Include="..\..\run\AdStrMap.pas"/>
+			<DCCReference Include="..\..\run\AdStSapi.pas"/>
+			<DCCReference Include="..\..\run\adstst.pas"/>
+			<DCCReference Include="..\..\run\AdTapi.pas"/>
+			<DCCReference Include="..\..\run\ADTrmBuf.pas"/>
+			<DCCReference Include="..\..\run\ADTrmEmu.pas"/>
+			<DCCReference Include="..\..\run\ADTrmMap.pas"/>
+			<DCCReference Include="..\..\run\ADTrmPsr.pas"/>
+			<DCCReference Include="..\..\run\adtsel.pas">
+				<Form>DeviceSelectionForm</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdTStat.pas">
+				<Form>ApdStandardTapiDisplay</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdTUtil.pas"/>
+			<DCCReference Include="..\..\run\AdVoIP.PAS"/>
+			<DCCReference Include="..\..\run\AdVoIPEd.pas">
+				<Form>VoipAudioVideoEditor</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdWnPort.pas"/>
+			<DCCReference Include="..\..\run\Adwutil.pas"/>
+			<DCCReference Include="..\..\run\AdXBase.pas"/>
+			<DCCReference Include="..\..\run\AdXChrFlt.pas"/>
+			<DCCReference Include="..\..\run\Adxdial.pas">
+				<Form>DialDialog</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\Adxdown.pas">
+				<Form>DownloadDialog</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\AdXLbMdm.pas"/>
+			<DCCReference Include="..\..\run\AdXParsr.pas"/>
+			<DCCReference Include="..\..\run\Adxport.pas">
+				<Form>ComPortOptions</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\Adxprot.pas">
+				<Form>ProtocolOptions</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\Adxup.pas">
+				<Form>UploadDialog</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\run\Awabsfax.pas"/>
+			<DCCReference Include="..\..\run\AWABSPCL.pas"/>
+			<DCCReference Include="..\..\run\AwAscii.pas"/>
+			<DCCReference Include="..\..\run\awfax.pas"/>
+			<DCCReference Include="..\..\run\Awfaxcvt.pas"/>
+			<DCCReference Include="..\..\run\AwFView.pas"/>
+			<DCCReference Include="..\..\run\AwKermit.pas"/>
+			<DCCReference Include="..\..\run\AwUser.pas"/>
+			<DCCReference Include="..\..\run\AwWin32.pas"/>
+			<DCCReference Include="..\..\run\AwWnSock.pas"/>
+			<DCCReference Include="..\..\run\AwXmodem.pas"/>
+			<DCCReference Include="..\..\run\AwYmodem.pas"/>
+			<DCCReference Include="..\..\run\awzmodem.pas"/>
+			<DCCReference Include="..\..\run\LnsQueue.pas"/>
+			<DCCReference Include="..\..\run\LNSWin32.pas"/>
+			<DCCReference Include="..\..\run\AwTPcl.pas"/>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType>Package</Borland.ProjectType>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Source>
+						<Source Name="MainSource">AsyncPro.dpk</Source>
+					</Source>
+					<Parameters>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">5</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">1</VersionInfo>
+						<VersionInfo Name="Build">0</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">3081</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName">TurboPower AsyncPro FOSS project team</VersionInfoKeys>
+						<VersionInfoKeys Name="FileDescription"/>
+						<VersionInfoKeys Name="FileVersion">5.0.1.0</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName"/>
+						<VersionInfoKeys Name="LegalCopyright"/>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName"/>
+						<VersionInfoKeys Name="ProductVersion">5.0.1.0</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k140.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dclofficexp140.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+					</Excluded_Packages>
+				</Delphi.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

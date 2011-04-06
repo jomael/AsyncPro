@@ -1,0 +1,72 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{23B31902-1D19-46A4-83CF-BFD508CDAFF3}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="a500_DXE.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="a500_RXE.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="A500Dep_DXE.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="A500Dep_RXE.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="a500_DXE">
+			<MSBuild Projects="a500_DXE.dproj"/>
+		</Target>
+		<Target Name="a500_DXE:Clean">
+			<MSBuild Projects="a500_DXE.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="a500_DXE:Make">
+			<MSBuild Projects="a500_DXE.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="a500_RXE">
+			<MSBuild Projects="a500_RXE.dproj"/>
+		</Target>
+		<Target Name="a500_RXE:Clean">
+			<MSBuild Projects="a500_RXE.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="a500_RXE:Make">
+			<MSBuild Projects="a500_RXE.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="A500Dep_DXE">
+			<MSBuild Projects="A500Dep_DXE.dproj"/>
+		</Target>
+		<Target Name="A500Dep_DXE:Clean">
+			<MSBuild Projects="A500Dep_DXE.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="A500Dep_DXE:Make">
+			<MSBuild Projects="A500Dep_DXE.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="A500Dep_RXE">
+			<MSBuild Projects="A500Dep_RXE.dproj"/>
+		</Target>
+		<Target Name="A500Dep_RXE:Clean">
+			<MSBuild Projects="A500Dep_RXE.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="A500Dep_RXE:Make">
+			<MSBuild Projects="A500Dep_RXE.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="a500_DXE;a500_RXE;A500Dep_DXE;A500Dep_RXE"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="a500_DXE:Clean;a500_RXE:Clean;A500Dep_DXE:Clean;A500Dep_RXE:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="a500_DXE:Make;a500_RXE:Make;A500Dep_DXE:Make;A500Dep_RXE:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>
