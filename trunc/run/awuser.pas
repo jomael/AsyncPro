@@ -42,7 +42,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                    AWUSER.PAS 5.00                    *}
+{*                    AWUSER.PAS 5.01                    *}
 {*********************************************************}
 {* Low-level dispatcher                                  *}
 {*********************************************************}
@@ -313,7 +313,7 @@ type
                                  Data : Cardinal;
                                  Buffer : Pointer;
                                  BufferLen : Cardinal);
-      procedure AddStringToLog(S : Ansistring);
+      procedure AddStringToLog(S : string);
       property ComHandle : Integer read CidEx;
       {Public virtual dispatcher functions:}
       function OpenCom( const ComName: string; InQueue,
@@ -1727,10 +1727,15 @@ end;
     Result := PutBlock(S[1], Length(S));
   end;
 
-  procedure TApdBaseDispatcher.AddStringToLog(S : Ansistring);
+  procedure TApdBaseDispatcher.AddStringToLog(S : string);
+  var
+    AnsiStr : AnsiString;
   begin
     if DLoggingOn then
-      AddDispatchEntry(dtUser, dstNone, 0, @S[1], length(S) * SizeOf(AnsiChar))
+    begin
+      AnsiStr := AnsiString(S);
+      AddDispatchEntry(dtUser, dstNone, 0, @AnsiStr[1], length(S) * SizeOf(AnsiChar))
+    end;
   end;
 
   function TApdBaseDispatcher.PutBlock(const Block; Len : Cardinal) : Integer;

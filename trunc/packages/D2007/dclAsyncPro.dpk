@@ -30,7 +30,8 @@ package dclAsyncPro;
 requires
   rtl,
   AsyncPro,
-  designide;
+  designide,
+  vcl;
 
 contains
   adabout in '..\..\design\D2006,7 dfm\adabout.pas' {ApdAboutForm},
@@ -39,7 +40,7 @@ contains
   AdStatEd in '..\..\design\AdStatEd.pas' {frmStateEdit},
   AdStatE0 in '..\..\design\AdStatE0.pas' {frmConditionEdit},
   Adpedit0 in '..\..\design\Adpedit0.pas' {AdPEdit},
-  adpacked in '..\..\design\adpacked.pas' {PacketEditor},
-  Adpeditt in '..\..\design\Adpeditt.pas';
+  Adpeditt in '..\..\design\Adpeditt.pas',
+  adpacked in '..\..\design\D2006,7 dfm\adpacked.pas';
 
 end.

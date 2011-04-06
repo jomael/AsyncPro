@@ -1,0 +1,60 @@
+package AsyncProDep;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'TurboPower Async Professional 5.01 Deprecated Runtime Package'}
+{$LIBSUFFIX '_DXE'}
+{$RUNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  vcl,
+  AsyncPro;
+
+contains
+  awterm in '..\..\run\deprecated\awterm.pas',
+  Addatab in '..\..\run\deprecated\Addatab.pas',
+  Addbfld in '..\..\run\deprecated\Addbfld.pas' {FrmFieldInfo},
+  Addial in '..\..\run\deprecated\Addial.pas' {DialerForm},
+  Adfldlst in '..\..\run\deprecated\Adfldlst.pas' {FrmDBFieldList},
+  Adgetnum in '..\..\run\deprecated\Adgetnum.pas' {GetNumberForm},
+  Adinidb in '..\..\run\deprecated\Adinidb.pas',
+  Adkeyed in '..\..\run\deprecated\Adkeyed.pas' {KMEditor},
+  Admoddb in '..\..\run\deprecated\Admoddb.pas',
+  Admodem in '..\..\run\deprecated\Admodem.pas',
+  Adpbedit in '..\..\run\deprecated\Adpbedit.pas' {PhonebookForm},
+  Adpbook in '..\..\run\deprecated\Adpbook.pas',
+  Adpentry in '..\..\run\deprecated\Adpentry.pas' {PhoneEntryForm},
+  Adselnum in '..\..\run\deprecated\Adselnum.pas' {NumberSelectForm},
+  ADSMDM1 in '..\..\run\deprecated\ADSMDM1.pas' {AdSModemSelection},
+  AdSModem in '..\..\run\deprecated\AdSModem.pas' {ApdSModemStatusDisplay},
+  AdTerm in '..\..\run\deprecated\AdTerm.pas',
+  AwBPlus in '..\..\run\deprecated\AwBPlus.pas',
+  Awemu in '..\..\run\deprecated\Awemu.pas',
+  AwIniDB in '..\..\run\deprecated\AwIniDB.pas',
+  Awkeyemu in '..\..\run\deprecated\Awkeyemu.pas',
+  Awmoddb in '..\..\run\deprecated\Awmoddb.pas',
+  AwModem in '..\..\run\deprecated\AwModem.pas';
+
+end.

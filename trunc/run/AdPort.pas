@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                    ADPORT.PAS 5.00                    *}
+{*                    ADPORT.PAS 5.01R                   *}
 {*********************************************************}
 {* TApdComPort component                                 *}
 {*********************************************************}
@@ -450,8 +450,7 @@ type
       {-Discard the contents of the output buffer}
 
     {Trigger managment}
-    function AddDataTrigger(const Data : AnsiString;
-                            const IgnoreCase : Boolean) : Word;
+    function AddDataTrigger(const Data : string; const IgnoreCase : Boolean) : Word;
       {-Add a data trigger}
     function AddTimerTrigger : Word;
       {-Add a timer trigger}
@@ -482,7 +481,7 @@ type
       {-Return the next block of data}
     procedure PutChar(const C : AnsiChar);
       {-Add C to the output buffer}
-    procedure PutString(const S : AnsiString);
+    procedure PutString(const S : string);
       {-Add S to the output buffer}
     function PutBlock(const Block; const Len : Word) : Integer;
       {-Add Block to the output buffer}
@@ -603,7 +602,7 @@ type
     {Tracing}
     procedure AddTraceEntry(const CurEntry, CurCh : AnsiChar);
       {-Add an entry to the trace buffer}
-    procedure AddStringToLog(S : Ansistring);
+    procedure AddStringToLog(S : string);
       {-Add a string to the current LOG file}
 
     {Trigger events}
@@ -643,7 +642,7 @@ type
       read FOnWaitchar write FOnWaitChar;
 
     {I/O properties}
-    property Output : AnsiString
+    property Output : string
       write PutString;
 
     {TComHandle, read only}
@@ -1100,248 +1099,274 @@ var
     end;
   end;
 
-  procedure TApdCustomComPort.SetOpen(const Enable : Boolean);
-    {-Open/close the port}
-  begin
-    if FOpen <> Enable then begin
-      if not (csDesigning in ComponentState) and
-         not (csLoading in ComponentState) then begin
-        if Enable then begin
-          if (PortState = psClosed) then
-            { open the port }
-            InitPort
-          else
-            { wait until we're closed }
-            OpenPending := True;
-        end else
-          { close the port }
-          DonePort;
-      end else begin
-        { we're loading or designing, just set a flag }
-        FOpen := Enable;
-        if Enable then
-          ForceOpen := True;
-      end;
-    end;
-  end;
+	procedure TApdCustomComPort.SetOpen(const Enable : Boolean);
+		{-Open/close the port}
+	begin
+		if FOpen <> Enable then
+		begin
+			if not (csDesigning in ComponentState) and
+				not (csLoading in ComponentState) then
+				begin
+				if Enable then
+				begin
+					if (PortState = psClosed) then
+						{ open the port }
+						InitPort
+					else
+						{ wait until we're closed }
+						OpenPending := True;
+				end else
+					{ close the port }
+					DonePort;
+			end
+			else
+			begin
+				{ we're loading or designing, just set a flag }
+				FOpen := Enable;
+				if Enable then
+					ForceOpen := True;
+			end;
+		end;
+	end;
 
-  procedure TApdCustomComPort.SetHWFlowOptions(const NewOpts : THWFlowOptionSet);
-    {-Set hardware flow options}
-  const
-    UseDTR : array[Boolean] of Word = (0, hfUseDTR);
-    UseRTS : array[Boolean] of Word = (0, hfUseRTS);
-    RequireDSR : array[Boolean] of Word = (0, hfRequireDSR);
-    RequireCTS : array[Boolean] of Word = (0, hfRequireCTS);
-  var
-    Opts : Word;
-  begin
-    if (FHWFlowOptions <> NewOpts) or Force then begin
-      Opts := UseDTR[hwfUseDTR in NewOpts] +
-              UseRTS[hwfUseRTS in NewOpts] +
-              RequireDSR[hwfRequireDSR in NewOpts] +
-              RequireCTS[hwfRequireCTS in NewOpts];
+	procedure TApdCustomComPort.SetHWFlowOptions(const NewOpts : THWFlowOptionSet);
+		{-Set hardware flow options}
+	const
+		UseDTR : array[Boolean] of Word = (0, hfUseDTR);
+		UseRTS : array[Boolean] of Word = (0, hfUseRTS);
+		RequireDSR : array[Boolean] of Word = (0, hfRequireDSR);
+		RequireCTS : array[Boolean] of Word = (0, hfRequireCTS);
+	var
+		Opts : Word;
+	begin
+		if (FHWFlowOptions <> NewOpts) or Force then
+		begin
+			Opts := UseDTR[hwfUseDTR in NewOpts] +
+							UseRTS[hwfUseRTS in NewOpts] +
+							RequireDSR[hwfRequireDSR in NewOpts] +
+							RequireCTS[hwfRequireCTS in NewOpts];
 
-      {Validate bufferfull and bufferresume if opts not zero}
-      if Opts <> 0 then begin
-        if (BufferFull = 0) or (BufferFull > InSize) then
-          FBufferFull := Trunc(InSize * 0.9);
-        if (BufferResume = 0) or (BufferResume > BufferFull) then
-          FBufferResume := Trunc(InSize * 0.1);
-      end;
+			{Validate bufferfull and bufferresume if opts not zero}
+			if Opts <> 0 then
+			begin
+				if (BufferFull = 0) or (BufferFull > InSize) then
+					FBufferFull := Trunc(InSize * 0.9);
+				if (BufferResume = 0) or (BufferResume > BufferFull) then
+					FBufferResume := Trunc(InSize * 0.1);
+			end;
 
-      if (PortState = psOpen) then begin
-        CheckException(Self, Dispatcher.HWFlowOptions(FBufferFull, FBufferResume, Opts))
-      end;
-      FHWFlowOptions := NewOpts;
-      {Force RS485 mode off if using RTS/CTS flow control}
-      if (hwfUseRTS in NewOpts) or
-         (hwfRequireCTS in NewOpts) then
-        RS485Mode := False;
-    end;
-  end;
+			if (PortState = psOpen) then
+			begin
+				CheckException(Self, Dispatcher.HWFlowOptions(FBufferFull, FBufferResume, Opts))
+			end;
+			FHWFlowOptions := NewOpts;
+			{Force RS485 mode off if using RTS/CTS flow control}
+			if (hwfUseRTS in NewOpts) or
+				 (hwfRequireCTS in NewOpts) then
+				RS485Mode := False;
+		end;
+	end;
 
-  function TApdCustomComPort.GetFlowState : TFlowControlState;
-    {-Return the current state of flow control}
-  begin
-    if (PortState <> psShuttingDown) then begin
-      Result := TFlowControlState(Pred(CheckException(Self,
-        ValidDispatcher.HWFlowState)));
-      if Result = fcOff then
-        Result := TFlowControlState(Pred(CheckException(Self,
-          Dispatcher.SWFlowState)));
-    end else begin
-      Result := fcOff;
-    end;
-  end;
+	function TApdCustomComPort.GetFlowState : TFlowControlState;
+		{-Return the current state of flow control}
+	begin
+		if (PortState <> psShuttingDown) then
+		begin
+			Result := TFlowControlState(Pred(CheckException(Self,
+				ValidDispatcher.HWFlowState)));
+			if Result = fcOff then
+				Result := TFlowControlState(Pred(CheckException(Self,
+					Dispatcher.SWFlowState)));
+		end
+		else
+		begin
+			Result := fcOff;
+		end;
+	end;
 
-  procedure TApdCustomComPort.SetSWFlowOptions(const NewOpts : TSWFlowOptions);
-  var
-    Opts : Word;
-  begin
-    if (FSWFlowOptions <> NewOpts) or Force then begin
-      if NewOpts = swfBoth then
-        Opts := sfTransmitFlow + sfReceiveFlow
-      else if NewOpts = swfTransmit then
-        Opts := sfTransmitFlow
-      else if NewOpts = swfReceive then
-        Opts := sfReceiveFlow
-      else
-        Opts := 0;
+	procedure TApdCustomComPort.SetSWFlowOptions(const NewOpts : TSWFlowOptions);
+	var
+		Opts : Word;
+	begin
+		if (FSWFlowOptions <> NewOpts) or Force then
+		begin
+			if NewOpts = swfBoth then
+				Opts := sfTransmitFlow + sfReceiveFlow
+			else if NewOpts = swfTransmit then
+				Opts := sfTransmitFlow
+			else if NewOpts = swfReceive then
+				Opts := sfReceiveFlow
+			else
+				Opts := 0;
 
-      {Validate bufferfull and bufferresume if opts not zero}
-      if Opts <> 0 then begin
-        if (BufferFull = 0) or (BufferFull > InSize) then
-          FBufferFull := Trunc(InSize * 0.75);
-        if (BufferResume = 0) or (BufferResume > BufferFull) then
-          FBufferResume := Trunc(InSize * 0.25);
-      end;
+			{Validate bufferfull and bufferresume if opts not zero}
+			if Opts <> 0 then
+			begin
+				if (BufferFull = 0) or (BufferFull > InSize) then
+					FBufferFull := Trunc(InSize * 0.75);
+				if (BufferResume = 0) or (BufferResume > BufferFull) then
+					FBufferResume := Trunc(InSize * 0.25);
+			end;
 
-      if (PortState = psOpen) then begin
-        if Opts <> 0 then
-          CheckException(Self,
-            Dispatcher.SWFlowEnable(FBufferFull, FBufferResume, Opts))
-        else
-          CheckException(Self, Dispatcher.SWFlowDisable);
-      end;
-      FSWFlowOptions := NewOpts;
-    end;
-  end;
+			if (PortState = psOpen) then
+			begin
+				if Opts <> 0 then
+					CheckException(Self,
+						Dispatcher.SWFlowEnable(FBufferFull, FBufferResume, Opts))
+				else
+					CheckException(Self, Dispatcher.SWFlowDisable);
+			end;
+			FSWFlowOptions := NewOpts;
+		end;
+	end;
 
-  procedure TApdCustomComPort.SetXonChar(const NewChar : AnsiChar);
-    {-Set new xon character}
-  begin
-    if (NewChar <> FXOnChar) or Force then begin
-      FXOnChar := NewChar;
-      if (PortState = psOpen) then
-        CheckException(Self, Dispatcher.SWFlowChars(FXOnChar, FXOffChar));
-    end;
-  end;
+	procedure TApdCustomComPort.SetXonChar(const NewChar : AnsiChar);
+		{-Set new xon character}
+	begin
+		if (NewChar <> FXOnChar) or Force then
+		begin
+			FXOnChar := NewChar;
+			if (PortState = psOpen) then
+				CheckException(Self, Dispatcher.SWFlowChars(FXOnChar, FXOffChar));
+		end;
+	end;
 
-  procedure TApdCustomComPort.SetXoffChar(const NewChar : AnsiChar);
-    {-Set new xoff character}
-  begin
-    if (NewChar <> FXOffChar) or Force then begin
-      FXOffChar := NewChar;
-      if (PortState = psOpen) then
-        CheckException(Self, Dispatcher.SWFlowChars(FXOnChar, FXOffChar));
-    end;
-  end;
+	procedure TApdCustomComPort.SetXoffChar(const NewChar : AnsiChar);
+		{-Set new xoff character}
+	begin
+		if (NewChar <> FXOffChar) or Force then
+		begin
+			FXOffChar := NewChar;
+			if (PortState = psOpen) then
+				CheckException(Self, Dispatcher.SWFlowChars(FXOnChar, FXOffChar));
+		end;
+	end;
 
-  procedure TApdCustomComPort.SetBufferFull(const NewFull : Word);
-    {-Set buffer full mark}
-  var
-    SaveForce : Boolean;
-  begin
-    if (NewFull <> FBufferFull) or Force then begin
-      if NewFull <= InSize then
-        FBufferFull := NewFull
-      else
-        FBufferFull := Trunc(NewFull * 0.9);
-      SaveForce := Force;
-      Force := True;
-      SetHWFlowOptions(HWFlowOptions);
-      SetSWFlowOptions(SWFlowOptions);
-      Force := SaveForce;
-    end;
-  end;
+	procedure TApdCustomComPort.SetBufferFull(const NewFull : Word);
+		{-Set buffer full mark}
+	var
+		SaveForce : Boolean;
+	begin
+		if (NewFull <> FBufferFull) or Force then
+		begin
+			if NewFull <= InSize then
+				FBufferFull := NewFull
+			else
+				FBufferFull := Trunc(NewFull * 0.9);
+			SaveForce := Force;
+			Force := True;
+			SetHWFlowOptions(HWFlowOptions);
+			SetSWFlowOptions(SWFlowOptions);
+			Force := SaveForce;
+		end;
+	end;
 
-  procedure TApdCustomComPort.SetBufferResume(const NewResume : Word);
-    {-Set buffer resume mark}
-  var
-    SaveForce : Boolean;
-  begin
-    if (NewResume <> FBufferResume) or Force then begin
-      if NewResume > FBufferFull then
-        FBufferResume := Trunc(FBufferFull * 0.1)
-      else
-        FBufferResume := NewResume;
-      SaveForce := Force;
-      Force := True;
-      SetHWFlowOptions(HWFlowOptions);
-      SetSWFlowOptions(SWFlowOptions);
-      Force := SaveForce;
-    end;
-  end;
+	procedure TApdCustomComPort.SetBufferResume(const NewResume : Word);
+		{-Set buffer resume mark}
+	var
+		SaveForce : Boolean;
+	begin
+		if (NewResume <> FBufferResume) or Force then
+		begin
+			if NewResume > FBufferFull then
+				FBufferResume := Trunc(FBufferFull * 0.1)
+			else
+				FBufferResume := NewResume;
+			SaveForce := Force;
+			Force := True;
+			SetHWFlowOptions(HWFlowOptions);
+			SetSWFlowOptions(SWFlowOptions);
+			Force := SaveForce;
+		end;
+	end;
 
-  procedure TApdCustomComPort.SetDTR(const NewDTR : Boolean);
-    {-Set a new DTR value}
-  begin
-    if (NewDTR <> FDTR) or Force then begin
-      if (PortState = psOpen) then begin
-        if CheckException(Self, Dispatcher.SetDTR(NewDTR)) = ecOK then
-          FDTR := NewDTR;
-      end else begin
-        FDTR := NewDTR;
-      end;
-    end;
-  end;
+	procedure TApdCustomComPort.SetDTR(const NewDTR : Boolean);
+		{-Set a new DTR value}
+	begin
+		if (NewDTR <> FDTR) or Force then
+		begin
+			if (PortState = psOpen) then
+			begin
+				if CheckException(Self, Dispatcher.SetDTR(NewDTR)) = ecOK then
+					FDTR := NewDTR;
+			end
+			else
+			begin
+				FDTR := NewDTR;
+			end;
+		end;
+	end;
 
-  procedure TApdCustomComPort.SetRTS(const NewRTS : Boolean);
-    {-Set new RTS value}
-  begin
-    if (NewRTS <> FRTS) or Force then begin
-      if (PortState = psOpen) then begin
-        if CheckException(Self, Dispatcher.SetRTS(NewRTS)) = ecOK then
-          FRTS := NewRTS;
-      end else begin
-        FRTS := NewRTS;
-      end;
-    end;
-  end;
+	procedure TApdCustomComPort.SetRTS(const NewRTS : Boolean);
+		{-Set new RTS value}
+	begin
+		if (NewRTS <> FRTS) or Force then
+		begin
+			if (PortState = psOpen) then
+			begin
+				if CheckException(Self, Dispatcher.SetRTS(NewRTS)) = ecOK then
+					FRTS := NewRTS;
+			end
+			else
+			begin
+				FRTS := NewRTS;
+			end;
+		end;
+	end;
 
-  procedure TApdCustomComPort.SetOnTrigger(const Value : TTriggerEvent);
-  begin
-    FOnTrigger := Value;
-    UpdateHandlerFlag;
-  end;
+	procedure TApdCustomComPort.SetOnTrigger(const Value : TTriggerEvent);
+	begin
+		FOnTrigger := Value;
+		UpdateHandlerFlag;
+	end;
 
-  procedure TApdCustomComPort.SetOnTriggerAvail(const Value : TTriggerAvailEvent);
-  begin
-    FOnTriggerAvail := Value;
-    UpdateHandlerFlag;
-  end;
+	procedure TApdCustomComPort.SetOnTriggerAvail(const Value : TTriggerAvailEvent);
+	begin
+		FOnTriggerAvail := Value;
+		UpdateHandlerFlag;
+	end;
 
-  procedure TApdCustomComPort.SetOnTriggerData(const Value : TTriggerDataEvent);
-  begin
-    FOnTriggerData := Value;
-    UpdateHandlerFlag;
-  end;
+	procedure TApdCustomComPort.SetOnTriggerData(const Value : TTriggerDataEvent);
+	begin
+		FOnTriggerData := Value;
+		UpdateHandlerFlag;
+	end;
 
-  procedure TApdCustomComPort.SetOnTriggerStatus(const Value : TTriggerStatusEvent);
-  begin
-    FOnTriggerStatus := Value;
-    UpdateHandlerFlag;
-  end;
+	procedure TApdCustomComPort.SetOnTriggerStatus(const Value : TTriggerStatusEvent);
+	begin
+		FOnTriggerStatus := Value;
+		UpdateHandlerFlag;
+	end;
 
-  procedure TApdCustomComPort.SetOnTriggerTimer(const Value : TTriggerTimerEvent);
-  begin
-    FOnTriggerTimer := Value;
-    UpdateHandlerFlag;
-  end;
+	procedure TApdCustomComPort.SetOnTriggerTimer(const Value : TTriggerTimerEvent);
+	begin
+		FOnTriggerTimer := Value;
+		UpdateHandlerFlag;
+	end;
 
-  procedure TApdCustomComPort.SetOnTriggerLineError(const Value : TTriggerLineErrorEvent);
-  begin
-    FOnTriggerLineError := Value;
-    UpdateHandlerFlag;
-  end;
+	procedure TApdCustomComPort.SetOnTriggerLineError(const Value : TTriggerLineErrorEvent);
+	begin
+		FOnTriggerLineError := Value;
+		UpdateHandlerFlag;
+	end;
 
-  procedure TApdCustomComPort.SetOnTriggerModemStatus(const Value : TNotifyEvent);
-  begin
-    FOnTriggerModemStatus := Value;
-    UpdateHandlerFlag;
-  end;
+	procedure TApdCustomComPort.SetOnTriggerModemStatus(const Value : TNotifyEvent);
+	begin
+		FOnTriggerModemStatus := Value;
+		UpdateHandlerFlag;
+	end;
 
-  procedure TApdCustomComPort.SetOnTriggerOutbuffFree(const Value : TNotifyEvent);
-  begin
-    FOnTriggerOutbuffFree := Value;
-    UpdateHandlerFlag;
-  end;
+	procedure TApdCustomComPort.SetOnTriggerOutbuffFree(const Value : TNotifyEvent);
+	begin
+		FOnTriggerOutbuffFree := Value;
+		UpdateHandlerFlag;
+	end;
 
-  procedure TApdCustomComPort.SetOnTriggerOutbuffUsed(const Value : TNotifyEvent);
-  begin
-    FOnTriggerOutbuffUsed := Value;
-    UpdateHandlerFlag;
-  end;
+	procedure TApdCustomComPort.SetOnTriggerOutbuffUsed(const Value : TNotifyEvent);
+	begin
+		FOnTriggerOutbuffUsed := Value;
+		UpdateHandlerFlag;
+	end;
 
   procedure TApdCustomComPort.SetOnTriggerOutSent(const Value : TNotifyEvent);
   begin
@@ -1709,696 +1734,722 @@ var
       FDispatcher.UpdateHandlerFlags(fuDisablePort);
   end;
 
-  procedure TApdCustomComPort.PortOpen;
-    {-Port open processing}
-  var
-    I : Word;
-    UL : PUserListEntry;
-  begin
-    {Tell all comport users that the port is now open}
-    if UserList.Count > 0 then begin
-      for I := UserList.Count-1 downto 0 do begin
-        UL := UserList.Items[I];
-        with UL^ do begin
-          if Handle <> 0 then
-            SendMessage(Handle, APW_PORTOPEN, 0, 0)
-          else begin                                                     {!!.03}
-            if IsEx then                                                 {!!.03}
-              UL^.OpenCloseEx(Self, ctOpen)                              {!!.03}
-            else                                                         {!!.03}
-              UL^.OpenClose(Self, True);
-          end;                                                           {!!.03}
-        end;
-      end;
-    end;
-
-    if Assigned(FOnPortOpen) then
-      FOnPortOpen(Self);
-  end;
-
-  procedure TApdCustomComPort.PortClose;
-    {-Port close processing}
-  var
-    I : Word;
-    UL : PUserListEntry;
-  begin
-    {Tell all comport users that the port is now closed}
-    if UserList.Count > 0 then begin
-      for I := UserList.Count-1 downto 0 do begin
-        UL := UserList.Items[I];
-        with UL^ do begin
-          if Handle <> 0 then
-            SendMessage(Handle, APW_PORTCLOSE, 0, 0)
-          else begin                                                     {!!.03}
-            if IsEx then                                                 {!!.03}
-              UL^.OpenCloseEx(Self, ctClosed)                            {!!.03}
-            else                                                         {!!.03}
-              UL^.OpenClose(Self, False);
-          end;                                                           {!!.03}
-        end;
-      end;
-    end;
-
-    if Assigned(FOnPortClose) then
-      FOnPortClose(Self);
-  end;
-
-  procedure TApdCustomComPort.PortClosing;                               {!!.03}
-    {-Port closing processing, sent to other controls to notify that the port }
-    { is starting to close for cleanup }
-  var
-    I : Word;
-    UL : PUserListEntry;
-  begin
-    { tell all users that the port is now being closed }
-    if UserList.Count > 0 then begin
-      for I := pred(UserList.Count) downto 0 do begin
-        UL := UserList.Items[I];
-        { only notify if they are registered as extended }
-        if UL^.IsEx then
-          with UL^ do begin
-            if Handle <> 0 then
-              SendMessage(Handle, APW_CLOSEPENDING, 0, 0)
-            else
-              UL^.OpenCloseEx(Self, ctClosing);
-          end;
-      end;
-    end;
-  end;
-
-  procedure TApdCustomComPort.TriggerLineError(const Error : Word;
-                                            const LineBreak : Boolean);
-    {-Received a line error}
-  begin
-    if Assigned(FOnTriggerLineError) then
-      FOnTriggerLineError(Self, Error, LineBreak);
-  end;
-
-  procedure TApdCustomComPort.TriggerModemStatus;
-    {-Received a modem status change}
-  begin
-    if Assigned(FOnTriggerModemStatus) then
-      FOnTriggerModemStatus(Self);
-  end;
-
-  procedure TApdCustomComPort.TriggerOutbuffFree;
-    {-Received and outbuff free trigger}
-  begin
-    if Assigned(FOnTriggerOutbuffFree) then
-      FOnTriggerOutbuffFree(Self);
-  end;
-
-  procedure TApdCustomComPort.TriggerOutbuffUsed;
-    {-Received and outbuff used trigger}
-  begin
-    if Assigned(FOnTriggerOutbuffUsed) then
-      FOnTriggerOutbuffUsed(Self);
-  end;
-
-  procedure TApdCustomComPort.TriggerOutSent;
-    {-Received an outsent trigger}
-  begin
-    if Assigned(FOnTriggerOutSent) then
-      FOnTriggerOutSent(Self);
-  end;
-
-  procedure TApdCustomComPort.WaitChar(C : AnsiChar);
-    {-Received a character in WaitForString or WaitForMultiString}
-  begin
-    if Assigned(FOnWaitChar) then
-      FOnWaitChar(Self, C);
-  end;
-
-  procedure TApdCustomComPort.RegisterComPort(Enabling : Boolean);
-    {-Use a hidden window to get triggers}
-  var
-    Instance : THandle;
-  begin
-    if Enabling then begin
-      {Make sure the window is registered}
-      RegisterComWindow;
-
-      if ModuleIsLib and not ModuleIsPackage then
-        { we're a DLL, not a package }
-        Instance   := SysInit.hInstance
-      else
-        {we're an exe or package }
-        Instance   := System.MainInstance;
-
-      {Create a window}
-      fComWindow := CreateWindow(ComWindowClass,        {class name}
-                                '',                     {caption}
-                                ws_Overlapped,          {window style}
-                                0,                      {X}
-                                0,                      {Y}
-                                0,                      {width}
-                                0,                      {height}
-                                0,                      {parent}
-                                0,                      {menu}
-                                Instance,               {instance}
-                                nil);                   {parameter}
-
-      {Register it}
-      FDispatcher.RegisterWndTriggerHandler(ComWindow);
-    end else begin
-      {Deregister it}
-      FDispatcher.DeregisterWndTriggerHandler(ComWindow);
-      DestroyWindow(ComWindow);
-    end;
-  end;
-
-  procedure TApdCustomComPort.ValidateComport;
-  var
-    ComSelDlg : TComSelectForm;
-  begin
-    if (FComNumber = 0) then
-      if (not FPromptForPort) then
-        raise ENoPortSelected.Create(ecNoPortSelected, False)
-      else begin
-        ComSelDlg := TComSelectForm.Create(Application);
-        try
-          if (ComSelDlg.ShowModal = mrOk) then
-            ComNumber := ComSelDlg.SelectedComNum
-          else
-            raise ENoPortSelected.Create(ecNoPortSelected, False);
-        finally
-          ComSelDlg.Free;
-        end;
-      end;
-  end;
-
-  constructor TApdCustomComPort.Create(AOwner : TComponent);
-    {-Create the object instance}
-  begin
-
-    {Create the registration list before notification events are sent}
-    UserList := TList.Create;
-
-    {No override by default}
-    OverrideLine := False;
-
-    {This causes notification events for all other components}
-    inherited Create(AOwner);
-
-    {Private inits}
-    Force := False;
-    PortState := psClosed;
-    ForceOpen := False;
-    CopyTriggers := False;
-    BusyBeforeWait := False;
-    WaitPrepped := False;
-    fComWindow := 0;
-
-    {Data inits}
-    FDeviceLayers := [dlWin32];
-    FPromptForPort := adpoDefPromptForPort;
-    FDeviceLayer := adpoDefDeviceLayer;
-    FDispatcher := nil;
-    FComNumber := adpoDefComNumber;
-    FOpen      := adpoDefOpen;
-    FAutoOpen  := adpoDefAutoOpen;
-    FDTR       := adpoDefDTR;
-    FRTS       := adpoDefRTS;
-    FSWFlowOptions := adpoDefSWFlowOptions;
-    FXonChar   := adpoDefXOnChar;
-    FXOffChar  := adpoDefXOffChar;
-    FBufferFull := adpoDefBufferFull;
-    FBufferResume := adpoDefBufferResume;
-    FTriggerLength := adpoDefTriggerLength;
-    FTracing   := adpoDefTracing;
-    FTraceSize := adpoDefTraceSize;
-    FTraceName := adpoDefTraceName;
-    FTraceHex  := adpoDefTraceHex;
-    TraceAllHex:= adpoDefTraceAllHex;
-    FLogging   := adpoDefLogging;
-    FLogSize   := adpoDefLogSize;
-    FLogName   := adpoDefLogName;
-    FLogHex    := adpoDefLogHex;
-    LogAllHex  := adpoDefLogAllHex;
-    FUseMSRShadow := adpoDefUseMSRShadow;
-    FUseEventWord := adpoDefUseEventWord;
-    FCommNotificationLevel := adpoDefCommNotificationLevel;
-    FTapiMode  := adpoDefTapiMode;
-
-
-    if not OverrideLine then begin
-      FBaud      := adpoDefBaudRt;
-      FParity    := adpoDefParity;
-      FDatabits  := adpoDefDatabits;
-      FStopbits  := adpoDefStopbits;
-      FInSize    := adpoDefInSize;
-      FOutSize   := adpoDefOutSize;
-      FHWFlowOptions := [];
-    end;
-
-    {Event inits}
-    FOnTrigger := nil;
-    FOnTriggerAvail := nil;
-    FOnTriggerData := nil;
-    FOnTriggerStatus := nil;
-    FOnTriggerTimer := nil;
-    FOnTriggerLineError := nil;
-    FOnTriggerModemStatus := nil;
-    FOnTriggerOutbuffFree := nil;
-    FOnTriggerOutbuffUsed := nil;
-    FOnTriggerOutSent := nil;
-    FOnPortOpen := nil;
-    FOnPortClose := nil;
-    FOnWaitChar := nil;
-
-  end;
-
-  destructor TApdCustomComPort.Destroy;
-    {-Destroy the object instance}
-  var
-    I : Word;
-    UL : PUserListEntry;
-  begin
-
-    {Close the port}
-    if (PortState = psOpen) then begin
-      DonePort;
-    end;
-
-    {Get rid of the user list}
-    if Assigned(UserList) and (UserList.Count > 0) then begin            {!!.02}
-      for I := UserList.Count-1 downto 0 do begin
-        UL := UserList.Items[I];
-        UserList.Remove(UL);
-        Dispose(UL);
-      end;
-    end;
-    UserList.Free;
-
-    TApdBaseDispatcher.ClearSaveBuffers(SaveTriggerBuffer);
-    inherited Destroy;
-  end;
-
-  procedure TApdCustomComPort.InitPort;
-    {-Physically open the comport}
-  var
-    Res : Integer;
-    nBaud     : LongInt;
-    nParity   : Word;
-    nDataBits : TDatabits;
-    nStopBits : TStopbits;
-    nHWOpts, nSWOpts, nBufferFull, nBufferResume : Cardinal;
-    nOnChar, nOffChar : AnsiChar;
-  begin
-    { Validate the comport -- not needed for Tapi }
-    if TapiMode <> tmOn then
-      ValidateComport;
-
-    { Activate the specified device layer }
-    FDispatcher := ActivateDeviceLayer;
-    FDispatcher.DeviceName := Format('\\.\COM%d', [ComNumber]);             // SWB
-    try
-      { Get line parameters that Tapi set }
-      if TapiMode = tmOn then begin
-        if ValidDispatcher.ComHandle = 0 then
-          CheckException(Self, ecNotOpenedByTapi);
-        FDispatcher.GetLine(nBaud, nParity, nDataBits, nStopBits);
-        FDispatcher.GetFlowOptions(nHWOpts, nSWOpts, nBufferFull,
-          nBufferResume, nOnChar, nOffChar);
-
-        { Sync our properties with those set by Tapi }
-        FBaud := nBaud;
-        FParity := TParity(nParity);
-        FDataBits := Ord(nDataBits);
-        FStopBits := Ord(nStopBits);
-
-        FHWFlowOptions := [];
-        if (nHWOpts and hfUseDTR) <> 0 then
-          Include(FHWFlowOptions, hwfUseDTR);
-        if (nHWOpts and hfUseRTS) <> 0 then
-          Include(FHWFlowOptions, hwfUseRTS);
-        if (nHWOpts and hfRequireDSR) <> 0 then
-          Include(FHWFlowOptions, hwfRequireDSR);
-        if (nHWOpts and hfRequireCTS) <> 0 then
-          Include(FHWFlowOptions, hwfRequireCTS);
-
-        FSWFlowOptions := TSWFlowOptions(nSWOpts);
-        FXOnChar := nOnChar;
-        FXOffChar := nOffChar;
-      end;
-
-      Res := InitializePort;
-
-      {Remap access denied and file not found errors}
-      if Res = ecAccessDenied then
-        Res := ecAlreadyOpen
-      else if (Res = ecFileNotFound) or (Res = ecPathNotFound) then
-        Res := ecBadId;
-
-      if (Res = ecOk) then begin
-        {Handle preset properties}
-        PortState := psOpen;
-        UpdateHandlerFlag;
-        Force := True;
-        SetTracing(Tracing);
-        SetLogging(Logging);
-        SetHWFlowOptions(HWFlowOptions);
-        SetSWFlowOptions(SWFlowOptions);
-        SetXOnChar(FXonChar);
-        SetXOffChar(FXoffChar);
-        SetTriggerLength(FTriggerLength);
-        SetDTR(FDTR);
-        SetRTS(FRTS);
-        {SetUseMSRShadow(FUseMSRShadow);} {16-bit}                       {!!.02}
-        SetUseEventWord(FUseEventWord);
-        {SetCommNotificationLevel(FCommNotificationLevel);} {16-bit}     {!!.02}
-        SetRS485Mode(FRS485Mode);
-        SetThreadBoost(FThreadBoost);
-        Force := False;
-        FOpen := True;
-
-        {Prepare for triggers}
-        RegisterComPort(True);
-
-        {Add pending triggers}
-        if CopyTriggers then begin
-          CopyTriggers := False;
-          FDispatcher.RestoreTriggers(SaveTriggerBuffer);
-        end;
-
-        {Send OnPortEvent}
-        PortOpen;
-      end else
-        CheckException(Self, Res);
-    except
-      FOpen := False;
-      PortState := psClosed;
-      FDispatcher.Free;
-      FDispatcher := nil;
-      raise;
-    end;
-  end;
-
-  procedure TApdCustomComPort.DonePort;
-    {-Physically close the comport}
-  begin
-    {FOpen := False;}                                                    {!!.02}
-    if (PortState = psOpen) then begin
-
-      { Force trace/log dumps if they were on }
-      Tracing := tlDump;
-      Logging := tlDump;
-
-      { Port is shutting down }
-      PortState := psShuttingDown;
-
-      { Send OnPortClose event }
-      {PortClose;}                                                       {!!.02}
-      PortClosing;                                                       {!!.03}
-
-      { Save triggers in case this port is reopened }
-      Dispatcher.SaveTriggers(SaveTriggerBuffer);
-      CopyTriggers := True;
-
-      { Close the port and clear ComTable }
-      Dispatcher.DonePort;
-      if Dispatcher.EventBusy then begin
-        PostMessage(fComWindow, apw_ClosePending, 0,
-          Dispatcher.Handle shl 16);
-        SafeYield;
-      end else begin
-        { Get rid of the trigger handler }
-        RegisterComPort(False);
-        FDispatcher.Free;
-        FDispatcher := nil;
-        PortState := psClosed;
-        FOpen := False;                                                  {!!.02}
-      end;
-      { Send OnPortClose event }
-      PortClose;                                                         {!!.02}
-    end;
-  end;
-
-  procedure TApdCustomComPort.Assign(Source: TPersistent);
-    {-Assign values of Source to self}
-  var
-    SourcePort : TApdCustomComPort absolute Source;
-    I : Word;
-    UL : PUserListEntry;
-  begin
-    if Source is TApdCustomComPort then begin
-      {Discard existing userlist}
-      if UserList.Count > 0 then
-        for I := UserList.Count-1 downto 0 do begin
-          UL := UserList.Items[I];
-          UserList.Remove(UL);
-          Dispose(UL);
-        end;
-      UserList.Free;
-
-      {Copy Source's userlist}
-      UserList := TList.Create;
-      if SourcePort.UserList.Count > 0 then
-        for I := 0 to SourcePort.UserList.Count-1 do begin
-          New(UL);
-          Move(SourcePort.UserList.Items[I]^, UL^,
-               SizeOf(TUserListEntry));
-          UserList.Add(UL);
-        end;
-
-      {Copy triggers from Source}
-      if (SourcePort.PortState = psOpen) then begin
-        SourcePort.Dispatcher.SaveTriggers(SaveTriggerBuffer);
-        CopyTriggers := True;
-      end;
-
-      {Copy all other fields}
-      Force            := SourcePort.Force;
-      FDeviceLayer     := SourcePort.FDeviceLayer;
-      FComNumber       := SourcePort.FComNumber;
-      FBaud            := SourcePort.FBaud;
-      FParity          := SourcePort.FParity;
-      FDatabits        := SourcePort.FDatabits;
-      FStopbits        := SourcePort.FStopbits;
-      FInSize          := SourcePort.FInSize;
-      FOutSize         := SourcePort.FOutSize;
-      FOpen            := False;
-      FAutoOpen        := SourcePort.FAutoOpen;
-      FPromptForPort   := SourcePort.FPromptForPort;
-      FRS485Mode       := SourcePort.FRS485Mode;
-      FThreadBoost     := SourcePort.FThreadBoost;
-      FDTR             := SourcePort.FDTR;
-      FRTS             := SourcePort.FRTS;
-      FBufferFull      := SourcePort.FBufferFull;
-      FBufferResume    := SourcePort.FBufferResume;
-      FHWFlowOptions   := SourcePort.FHWFlowOptions;
-      FSWFlowOptions   := SourcePort.FSWFlowOptions;
-      FXOnChar         := SourcePort.FXOnChar;
-      FXOffChar        := SourcePort.FXOffChar;
-      FTracing         := SourcePort.FTracing;
-      FTraceSize       := SourcePort.FTraceSize;
-      FTraceName       := SourcePort.FTraceName;
-      FTraceHex        := SourcePort.FTraceHex;
-      FTraceAllHex     := SourcePort.FTraceAllHex;
-      FLogging         := SourcePort.FLogging;
-      FLogSize         := SourcePort.FLogSize;
-      FLogName         := SourcePort.FLogName;
-      FLogHex          := SourcePort.FLogHex;
-      FLogAllHex       := SourcePort.FLogAllHex;
-      FTriggerLength   := SourcePort.FTriggerLength;
-      {Must go through write method to ensure flag gets updated}
-      OnTrigger        := SourcePort.FOnTrigger;
-      OnTriggerAvail   := SourcePort.FOnTriggerAvail;
-      OnTriggerData    := SourcePort.FOnTriggerData;
-      OnTriggerStatus  := SourcePort.FOnTriggerStatus;
-      OnTriggerTimer   := SourcePort.FOnTriggerTimer;
-      FOnPortOpen      := SourcePort.FOnPortOpen;
-      FOnPortClose     := SourcePort.FOnPortClose;
-      FTapiMode        := SourcePort.FTapiMode;
-    end;
-  end;
-
-  procedure TApdCustomComPort.RegisterUser(const H : THandle);
-    {-Register a user of this comport}
-  var
-    UL : PUserListEntry;
-  begin
-    New(UL);
-    with UL^ do begin
-      Handle := H;
-      OpenClose := nil;
-      OpenCloseEx := nil;                                                {!!.03}
-      IsEx := False;                                                     {!!.03}
-    end;
-    UserList.Add(UL);
-  end;
-
-  procedure TApdCustomComPort.RegisterUserEx(const H : THandle);{!!.03}
-      {-Register a TApdComPort user to receive open/closing/close events}
-  var
-    UL : PUserListEntry;
-  begin
-    New(UL);
-    with UL^ do begin
-      Handle := H;
-      OpenClose := nil;
-      OpenCloseEx := nil;
-      IsEx := True;
-    end;
-    UserList.Add(UL);
-  end;
-
-  procedure TApdCustomComPort.RegisterUserCallback(CallBack : TPortCallback);
-    {-Register a user of this comport}
-  var
-    UL : PUserListEntry;
-  begin
-    New(UL);
-    with UL^ do begin
-      Handle := 0;
-      OpenClose := Callback;
-      OpenCloseEx := nil;                                                {!!.03}
-      IsEx := False;                                                     {!!.03}
-    end;
-    UserList.Add(UL);
-  end;
-
-  procedure TApdCustomComPort.RegisterUserCallbackEx(                    {!!.03}
-    CallBackEx : TPortCallbackEx);
-  {-Register a TApdComPort user to receive extended callbacks}
-  var
-    UL : PUserListEntry;
-  begin
-    New(UL);
-    with UL^ do begin
-      Handle := 0;
-      OpenClose := nil;
-      OpenCloseEx := CallbackEx;
-      IsEx := True;
-    end;
-    UserList.Add(UL);
-  end;
-
-  procedure TApdCustomComPort.DeregisterUser(const H : THandle);
-    {-Deregister a user of this comport}
-  var
-    UL : PUserListEntry;
-    I : Word;
-  begin
-    if csDestroying in ComponentState then Exit;                         {!!.05}
-    if Assigned(UserList) and (UserList.Count > 0) then begin            {!!.02}
-      for I := UserList.Count-1 downto 0 do begin
-        UL := UserList.Items[I];
-        with UL^ do begin
-          if Handle = H then begin
-            UserList.Remove(UL);
-            Dispose(UL);
-          end;
-        end;
-      end;
-    end;
-  end;
-
-  procedure TApdCustomComPort.DeregisterUserCallback(CallBack : TPortCallback);
-    {-Deregister a user of this comport}
-  var
-    UL : PUserListEntry;
-    I : Word;
-  begin
-    if csDestroying in ComponentState then Exit;                         {!!.05}
-    if Assigned(UserList) and (UserList.Count > 0) then begin            {!!.02}
-      for I := UserList.Count-1 downto 0 do begin
-        UL := UserList.Items[I];
-        with UL^ do begin
-          if @CallBack = @OpenClose then begin
-            UserList.Remove(UL);
-            Dispose(UL);
-          end;
-        end;
-      end;
-    end;
-  end;
-
-  procedure TApdCustomComPort.DeregisterUserCallbackEx(                  {!!.03}
-    CallBackEx : TPortCallbackEx);
-    {-Deregister a TApdComPort user callback}
-  var
-    UL : PUserListEntry;
-    I : Word;
-  begin
-    if csDestroying in ComponentState then Exit;                         {!!.05}
-    if Assigned(UserList) and (UserList.Count > 0) then begin
-      for I := UserList.Count-1 downto 0 do begin
-        UL := UserList.Items[I];
-        with UL^ do begin
-          if @CallBackEx = @OpenCloseEx then begin
-            UserList.Remove(UL);
-            Dispose(UL);
-          end;
-        end;
-      end;
-    end;
-  end;
-
-  procedure TApdCustomComPort.ProcessCommunications;
-    {-Process communications receive events, but not triggers}
-  begin
-    if (PortState = psShuttingDown) then Exit;
-    CheckException(Self, ValidDispatcher.ProcessCommunications);
-  end;
-
-  procedure TApdCustomComPort.FlushInBuffer;
-    {-Flush the input buffer}
-  begin
-    if (PortState = psShuttingDown) then Exit;
-    CheckException(Self, ValidDispatcher.FlushInBuffer);
-  end;
-
-  procedure TApdCustomComPort.FlushOutBuffer;
-    {-Flush the output buffer}
-  begin
-    if (PortState = psShuttingDown) then Exit;
-    CheckException(Self, ValidDispatcher.FlushOutBuffer);
-  end;
-
-  procedure TApdCustomComPort.InitTracing(const NumEntries : Cardinal);
-    {-Start tracing}
-  begin
-    if (PortState = psShuttingDown) then Exit;
-    if NumEntries <> 0 then
-      FTraceSize := NumEntries;
-    CheckException(Self, Dispatcher.InitTracing(NumEntries));
-    FTracing := tlOn;
-  end;
-
-  procedure TApdCustomComPort.DumpTrace(const FName : string;
-                                        const InHex : Boolean);
-    {-Dump the trace file}
-  var
-    Dest : array[0..255] of Char;
-  begin
-    if (PortState = psShuttingDown) then Exit;
-    CheckException(Self, Dispatcher.DumpTrace(StrPCopy(Dest, FName),
-      InHex, TraceAllHex));
-    FTracing := tlOff;
-  end;
-
-  procedure TApdCustomComPort.AppendTrace(const FName : string;
-                                          const InHex : Boolean;
-                                          const NewState : TTraceLogState); // SWB
-    {-Append the trace file}
-  var
-    Dest : array[0..255] of Char;
-  begin
-    if (PortState = psShuttingDown) then Exit;
-    CheckException(Self,
-      Dispatcher.AppendTrace(StrPCopy(Dest, FName), InHex, TraceAllHex));
-    FTracing := NewState;                                                   // SWB
-  end;
-
-  procedure TApdCustomComPort.ClearTracing;
-    {-Clear the trace buffer but keep tracing}
-  begin
-    if (PortState = psShuttingDown) then Exit;
-    CheckException(Self, Dispatcher.ClearTracing);
-  end;
-
-  procedure TApdCustomComPort.AbortTracing;
+	procedure TApdCustomComPort.PortOpen;
+		{-Port open processing}
+	var
+		I : Word;
+		UL : PUserListEntry;
+	begin
+		{Tell all comport users that the port is now open}
+		if UserList.Count > 0 then begin
+			for I := UserList.Count-1 downto 0 do begin
+				UL := UserList.Items[I];
+				with UL^ do begin
+					if Handle <> 0 then
+						SendMessage(Handle, APW_PORTOPEN, 0, 0)
+					else begin                                                     {!!.03}
+						if IsEx then                                                 {!!.03}
+							UL^.OpenCloseEx(Self, ctOpen)                              {!!.03}
+						else                                                         {!!.03}
+							UL^.OpenClose(Self, True);
+					end;                                                           {!!.03}
+				end;
+			end;
+		end;
+
+		if Assigned(FOnPortOpen) then
+			FOnPortOpen(Self);
+	end;
+
+	procedure TApdCustomComPort.PortClose;
+		{-Port close processing}
+	var
+		I : Word;
+		UL : PUserListEntry;
+	begin
+		{Tell all comport users that the port is now closed}
+		if UserList.Count > 0 then
+		begin
+			for I := UserList.Count-1 downto 0 do
+			begin
+				UL := UserList.Items[I];
+				with UL^ do begin
+					if Handle <> 0 then
+						SendMessage(Handle, APW_PORTCLOSE, 0, 0)
+					else
+					begin                                                          {!!.03}
+						if IsEx then                                                 {!!.03}
+							UL^.OpenCloseEx(Self, ctClosed)                            {!!.03}
+						else                                                         {!!.03}
+							UL^.OpenClose(Self, False);
+					end;                                                           {!!.03}
+				end;
+			end;
+		end;
+
+		if Assigned(FOnPortClose) then
+			FOnPortClose(Self);
+	end;
+
+	procedure TApdCustomComPort.PortClosing;                               {!!.03}
+		{-Port closing processing, sent to other controls to notify that the port }
+		{ is starting to close for cleanup }
+	var
+		I : Word;
+		UL : PUserListEntry;
+	begin
+		{ tell all users that the port is now being closed }
+		if UserList.Count > 0 then
+		begin
+			for I := pred(UserList.Count) downto 0 do
+			begin
+				UL := UserList.Items[I];
+				{ only notify if they are registered as extended }
+				if UL^.IsEx then
+					with UL^ do
+					begin
+						if Handle <> 0 then
+							SendMessage(Handle, APW_CLOSEPENDING, 0, 0)
+						else
+							UL^.OpenCloseEx(Self, ctClosing);
+					end;
+			end;
+		end;
+	end;
+
+	procedure TApdCustomComPort.TriggerLineError(const Error : Word;
+																						const LineBreak : Boolean);
+		{-Received a line error}
+	begin
+		if Assigned(FOnTriggerLineError) then
+			FOnTriggerLineError(Self, Error, LineBreak);
+	end;
+
+	procedure TApdCustomComPort.TriggerModemStatus;
+		{-Received a modem status change}
+	begin
+		if Assigned(FOnTriggerModemStatus) then
+			FOnTriggerModemStatus(Self);
+	end;
+
+	procedure TApdCustomComPort.TriggerOutbuffFree;
+		{-Received and outbuff free trigger}
+	begin
+		if Assigned(FOnTriggerOutbuffFree) then
+			FOnTriggerOutbuffFree(Self);
+	end;
+
+	procedure TApdCustomComPort.TriggerOutbuffUsed;
+		{-Received and outbuff used trigger}
+	begin
+		if Assigned(FOnTriggerOutbuffUsed) then
+			FOnTriggerOutbuffUsed(Self);
+	end;
+
+	procedure TApdCustomComPort.TriggerOutSent;
+		{-Received an outsent trigger}
+	begin
+		if Assigned(FOnTriggerOutSent) then
+			FOnTriggerOutSent(Self);
+	end;
+
+	procedure TApdCustomComPort.WaitChar(C : AnsiChar);
+		{-Received a character in WaitForString or WaitForMultiString}
+	begin
+		if Assigned(FOnWaitChar) then
+			FOnWaitChar(Self, C);
+	end;
+
+	procedure TApdCustomComPort.RegisterComPort(Enabling : Boolean);
+		{-Use a hidden window to get triggers}
+	var
+		Instance : THandle;
+	begin
+		if Enabling then begin
+			{Make sure the window is registered}
+			RegisterComWindow;
+
+			if ModuleIsLib and not ModuleIsPackage then
+				{ we're a DLL, not a package }
+				Instance   := SysInit.hInstance
+			else
+				{we're an exe or package }
+				Instance   := System.MainInstance;
+
+			{Create a window}
+			fComWindow := CreateWindow(ComWindowClass,        {class name}
+																'',                     {caption}
+																ws_Overlapped,          {window style}
+																0,                      {X}
+																0,                      {Y}
+																0,                      {width}
+																0,                      {height}
+																0,                      {parent}
+																0,                      {menu}
+																Instance,               {instance}
+																nil);                   {parameter}
+
+			{Register it}
+			FDispatcher.RegisterWndTriggerHandler(ComWindow);
+		end
+		else
+		begin
+			{Deregister it}
+			FDispatcher.DeregisterWndTriggerHandler(ComWindow);
+			DestroyWindow(ComWindow);
+		end;
+	end;
+
+	procedure TApdCustomComPort.ValidateComport;
+	var
+		ComSelDlg : TComSelectForm;
+	begin
+		if (FComNumber = 0) then
+			if (not FPromptForPort) then
+				raise ENoPortSelected.Create(ecNoPortSelected, False)
+			else begin
+				ComSelDlg := TComSelectForm.Create(Application);
+				try
+					if (ComSelDlg.ShowModal = mrOk) then
+						ComNumber := ComSelDlg.SelectedComNum
+					else
+						raise ENoPortSelected.Create(ecNoPortSelected, False);
+				finally
+					ComSelDlg.Free;
+				end;
+			end;
+	end;
+
+	constructor TApdCustomComPort.Create(AOwner : TComponent);
+		{-Create the object instance}
+	begin
+
+		{Create the registration list before notification events are sent}
+		UserList := TList.Create;
+
+		{No override by default}
+		OverrideLine := False;
+
+		{This causes notification events for all other components}
+		inherited Create(AOwner);
+
+		{Private inits}
+		Force := False;
+		PortState := psClosed;
+		ForceOpen := False;
+		CopyTriggers := False;
+		BusyBeforeWait := False;
+		WaitPrepped := False;
+		fComWindow := 0;
+
+		{Data inits}
+		FDeviceLayers := [dlWin32];
+		FPromptForPort := adpoDefPromptForPort;
+		FDeviceLayer := adpoDefDeviceLayer;
+		FDispatcher := nil;
+		FComNumber := adpoDefComNumber;
+		FOpen      := adpoDefOpen;
+		FAutoOpen  := adpoDefAutoOpen;
+		FDTR       := adpoDefDTR;
+		FRTS       := adpoDefRTS;
+		FSWFlowOptions := adpoDefSWFlowOptions;
+		FXonChar   := adpoDefXOnChar;
+		FXOffChar  := adpoDefXOffChar;
+		FBufferFull := adpoDefBufferFull;
+		FBufferResume := adpoDefBufferResume;
+		FTriggerLength := adpoDefTriggerLength;
+		FTracing   := adpoDefTracing;
+		FTraceSize := adpoDefTraceSize;
+		FTraceName := adpoDefTraceName;
+		FTraceHex  := adpoDefTraceHex;
+		TraceAllHex:= adpoDefTraceAllHex;
+		FLogging   := adpoDefLogging;
+		FLogSize   := adpoDefLogSize;
+		FLogName   := adpoDefLogName;
+		FLogHex    := adpoDefLogHex;
+		LogAllHex  := adpoDefLogAllHex;
+		FUseMSRShadow := adpoDefUseMSRShadow;
+		FUseEventWord := adpoDefUseEventWord;
+		FCommNotificationLevel := adpoDefCommNotificationLevel;
+		FTapiMode  := adpoDefTapiMode;
+
+
+		if not OverrideLine then begin
+			FBaud      := adpoDefBaudRt;
+			FParity    := adpoDefParity;
+			FDatabits  := adpoDefDatabits;
+			FStopbits  := adpoDefStopbits;
+			FInSize    := adpoDefInSize;
+			FOutSize   := adpoDefOutSize;
+			FHWFlowOptions := [];
+		end;
+
+		{Event inits}
+		FOnTrigger := nil;
+		FOnTriggerAvail := nil;
+		FOnTriggerData := nil;
+		FOnTriggerStatus := nil;
+		FOnTriggerTimer := nil;
+		FOnTriggerLineError := nil;
+		FOnTriggerModemStatus := nil;
+		FOnTriggerOutbuffFree := nil;
+		FOnTriggerOutbuffUsed := nil;
+		FOnTriggerOutSent := nil;
+		FOnPortOpen := nil;
+		FOnPortClose := nil;
+		FOnWaitChar := nil;
+
+	end;
+
+	destructor TApdCustomComPort.Destroy;
+		{-Destroy the object instance}
+	var
+		I : Word;
+		UL : PUserListEntry;
+	begin
+
+		{Close the port}
+		if (PortState = psOpen) then begin
+			DonePort;
+		end;
+
+		{Get rid of the user list}
+		if Assigned(UserList) and (UserList.Count > 0) then begin            {!!.02}
+			for I := UserList.Count-1 downto 0 do begin
+				UL := UserList.Items[I];
+				UserList.Remove(UL);
+				Dispose(UL);
+			end;
+		end;
+		UserList.Free;
+
+		TApdBaseDispatcher.ClearSaveBuffers(SaveTriggerBuffer);
+		inherited Destroy;
+	end;
+
+	procedure TApdCustomComPort.InitPort;
+		{-Physically open the comport}
+	var
+		Res : Integer;
+		nBaud     : LongInt;
+		nParity   : Word;
+		nDataBits : TDatabits;
+		nStopBits : TStopbits;
+		nHWOpts, nSWOpts, nBufferFull, nBufferResume : Cardinal;
+		nOnChar, nOffChar : AnsiChar;
+	begin
+		{ Validate the comport -- not needed for Tapi }
+		if TapiMode <> tmOn then
+			ValidateComport;
+
+		{ Activate the specified device layer }
+		FDispatcher := ActivateDeviceLayer;
+		FDispatcher.DeviceName := Format('\\.\COM%d', [ComNumber]);             // SWB
+		try
+			{ Get line parameters that Tapi set }
+			if TapiMode = tmOn then begin
+				if ValidDispatcher.ComHandle = 0 then
+					CheckException(Self, ecNotOpenedByTapi);
+				FDispatcher.GetLine(nBaud, nParity, nDataBits, nStopBits);
+				FDispatcher.GetFlowOptions(nHWOpts, nSWOpts, nBufferFull,
+					nBufferResume, nOnChar, nOffChar);
+
+				{ Sync our properties with those set by Tapi }
+				FBaud := nBaud;
+				FParity := TParity(nParity);
+				FDataBits := Ord(nDataBits);
+				FStopBits := Ord(nStopBits);
+
+				FHWFlowOptions := [];
+				if (nHWOpts and hfUseDTR) <> 0 then
+					Include(FHWFlowOptions, hwfUseDTR);
+				if (nHWOpts and hfUseRTS) <> 0 then
+					Include(FHWFlowOptions, hwfUseRTS);
+				if (nHWOpts and hfRequireDSR) <> 0 then
+					Include(FHWFlowOptions, hwfRequireDSR);
+				if (nHWOpts and hfRequireCTS) <> 0 then
+					Include(FHWFlowOptions, hwfRequireCTS);
+
+				FSWFlowOptions := TSWFlowOptions(nSWOpts);
+				FXOnChar := nOnChar;
+				FXOffChar := nOffChar;
+			end;
+
+			Res := InitializePort;
+
+			{Remap access denied and file not found errors}
+			if Res = ecAccessDenied then
+				Res := ecAlreadyOpen
+			else if (Res = ecFileNotFound) or (Res = ecPathNotFound) then
+				Res := ecBadId;
+
+			if (Res = ecOk) then begin
+				{Handle preset properties}
+				PortState := psOpen;
+				UpdateHandlerFlag;
+				Force := True;
+				SetTracing(Tracing);
+				SetLogging(Logging);
+				SetHWFlowOptions(HWFlowOptions);
+				SetSWFlowOptions(SWFlowOptions);
+				SetXOnChar(FXonChar);
+				SetXOffChar(FXoffChar);
+				SetTriggerLength(FTriggerLength);
+				SetDTR(FDTR);
+				SetRTS(FRTS);
+				{SetUseMSRShadow(FUseMSRShadow);} {16-bit}                       {!!.02}
+				SetUseEventWord(FUseEventWord);
+				{SetCommNotificationLevel(FCommNotificationLevel);} {16-bit}     {!!.02}
+				SetRS485Mode(FRS485Mode);
+				SetThreadBoost(FThreadBoost);
+				Force := False;
+				FOpen := True;
+
+				{Prepare for triggers}
+				RegisterComPort(True);
+
+				{Add pending triggers}
+				if CopyTriggers then begin
+					CopyTriggers := False;
+					FDispatcher.RestoreTriggers(SaveTriggerBuffer);
+				end;
+
+				{Send OnPortEvent}
+				PortOpen;
+			end else
+				CheckException(Self, Res);
+		except
+			FOpen := False;
+			PortState := psClosed;
+			FDispatcher.Free;
+			FDispatcher := nil;
+			raise;
+		end;
+	end;
+
+	procedure TApdCustomComPort.DonePort;
+		{-Physically close the comport}
+	begin
+		{FOpen := False;}                                                    {!!.02}
+		if (PortState = psOpen) then
+		begin
+
+			{ Force trace/log dumps if they were on }
+			Tracing := tlDump;
+			Logging := tlDump;
+
+			{ Port is shutting down }
+			PortState := psShuttingDown;
+
+			{ Send OnPortClose event }
+			{PortClose;}                                                       {!!.02}
+			PortClosing;                                                       {!!.03}
+
+			{ Save triggers in case this port is reopened }
+			Dispatcher.SaveTriggers(SaveTriggerBuffer);
+			CopyTriggers := True;
+
+			{ Close the port and clear ComTable }
+			Dispatcher.DonePort;
+			if Dispatcher.EventBusy then
+			begin
+				PostMessage(fComWindow, apw_ClosePending, 0, Dispatcher.Handle shl 16);
+				SafeYield;
+			end
+			else
+			begin
+				{ Get rid of the trigger handler }
+				RegisterComPort(False);
+				FDispatcher.Free;
+				FDispatcher := nil;
+				PortState := psClosed;
+				FOpen := False;                                                  {!!.02}
+			end;
+			{ Send OnPortClose event }
+			PortClose;                                                         {!!.02}
+		end;
+	end;
+
+	procedure TApdCustomComPort.Assign(Source: TPersistent);
+		{-Assign values of Source to self}
+	var
+		SourcePort : TApdCustomComPort absolute Source;
+		I : Word;
+		UL : PUserListEntry;
+	begin
+		if Source is TApdCustomComPort then
+		begin
+			{Discard existing userlist}
+			if UserList.Count > 0 then
+				for I := UserList.Count-1 downto 0 do
+				begin
+					UL := UserList.Items[I];
+					UserList.Remove(UL);
+					Dispose(UL);
+				end;
+			UserList.Free;
+
+			{Copy Source's userlist}
+			UserList := TList.Create;
+			if SourcePort.UserList.Count > 0 then
+				for I := 0 to SourcePort.UserList.Count-1 do
+				begin
+					New(UL);
+					Move(SourcePort.UserList.Items[I]^, UL^, SizeOf(TUserListEntry));
+					UserList.Add(UL);
+				end;
+
+			{Copy triggers from Source}
+			if (SourcePort.PortState = psOpen) then begin
+				SourcePort.Dispatcher.SaveTriggers(SaveTriggerBuffer);
+				CopyTriggers := True;
+			end;
+
+			{Copy all other fields}
+			Force            := SourcePort.Force;
+			FDeviceLayer     := SourcePort.FDeviceLayer;
+			FComNumber       := SourcePort.FComNumber;
+			FBaud            := SourcePort.FBaud;
+			FParity          := SourcePort.FParity;
+			FDatabits        := SourcePort.FDatabits;
+			FStopbits        := SourcePort.FStopbits;
+			FInSize          := SourcePort.FInSize;
+			FOutSize         := SourcePort.FOutSize;
+			FOpen            := False;
+			FAutoOpen        := SourcePort.FAutoOpen;
+			FPromptForPort   := SourcePort.FPromptForPort;
+			FRS485Mode       := SourcePort.FRS485Mode;
+			FThreadBoost     := SourcePort.FThreadBoost;
+			FDTR             := SourcePort.FDTR;
+			FRTS             := SourcePort.FRTS;
+			FBufferFull      := SourcePort.FBufferFull;
+			FBufferResume    := SourcePort.FBufferResume;
+			FHWFlowOptions   := SourcePort.FHWFlowOptions;
+			FSWFlowOptions   := SourcePort.FSWFlowOptions;
+			FXOnChar         := SourcePort.FXOnChar;
+			FXOffChar        := SourcePort.FXOffChar;
+			FTracing         := SourcePort.FTracing;
+			FTraceSize       := SourcePort.FTraceSize;
+			FTraceName       := SourcePort.FTraceName;
+			FTraceHex        := SourcePort.FTraceHex;
+			FTraceAllHex     := SourcePort.FTraceAllHex;
+			FLogging         := SourcePort.FLogging;
+			FLogSize         := SourcePort.FLogSize;
+			FLogName         := SourcePort.FLogName;
+			FLogHex          := SourcePort.FLogHex;
+			FLogAllHex       := SourcePort.FLogAllHex;
+			FTriggerLength   := SourcePort.FTriggerLength;
+			{Must go through write method to ensure flag gets updated}
+			OnTrigger        := SourcePort.FOnTrigger;
+			OnTriggerAvail   := SourcePort.FOnTriggerAvail;
+			OnTriggerData    := SourcePort.FOnTriggerData;
+			OnTriggerStatus  := SourcePort.FOnTriggerStatus;
+			OnTriggerTimer   := SourcePort.FOnTriggerTimer;
+			FOnPortOpen      := SourcePort.FOnPortOpen;
+			FOnPortClose     := SourcePort.FOnPortClose;
+			FTapiMode        := SourcePort.FTapiMode;
+		end;
+	end;
+
+	procedure TApdCustomComPort.RegisterUser(const H : THandle);
+		{-Register a user of this comport}
+	var
+		UL : PUserListEntry;
+	begin
+		New(UL);
+		with UL^ do begin
+			Handle := H;
+			OpenClose := nil;
+			OpenCloseEx := nil;                                                {!!.03}
+			IsEx := False;                                                     {!!.03}
+		end;
+		UserList.Add(UL);
+	end;
+
+	procedure TApdCustomComPort.RegisterUserEx(const H : THandle);{!!.03}
+			{-Register a TApdComPort user to receive open/closing/close events}
+	var
+		UL : PUserListEntry;
+	begin
+		New(UL);
+		with UL^ do
+		begin
+			Handle := H;
+			OpenClose := nil;
+			OpenCloseEx := nil;
+			IsEx := True;
+		end;
+		UserList.Add(UL);
+	end;
+
+	procedure TApdCustomComPort.RegisterUserCallback(CallBack : TPortCallback);
+		{-Register a user of this comport}
+	var
+		UL : PUserListEntry;
+	begin
+		New(UL);
+		with UL^ do
+		begin
+			Handle := 0;
+			OpenClose := Callback;
+			OpenCloseEx := nil;                                                {!!.03}
+			IsEx := False;                                                     {!!.03}
+		end;
+		UserList.Add(UL);
+	end;
+
+	procedure TApdCustomComPort.RegisterUserCallbackEx(                    {!!.03}
+		CallBackEx : TPortCallbackEx);
+	{-Register a TApdComPort user to receive extended callbacks}
+	var
+		UL : PUserListEntry;
+	begin
+		New(UL);
+		with UL^ do
+		begin
+			Handle := 0;
+			OpenClose := nil;
+			OpenCloseEx := CallbackEx;
+			IsEx := True;
+		end;
+		UserList.Add(UL);
+	end;
+
+	procedure TApdCustomComPort.DeregisterUser(const H : THandle);
+		{-Deregister a user of this comport}
+	var
+		UL : PUserListEntry;
+		I : Word;
+	begin
+		if csDestroying in ComponentState then Exit;                         {!!.05}
+		if Assigned(UserList) and (UserList.Count > 0) then begin            {!!.02}
+			for I := UserList.Count-1 downto 0 do
+			begin
+				UL := UserList.Items[I];
+				with UL^ do
+				begin
+					if Handle = H then
+					begin
+						UserList.Remove(UL);
+						Dispose(UL);
+					end;
+				end;
+			end;
+		end;
+	end;
+
+	procedure TApdCustomComPort.DeregisterUserCallback(CallBack : TPortCallback);
+		{-Deregister a user of this comport}
+	var
+		UL : PUserListEntry;
+		I : Word;
+	begin
+		if csDestroying in ComponentState then Exit;                         {!!.05}
+		if Assigned(UserList) and (UserList.Count > 0) then begin            {!!.02}
+			for I := UserList.Count-1 downto 0 do
+			begin
+				UL := UserList.Items[I];
+				with UL^ do
+				begin
+					if @CallBack = @OpenClose then
+					begin
+						UserList.Remove(UL);
+						Dispose(UL);
+					end;
+				end;
+			end;
+		end;
+	end;
+
+	procedure TApdCustomComPort.DeregisterUserCallbackEx(                  {!!.03}
+		CallBackEx : TPortCallbackEx);
+		{-Deregister a TApdComPort user callback}
+	var
+		UL : PUserListEntry;
+		I : Word;
+	begin
+		if csDestroying in ComponentState then Exit;                         {!!.05}
+		if Assigned(UserList) and (UserList.Count > 0) then
+		begin
+			for I := UserList.Count-1 downto 0 do
+			begin
+				UL := UserList.Items[I];
+				with UL^ do
+				begin
+					if @CallBackEx = @OpenCloseEx then
+					begin
+						UserList.Remove(UL);
+						Dispose(UL);
+					end;
+				end;
+			end;
+		end;
+	end;
+
+	procedure TApdCustomComPort.ProcessCommunications;
+		{-Process communications receive events, but not triggers}
+	begin
+		if (PortState = psShuttingDown) then Exit;
+		CheckException(Self, ValidDispatcher.ProcessCommunications);
+	end;
+
+	procedure TApdCustomComPort.FlushInBuffer;
+		{-Flush the input buffer}
+	begin
+		if (PortState = psShuttingDown) then Exit;
+		CheckException(Self, ValidDispatcher.FlushInBuffer);
+	end;
+
+	procedure TApdCustomComPort.FlushOutBuffer;
+		{-Flush the output buffer}
+	begin
+		if (PortState = psShuttingDown) then Exit;
+		CheckException(Self, ValidDispatcher.FlushOutBuffer);
+	end;
+
+	procedure TApdCustomComPort.InitTracing(const NumEntries : Cardinal);
+		{-Start tracing}
+	begin
+		if (PortState = psShuttingDown) then Exit;
+		if NumEntries <> 0 then
+			FTraceSize := NumEntries;
+		CheckException(Self, Dispatcher.InitTracing(NumEntries));
+		FTracing := tlOn;
+	end;
+
+	procedure TApdCustomComPort.DumpTrace(const FName : string;
+																				const InHex : Boolean);
+		{-Dump the trace file}
+	var
+		Dest : array[0..255] of Char;
+	begin
+		if (PortState = psShuttingDown) then Exit;
+		CheckException(Self, Dispatcher.DumpTrace(StrPCopy(Dest, FName),
+			InHex, TraceAllHex));
+		FTracing := tlOff;
+	end;
+
+	procedure TApdCustomComPort.AppendTrace(const FName : string;
+																					const InHex : Boolean;
+																					const NewState : TTraceLogState); // SWB
+		{-Append the trace file}
+	var
+		Dest : array[0..255] of Char;
+	begin
+		if (PortState = psShuttingDown) then Exit;
+		CheckException(Self,
+			Dispatcher.AppendTrace(StrPCopy(Dest, FName), InHex, TraceAllHex));
+		FTracing := NewState;                                                   // SWB
+	end;
+
+	procedure TApdCustomComPort.ClearTracing;
+		{-Clear the trace buffer but keep tracing}
+	begin
+		if (PortState = psShuttingDown) then Exit;
+		CheckException(Self, Dispatcher.ClearTracing);
+	end;
+
+	procedure TApdCustomComPort.AbortTracing;
     {-Abort tracing without dumping the trace file}
   begin
     if (PortState = psShuttingDown) then Exit;
@@ -2413,7 +2464,7 @@ var
     Dispatcher.AddTraceEntry(CurEntry, CurCh);
   end;
 
-  procedure TApdCustomComPort.AddStringToLog(S : AnsiString);
+  procedure TApdCustomComPort.AddStringToLog(S : string);
   begin
     if (PortState = psShuttingDown) then Exit;
     ValidDispatcher.AddStringToLog(S);
@@ -2522,7 +2573,7 @@ var
     FLogging := tlPause;
   end;
 
-  function TApdCustomComPort.AddDataTrigger(const Data : AnsiString;
+  function TApdCustomComPort.AddDataTrigger(const Data : string;
                                             const IgnoreCase : Boolean) : Word;
     {-Add a ShortString data trigger}
   var
@@ -2534,7 +2585,7 @@ var
   Len := Length( Data);
   if Len > Length( P) then
     Len := Length( P);  // Length( P) = 256
-  StrPLCopy(P, Data, Length( P));  // We don't need a zero terminator.
+  StrPLCopy(P, AnsiString(Data), Length( P));  // We don't need a zero terminator.
   result := Word( CheckException( Self,
     ValidDispatcher.AddDataTriggerLen( P, IgnoreCase, Len)))
   end;
@@ -2665,14 +2716,17 @@ var
     CheckException(Self, ValidDispatcher.PutChar(C));
   end;
 
-  procedure TApdCustomComPort.PutString(const S : AnsiString);
+  procedure TApdCustomComPort.PutString(const S : string);
     {-Add S to the output buffer}
+  var
+    opStr : AnsiString;
   begin
     if (PortState = psShuttingDown) then Exit;
+    opStr := AnsiString(S);
    {$IFOPT H+}
-    CheckException(Self, ValidDispatcher.PutBlock(Pointer(S)^, Length(S)));
+    CheckException(Self, ValidDispatcher.PutBlock(Pointer(opStr)^, Length(opStr)));
    {$ELSE}
-    CheckException(Self, ValidDispatcher.PutString(S));
+    CheckException(Self, ValidDispatcher.PutString(opStr));
    {$ENDIF}
   end;
 

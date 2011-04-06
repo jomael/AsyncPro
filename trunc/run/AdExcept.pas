@@ -26,7 +26,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADEXCEPT.PAS 5.00                   *}
+{*                   ADEXCEPT.PAS 5.01                   *}
 {*********************************************************}
 
 {Global defines potentially affecting this unit}

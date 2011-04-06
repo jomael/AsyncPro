@@ -27,6 +27,11 @@
  *  Sean B. Durkin
  *
  * ***** END LICENSE BLOCK ***** *)
+ 
+ {*********************************************************}
+{*                   LNSQUEUE.PAS 5.01R                   *}
+{**********************************************************}
+
 {Global defines potentially affecting this unit}
 {$I ..\includes\AWDEFINE.INC}
 

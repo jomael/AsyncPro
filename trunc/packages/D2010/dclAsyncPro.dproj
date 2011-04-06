@@ -20,16 +20,18 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_UnitSearchPath>$(BDSCOMMONDIR)\BPL;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<DCC_DcuOutput>$(DCU)</DCC_DcuOutput>
-			<DCC_BplOutput>$(BPL)</DCC_BplOutput>
+			<DCC_BplOutput>$(BDSCOMMONDIR)\Bpl</DCC_BplOutput>
 			<DCC_DcpOutput>$(DCP)</DCC_DcpOutput>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<DllSuffix>_D2010</DllSuffix>
-			<DCC_DependencyCheckOutputName>C:\Program Files\Common Files\BPL\dclAsyncPro_D2010.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Documents and Settings\All Users\Documents\RAD Studio\7.0\Bpl\dclAsyncPro_D2010.bpl</DCC_DependencyCheckOutputName>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_Platform>x86</DCC_Platform>
-			<DCC_Description>TurboPower AsyncPro 5 design-time package</DCC_Description>
+			<DCC_Description>TurboPower AsyncPro 5.01 design-time package</DCC_Description>
 			<GenPackage>true</GenPackage>
 			<DCC_S>false</DCC_S>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
@@ -55,6 +57,7 @@
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="AsyncPro.dcp"/>
 			<DCCReference Include="designide.dcp"/>
+			<DCCReference Include="vclx.dcp"/>
 			<DCCReference Include="..\..\design\adabout.pas">
 				<Form>ApdAboutForm</Form>
 			</DCCReference>
@@ -62,6 +65,16 @@
 			<DCCReference Include="..\..\design\AproReg.pas"/>
 			<DCCReference Include="..\..\design\Adpedit0.pas">
 				<Form>AdPEdit</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\design\AdStatEd.pas">
+				<Form>frmStateEdit</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\design\adpacked.pas">
+				<Form>PacketEditor</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\design\Adpeditt.pas"/>
+			<DCCReference Include="..\..\design\AdStatE0.pas">
+				<Form>frmConditionEdit</Form>
 			</DCCReference>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

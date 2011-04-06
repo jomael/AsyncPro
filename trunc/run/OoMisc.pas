@@ -26,7 +26,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                    OOMISC.PAS 5.00                    *}
+{*                    OOMISC.PAS 5.01                    *}
 {*********************************************************}
 {* Miscellaneous supporting methods and types            *}
 {*********************************************************}
@@ -131,9 +131,9 @@ type
   end;
   TOleEnum = type DWORD;
   { XML definitions }
-  {$IFDEF unicode}
+  {$IFDEF UNICODE}
     DOMString = unicodeString;
-  {$Else}
+	{$Else}
     DOMString = WideString;
   {$EndIf}
 
@@ -178,7 +178,7 @@ const {RasMaximum buffer sizes}                                          {!!.06}
   RasMaxIPAddress   = 15;                                                {!!.06}
   RasMaxIPXAddress  = 21;                                                {!!.06}
   RasMaxFacilities  = 200;                                               {!!.06}
-  RasMaxUserData    = 200;                                               {!!.06}
+	RasMaxUserData    = 200;                                               {!!.06}
 
 type  { moved from AdRasUtl.pas }                                        {!!.06}
   {RAS IP address - "a.b.c.d"}                                           {!!.06}
@@ -223,7 +223,7 @@ type { moved from AdRasUtl.pas }                                         {!!.06}
     szX25UserData      : array[0..RasMaxUserData] of char;               {!!.06}
     dwChannels         : DWord;                                          {!!.06}
     dwReserved1        : DWord;                                          {!!.06}
-    dwReserved2        : DWord;                                          {!!.06}
+		dwReserved2        : DWord;                                          {!!.06}
   end;                                                                   {!!.06}
 
 const   {RASENTRY 'dwfOptions' bit flags}                                {!!.06}
@@ -313,7 +313,7 @@ const
   {For skipping line parameter changes}
   DontChangeBaud         = 0;
   DontChangeParity       = SpaceParity + 1;
-  DontChangeDatabits     = 9;
+	DontChangeDatabits     = 9;
   DontChangeStopbits     = TwoStopbits + 1;
 
   {Modem status trigger options}
@@ -358,7 +358,7 @@ const
   wfcWriteNone          = 0;  {No option set yet}
   wfcWriteFail          = 1;  {Fail the open attempt}
   wfcWriteRename        = 2;  {Rename the incoming file}
-  wfcWriteAnyway        = 3;  {Overwrite the existing file}
+	wfcWriteAnyway        = 3;  {Overwrite the existing file}
   wfcWriteResume        = 4;  {Resume an interrupted receive}    
 
   {Ascii CR/LF translation options}
@@ -403,7 +403,7 @@ type
   {NotifyProc type, same as a window procedure}
   TApdNotifyProc = procedure(Msg, wParam : Cardinal;
                          lParam : Longint);
-  TApdNotifyEvent = procedure(Msg, wParam : Cardinal;
+	TApdNotifyEvent = procedure(Msg, wParam : Cardinal;
                          lParam : Longint) of object;
 const
   {Avoid requiring WIN31}
@@ -448,7 +448,7 @@ const
   apw_ProtocolStatus     = apw_First+21;  {From protocol - update status display}
   apw_ProtocolLog        = apw_First+22;  {From protocol - LogFile message}
   apw_ProtocolNextFile   = apw_First+23;  {From protocol - return next file}
-  apw_ProtocolAcceptFile = apw_First+24;  {From protocol - accept file}
+	apw_ProtocolAcceptFile = apw_First+24;  {From protocol - accept file}
   apw_ProtocolFinish     = apw_First+25;  {From protocol - protocol is finished}
   apw_ProtocolResume     = apw_First+26;  {From protocol - resume request}
   apw_ProtocolError      = apw_First+27;  {From protocol - error during protocol}
@@ -493,7 +493,7 @@ const
   apw_TermBuffer         = apw_First+67;  {To terminal - alloc new buffers}
   apw_TermColors         = apw_First+68;  {To terminal - set new colors}
   apw_TermToggleScroll   = apw_First+69;  {To terminal - toggle scrollback}
-  apw_TermCapture        = apw_First+70;  {To terminal - set capture mode}
+	apw_TermCapture        = apw_First+70;  {To terminal - set capture mode}
   apw_TermStuff          = apw_First+71;  {To terminal - stuff data}
   apw_TermPaint          = apw_First+72;  {To terminal - update screen}
   apw_TermSetWndProc     = apw_First+73;  {To terminal - set window proc}
@@ -538,7 +538,7 @@ const
   apw_ViewGetPageDim     = apw_First+120; {To fax viewer - get pg dimensions}
   apw_ViewSetLoadWholeFax= apw_First+121; {To fax viewer - set load whole fax}
   apw_ViewSetBusyCursor  = apw_First+122; {To fax viewer - set cursor for busy}
-  apw_ViewerError        = apw_First+123; {Fax viewer error report}
+	apw_ViewerError        = apw_First+123; {Fax viewer error report}
   apw_ViewGetPageFlags   = apw_First+124; {To fax viewer - get pg flags}
   apw_ViewGetFileName    = apw_First+125; {To fax viewer - get file name}
 
@@ -583,7 +583,7 @@ const
 const
   apw_SapiTrain          = apw_First+192; {Sapi training requested}
   apw_SapiPhoneCallBack  = apw_First+193; {Sapi AskFor phrase return}
-  apw_SapiInfoPhrase     = apw_First+194; {Sapi TAPI connection status}
+	apw_SapiInfoPhrase     = apw_First+194; {Sapi TAPI connection status}
 
 const
   apw_PgrStatusEvent     = apw_First+200; {Pager status event}
@@ -628,7 +628,7 @@ const
 const
   {egDOS}
   ecFileNotFound           = -2;       {File not found}
-  ecPathNotFound           = -3;       {Path not found}
+	ecPathNotFound           = -3;       {Path not found}
   ecTooManyFiles           = -4;       {Too many open files}
   ecAccessDenied           = -5;       {File access denied}
   ecInvalidHandle          = -6;       {Invalid file handle}
@@ -673,7 +673,7 @@ const
   ecBaudRate               = -2002;    {ie_Baudrate - unsupported baud rate}
   ecByteSize               = -2003;    {ie_Bytesize - invalid byte size}
   ecDefault                = -2004;    {ie_Default - error in default parameters}
-  ecHardware               = -2005;    {ie_Hardware - hardware not present}
+	ecHardware               = -2005;    {ie_Hardware - hardware not present}
   ecMemory                 = -2006;    {ie_Memory - unable to allocate queues}
   ecCommNotOpen            = -2007;    {ie_NOpen - device not open}
   ecAlreadyOpen            = -2008;    {ie_Open - device already open}
@@ -763,7 +763,7 @@ const {RAS connection status codes}
   csRasPausedEnd           = csRasPaused + 3;
 
   csRasConnected           = $2000;
-  csRasDisconnected        = csRasConnected + 1;
+	csRasDisconnected        = csRasConnected + 1;
 
   { Protocols }
   { If strings are added -- apStatusMsg needs to be changed in AWABSPCL.PAS }
@@ -853,7 +853,7 @@ const
 const
   {Packet errors}
   ecStartStringEmpty       = -5501;    {Start string is empty}
-  ecPacketTooSmall         = -5502;    {Packet size cannot be smaller than start string}
+	ecPacketTooSmall         = -5502;    {Packet size cannot be smaller than start string}
   ecNoEndCharCount         = -5503;    {CharCount packets must have an end-condition}
   ecEmptyEndString         = -5504;    {End string is empty}
   ecZeroSizePacket         = -5505;    {Packet size cannot be zero}
@@ -898,7 +898,7 @@ const
 const                                                                    {!!.04}
   {State Machine}                                                        {!!.04}
   ecNoStateMachine         = -7500;    {No state machine}                {!!.04}
-  ecNoStartState           = -7501;    {StartState not set}              {!!.04}
+	ecNoStartState           = -7501;    {StartState not set}              {!!.04}
   ecNoSapiEngine           = -7502;    {SAPI Engine not set}             {!!.04}               
 
 const
@@ -943,7 +943,7 @@ const
   ecDrvCopyError           = -8087;    {Error copying printer driver}
   ecCannotAddPrinter       = -8088;    {32-bit AddPrinter call failed}
   ecDrvBadResources        = -8089;    {Bad/missing resources in driver}
-  ecDrvDriverNotFound      = -8090;    {Driver file not found}
+	ecDrvDriverNotFound      = -8090;    {Driver file not found}
   ecUniCannotGetPrinterDriverDir
                            = -8091;    {Cannot determine Win NT printer driver dir}
   ecInstallDriverFailed    = -8092;    {AddPrinterDriver API failed}
@@ -1033,7 +1033,7 @@ const
   wsaEHostDown       = 10064;
   wsaEHostUnreach    = 10065;
   wsaENotEmpty       = 10066;
-  wsaEProcLim        = 10067;
+	wsaEProcLim        = 10067;
   wsaEUsers          = 10068;
   wsaEDQuot          = 10069;
   wsaEStale          = 10070;
@@ -1078,7 +1078,7 @@ const
 const
   {Adjusted TAPI error codes}
   ecAllocated              = -13801;
-  ecBadDeviceID            = -13802;
+	ecBadDeviceID            = -13802;
   ecBearerModeUnavail      = -13803;
   ecCallUnavail            = -13805;
   ecCompletionOverrun      = -13806;
@@ -1123,7 +1123,7 @@ const
   ecInvalLocation          = -13845;
   ecInvalMediaList         = -13846;
   ecInvalMediaMode         = -13847;
-  ecInvalMessageID         = -13848;
+	ecInvalMessageID         = -13848;
   ecInvalParam             = -13850;
   ecInvalParkID            = -13851;
   ecInvalParkMode          = -13852;
@@ -1168,7 +1168,7 @@ const
    of room for expansion of the TAPI error codes.}
   ecTapiBusy               = -13928;
   ecTapiNotSet             = -13929;
-  ecTapiNoSelect           = -13930;
+	ecTapiNoSelect           = -13930;
   ecTapiLoadFail           = -13931;
   ecTapiGetAddrFail        = -13932;
   ecTapiUnexpected         = -13934;
@@ -1213,7 +1213,7 @@ const
   cLF  = #10;
   cVT  = #11;
   cFF  = #12;
-  cCR  = #13;
+	cCR  = #13;
   cSO  = #14;
   cSI  = #15;
   cDle = #16;
@@ -1369,193 +1369,193 @@ const
   eFETM { } = 58;      {Format effector transfer mode}
   eFNT  { } = 59;      {Font selection}
   eGATM { } = 60;      {Guarded area transfer mode}
-  eGSM  { } = 61;      {Graphics size modification}
-  eGSS  { } = 62;      {Graphics size selection}
-  eHEM  { } = 63;      {Horizontal editing mode}
-  eHPA  {X} = eCHA;    {Horizontal position absolute}
-  eHPR  {X} = eCUF;    {Horizontal position relative}
-  eHTJ  {X} = 64;      {Horizontal tab with justification}
-  eHTS  {X} = 65;      {Horizontal tabulation set}
-  eHVP  {X} = eCUP;    {Horizontal and vertical position}
-  eICH  {X} = 66;      {Insert character}
-  eIL   {X} = 67;      {Insert line}
-  eIND  {X} = eCUD;    {Index}
-  eINT  { } = 68;      {Interrupt}
-  eIRM  {.} = 69;      {Inseration-Replacement mode}
-  eJFY  { } = 70;      {Justify}
-  eKAM  {.} = 71;      {Keyboard action mode}
-  eLNM  {.} = 72;      {Line feed new line mode}
-  eMATM { } = 73;      {Multiple area transfer mode}
-  eMC   {.} = 74;      {Media copy}
-  eMW   {.} = 75;      {Message waiting}
-  eNEL  {X} = 76;      {Next line}
-  eNP   {.} = 77;      {Next page}
-  eOSC  { } = 78;      {Operating system command}
-  ePLD  { } = 79;      {Partial line down}
-  ePLU  { } = 80;      {Partial line up}
-  ePM   { } = 81;      {Privacy message}
-  ePP   {.} = 82;      {Preceding page}
-  ePU1  { } = 83;      {Private use 1}
-  ePU2  { } = 84;      {Private use 2}
-  ePUM  { } = 85;      {Positioning unit mode}
-  eQUAD { } = 86;      {Quad}
-  eREP  { } = 87;      {Repeat}
-  eRI   {X} = 88;      {Reverse index}
-  eRIS  {.} = 89;      {Reset to initial state}
-  eRM   {.} = 90;      {Reset mode}
-  eSATM { } = 91;      {Selected area transfer mode}
-  eSD   { } = 92;      {Scroll down}
-  eSEM  { } = 93;      {selected editing extent mode}
-  eSGR  {X} = eSetAttribute;{Select graphics rendition}
-  eSL   { } = 94;      {Scroll left}
-  eSM   {.} = eSetMode;{Set Mode}
-  eSPA  { } = 95;      {Start of protected area}
-  eSPI  { } = 96;      {Spacing increment}
-  eSR   { } = 97;      {Scroll right}
-  eSRM  { } = 98;      {Send-Receive mode}
-  eSRTM { } = 99;      {Status report transfer mode}
-  eSS2  { } = 100;     {Single shift 2}
-  eSS3  { } = 101;     {Single shift 3}
-  eSSA  { } = 102;     {Start of selected area}
-  eST   { } = 103;     {String terminator}
-  eSTS  { } = 104;     {Set transmit state}
-  eSU   { } = 105;     {Scroll up}
-  eTBC  {X} = 106;     {Tabulation clear}
-  eTSM  { } = 107;     {Tabulation stop mode}
-  eTSS  { } = 108;     {Thin space specification}
-  eTTM  { } = 109;     {Transfer termination mode}
-  eVEM  { } = 110;     {Vertical editing mode}
-  eVPA  {X} = 111;     {Vertical position absolute}
-  eVPR  {X} = eCUD;    {Vertical position relative}
-  eVTS  {X} = 112;     {vertical tabulation set}
-  eDECSTBM  = 113;     {dec private-set Top/Bottom margin}
+	eGSM  { } = 61;      {Graphics size modification}
+	eGSS  { } = 62;      {Graphics size selection}
+	eHEM  { } = 63;      {Horizontal editing mode}
+	eHPA  {X} = eCHA;    {Horizontal position absolute}
+	eHPR  {X} = eCUF;    {Horizontal position relative}
+	eHTJ  {X} = 64;      {Horizontal tab with justification}
+	eHTS  {X} = 65;      {Horizontal tabulation set}
+	eHVP  {X} = eCUP;    {Horizontal and vertical position}
+	eICH  {X} = 66;      {Insert character}
+	eIL   {X} = 67;      {Insert line}
+	eIND  {X} = eCUD;    {Index}
+	eINT  { } = 68;      {Interrupt}
+	eIRM  {.} = 69;      {Inseration-Replacement mode}
+	eJFY  { } = 70;      {Justify}
+	eKAM  {.} = 71;      {Keyboard action mode}
+	eLNM  {.} = 72;      {Line feed new line mode}
+	eMATM { } = 73;      {Multiple area transfer mode}
+	eMC   {.} = 74;      {Media copy}
+	eMW   {.} = 75;      {Message waiting}
+	eNEL  {X} = 76;      {Next line}
+	eNP   {.} = 77;      {Next page}
+	eOSC  { } = 78;      {Operating system command}
+	ePLD  { } = 79;      {Partial line down}
+	ePLU  { } = 80;      {Partial line up}
+	ePM   { } = 81;      {Privacy message}
+	ePP   {.} = 82;      {Preceding page}
+	ePU1  { } = 83;      {Private use 1}
+	ePU2  { } = 84;      {Private use 2}
+	ePUM  { } = 85;      {Positioning unit mode}
+	eQUAD { } = 86;      {Quad}
+	eREP  { } = 87;      {Repeat}
+	eRI   {X} = 88;      {Reverse index}
+	eRIS  {.} = 89;      {Reset to initial state}
+	eRM   {.} = 90;      {Reset mode}
+	eSATM { } = 91;      {Selected area transfer mode}
+	eSD   { } = 92;      {Scroll down}
+	eSEM  { } = 93;      {selected editing extent mode}
+	eSGR  {X} = eSetAttribute;{Select graphics rendition}
+	eSL   { } = 94;      {Scroll left}
+	eSM   {.} = eSetMode;{Set Mode}
+	eSPA  { } = 95;      {Start of protected area}
+	eSPI  { } = 96;      {Spacing increment}
+	eSR   { } = 97;      {Scroll right}
+	eSRM  { } = 98;      {Send-Receive mode}
+	eSRTM { } = 99;      {Status report transfer mode}
+	eSS2  { } = 100;     {Single shift 2}
+	eSS3  { } = 101;     {Single shift 3}
+	eSSA  { } = 102;     {Start of selected area}
+	eST   { } = 103;     {String terminator}
+	eSTS  { } = 104;     {Set transmit state}
+	eSU   { } = 105;     {Scroll up}
+	eTBC  {X} = 106;     {Tabulation clear}
+	eTSM  { } = 107;     {Tabulation stop mode}
+	eTSS  { } = 108;     {Thin space specification}
+	eTTM  { } = 109;     {Transfer termination mode}
+	eVEM  { } = 110;     {Vertical editing mode}
+	eVPA  {X} = 111;     {Vertical position absolute}
+	eVPR  {X} = eCUD;    {Vertical position relative}
+	eVTS  {X} = 112;     {vertical tabulation set}
+	eDECSTBM  = 113;     {dec private-set Top/Bottom margin}
 
-  eENQ  {X} = 114;     {enquiry request}
-  eBEL  {X} = 115;     {sound bell}
-  eBS   {X} = 116;     {backspace}
-  eLF   {X} = 117;     {line feed command}
-  eCR   {X} = 118;     {carriage return}
-  eSO   {X} = 119;     {invoke G1 charset}
-  eSI   {X} = 120;     {invoke G0 charset}
-  eIND2 {X} = 121;     {corrected eIND (<> eCUD, eDown) new term only}
-  eDECALN   = 122;     {DEC PRIVATE-screen alignment display}
-  eDECDHL   = 123;     {DEC PRIVATE-Double height line}
-  eDECDWL   = 124;     {DEC PRIVATE-Double width line}
-  eDECLL    = 125;     {DEC PRIVATE-load LEDs}
-  eDECREQTPARM = 126;  {DEC PRIVATE-request terminal parameters}
-  eDECSWL   = 127;     {DEC PRIVATE-single width line}
-  eDECTST   = 128;     {DEC PRIVATE-Invoke confidence test}
-  eDECSCS   = 129;     {DEC PRIVATE-select charset}
+	eENQ  {X} = 114;     {enquiry request}
+	eBEL  {X} = 115;     {sound bell}
+	eBS   {X} = 116;     {backspace}
+	eLF   {X} = 117;     {line feed command}
+	eCR   {X} = 118;     {carriage return}
+	eSO   {X} = 119;     {invoke G1 charset}
+	eSI   {X} = 120;     {invoke G0 charset}
+	eIND2 {X} = 121;     {corrected eIND (<> eCUD, eDown) new term only}
+	eDECALN   = 122;     {DEC PRIVATE-screen alignment display}
+	eDECDHL   = 123;     {DEC PRIVATE-Double height line}
+	eDECDWL   = 124;     {DEC PRIVATE-Double width line}
+	eDECLL    = 125;     {DEC PRIVATE-load LEDs}
+	eDECREQTPARM = 126;  {DEC PRIVATE-request terminal parameters}
+	eDECSWL   = 127;     {DEC PRIVATE-single width line}
+	eDECTST   = 128;     {DEC PRIVATE-Invoke confidence test}
+	eDECSCS   = 129;     {DEC PRIVATE-select charset}
 
-  {Extended attributes}
-  eattrBlink      = $01;
-  eattrInverse    = $02;
-  eattrIntense    = $04;
-  eattrInvisible  = $08;
-  eattrUnderline  = $10;
+	{Extended attributes}
+	eattrBlink      = $01;
+	eattrInverse    = $02;
+	eattrIntense    = $04;
+	eattrInvisible  = $08;
+	eattrUnderline  = $10;
 
-  {ANSI color constants}
-  emBlack       = 0;
-  emRed         = 1;
-  emGreen       = 2;
-  emYellow      = 3;
-  emBlue        = 4;
-  emMagenta     = 5;
-  emCyan        = 6;
-  emWhite       = 7;
-  emBlackBold   = 8;
-  emRedBold     = 9;
-  emGreenBold   = 10;
-  emYellowBold  = 11;
-  emBlueBold    = 12;
-  emMagentaBold = 13;
-  emCyanBold    = 14;
-  emWhiteBold   = 15;
+	{ANSI color constants}
+	emBlack       = 0;
+	emRed         = 1;
+	emGreen       = 2;
+	emYellow      = 3;
+	emBlue        = 4;
+	emMagenta     = 5;
+	emCyan        = 6;
+	emWhite       = 7;
+	emBlackBold   = 8;
+	emRedBold     = 9;
+	emGreenBold   = 10;
+	emYellowBold  = 11;
+	emBlueBold    = 12;
+	emMagentaBold = 13;
+	emCyanBold    = 14;
+	emWhiteBold   = 15;
 
-  {AnsiEmulator option flags}
-  teMapVT100           = $0001;
+	{AnsiEmulator option flags}
+	teMapVT100           = $0001;
 
-  {Misc}
-  MaxParams   = 5;       {Maximum parameters for our interpreter}
-  MaxQueue    = 20;      {Maximum characters in queue}
-  MaxOther    = 11;      {Maximum other data}
-  MaxParamLength = 5;    {Maximum parameter length for interpreter}
-  KeyMappingLen = 20;    {Maximum length of a keymapping}
+	{Misc}
+	MaxParams   = 5;       {Maximum parameters for our interpreter}
+	MaxQueue    = 20;      {Maximum characters in queue}
+	MaxOther    = 11;      {Maximum other data}
+	MaxParamLength = 5;    {Maximum parameter length for interpreter}
+	KeyMappingLen = 20;    {Maximum length of a keymapping}
 
 type
-  {AnsiEmulator's parser states}
-  TAnsiParser = (GotNone, GotEscape, GotBracket, GotSemiColon, GotParam,
-                 GotCommand, GotControlSeqIntro, GotLeftBrace, GotRightBrace,
-                 GotSpace, GotQuestionMark, GotQuestionParam);
+	{AnsiEmulator's parser states}
+	TAnsiParser = (GotNone, GotEscape, GotBracket, GotSemiColon, GotParam,
+								 GotCommand, GotControlSeqIntro, GotLeftBrace, GotRightBrace,
+								 GotSpace, GotQuestionMark, GotQuestionParam);
 
-  {Array used for internal queue}
-  TApQueue = Array[1..MaxQueue] of AnsiChar;                                    // SWB
+	{Array used for internal queue}
+	TApQueue = Array[1..MaxQueue] of AnsiChar;                                    // SWB
 
-  {Emulator for PC ANSI codes}
-  PAnsiEmulator = ^TAnsiEmulator;
-  TAnsiEmulator = record
-    emuType        : Cardinal;       { Emulator Type }
-    emuFlags       : Cardinal;
-    emuFirst       : Bool;           {True if first time thru}
-    emuAttr        : Byte;
-    emuIndex       : Cardinal;       {Index into rcvd byte array}
-    emuParamIndex  : Cardinal;       {Parameter index}
-    emuQueue       : TApQueue;       {Queue of recvd bytes}                 // SWB
+	{Emulator for PC ANSI codes}
+	PAnsiEmulator = ^TAnsiEmulator;
+	TAnsiEmulator = record
+		emuType        : Cardinal;       { Emulator Type }
+		emuFlags       : Cardinal;
+		emuFirst       : Bool;           {True if first time thru}
+		emuAttr        : Byte;
+		emuIndex       : Cardinal;       {Index into rcvd byte array}
+		emuParamIndex  : Cardinal;       {Parameter index}
+		emuQueue       : TApQueue;       {Queue of recvd bytes}                 // SWB
 //    emuParamStr    : array[1..MaxParams] of string[MaxParamLength];
-    emuParamStr    : array[1..MaxParams] of AnsiString;
-    emuParamInt    : array[1..MaxParams] of Integer;
-    emuParserState : TAnsiParser;    {Current state}
-    emuOther       : Pointer;
-  end;
+		emuParamStr    : array[1..MaxParams] of string;
+		emuParamInt    : array[1..MaxParams] of Integer;
+		emuParserState : TAnsiParser;    {Current state}
+		emuOther       : Pointer;
+	end;
 
 const
-  {Terminal window Cardinal}
-  gwl_Terminal = 0;
+	{Terminal window Cardinal}
+	gwl_Terminal = 0;
 
-  {Terminal options}
-  tws_WantTab        = $0001; {Process tabs internally}
-  tws_IntHeight      = $0002; {Integral height}
-  tws_IntWidth       = $0004; {Integral width}
-  tws_AutoHScroll    = $0008; {Add/remove horiz scroll automatically}
-  tws_AutoVScroll    = $0010; {Add/remove vert scroll automatically}
+	{Terminal options}
+	tws_WantTab        = $0001; {Process tabs internally}
+	tws_IntHeight      = $0002; {Integral height}
+	tws_IntWidth       = $0004; {Integral width}
+	tws_AutoHScroll    = $0008; {Add/remove horiz scroll automatically}
+	tws_AutoVScroll    = $0010; {Add/remove vert scroll automatically}
 
 type
-  {For general typecasting}
-  LH = record
-    L,H : Word;
-  end;
+	{For general typecasting}
+	LH = record
+		L,H : Word;
+	end;
 
-  {IniDBase (deprecated) consts and types}
+	{IniDBase (deprecated) consts and types}
 const
-  MaxDBRecs    = 999;         {Maximum number of database records}
-  MaxNameLen   = 21;          {Maximum length of a profile string key}
-  MaxIndexLen  = 31;          {Maximum length of an index string}
-  NonValue     = '#';         {Value of DB fields SPECIFICALLY left blank}
-  dbIndex      = 'Index';     {Item index section heading}
-  dbDefaults   = 'Defaults';  {Default value section heading}
-  dbNumEntries = '_Entries';  {Number of entries key name}
-  dbBogus      = 'None';      {Bogus key name for creating sections}
+	MaxDBRecs    = 999;         {Maximum number of database records}
+	MaxNameLen   = 21;          {Maximum length of a profile string key}
+	MaxIndexLen  = 31;          {Maximum length of an index string}
+	NonValue     = '#';         {Value of DB fields SPECIFICALLY left blank}
+	dbIndex      = 'Index';     {Item index section heading}
+	dbDefaults   = 'Defaults';  {Default value section heading}
+	dbNumEntries = '_Entries';  {Number of entries key name}
+	dbBogus      = 'None';      {Bogus key name for creating sections}
 
 type
-  PIniDatabaseKey = ^TIniDatabaseKey;
-  TIniDatabaseKey = record
-    KeyName  : PChar;
-    DataSize : Cardinal;
-    StrType  : Bool;
-    Index    : Bool;
-    Next     : PIniDatabaseKey;
-  end;
+	PIniDatabaseKey = ^TIniDatabaseKey;
+	TIniDatabaseKey = record
+		KeyName  : PAnsiChar;
+		DataSize : Cardinal;
+		StrType  : Bool;
+		Index    : Bool;
+		Next     : PIniDatabaseKey;
+	end;
 
-  PIniDatabase = ^TIniDatabase;
-  TIniDatabase = record
-    FName          : PChar;
-    DictionaryHead : PIniDatabaseKey;
-    DictionaryTail : PIniDatabaseKey;
-    NumRecords     : Integer;
-    RecordSize     : Cardinal;
-    DefaultRecord  : Pointer;
-    Prepared       : Bool;
-  end;
+	PIniDatabase = ^TIniDatabase;
+	TIniDatabase = record
+		FName          : PAnsiChar;
+		DictionaryHead : PIniDatabaseKey;
+		DictionaryTail : PIniDatabaseKey;
+		NumRecords     : Integer;
+		RecordSize     : Cardinal;
+		DefaultRecord  : Pointer;
+		Prepared       : Bool;
+	end;
 
 const
   ApdMaxTags      = 5;     {Maximum number of err corr or data comp tags}
@@ -1573,7 +1573,7 @@ const
 
 type
   {where these same variables are declared as Strings.}
-  TModemNameZ     = array[0..ApdModemNameLen] of AnsiChar;
+TModemNameZ     = array[0..ApdModemNameLen] of AnsiChar;
   TCmdStringZ     = array[0..ApdCmdLen] of AnsiChar;
   TRspStringZ     = array[0..ApdRspLen] of AnsiChar;
   TTagStringZ     = array[0..ApdTagLen] of AnsiChar;
@@ -1649,9 +1649,9 @@ const
   ApdKeyIndexMaxLen  = 120;
 
 type
-  TKeyMapName    = array[0..ApdKeyMapNameLen] of AnsiChar;
-  TKeyMapping    = array[0..KeyMappingLen] of AnsiChar;
-  TKeyMappingStr = string[KeyMappingLen];
+	TKeyMapName    = array[0..ApdKeyMapNameLen] of AnsiChar;
+	TKeyMapping    = array[0..KeyMappingLen] of AnsiChar;
+	TKeyMappingStr = string[KeyMappingLen];
 
 
   PKeyMapXFerRec = ^TKeyMapXFerRec;
@@ -1662,21 +1662,21 @@ type
 
   PVKeyMapRec = ^TVKeyMapRec;
   TVKEyMapRec = record
-    KeyCode   : Cardinal;
-    ShiftState: Cardinal;
-    Mapping   : TKeyMappingStr;
-  end;
+		KeyCode   : Cardinal;
+		ShiftState: Cardinal;
+		Mapping   : TKeyMappingStr;
+	end;
 
-  PKeyEmulator = ^TKeyEmulator;
-  TKeyEmulator = record
-    kbKeyFileName : PansiChar;                            { current file name }
-    kbKeyName     : TKeyMapName;                      { current key index name }
-    kbProcessAll  : Bool;
-    kbProcessExt  : Bool;
-    kbKeyNameList : array[0..ApdKeyIndexMaxLen] of AnsiChar;
-    kbKeyMap      : array[1..ApdMaxKeyMaps] of TVKeyMapRec;
-    kbKeyDataBase : PIniDataBase;          { pointer to the INI data base file }
-  end;
+	PKeyEmulator = ^TKeyEmulator;
+	TKeyEmulator = record
+		kbKeyFileName : PAnsiChar;                        { current file name }
+		kbKeyName     : TKeyMapName;                      { current key index name }
+		kbProcessAll  : Bool;
+		kbProcessExt  : Bool;
+		kbKeyNameList : array[0..ApdKeyIndexMaxLen] of AnsiChar;
+		kbKeyMap      : array[1..ApdMaxKeyMaps] of TVKeyMapRec;
+		kbKeyDataBase : PIniDataBase;          { pointer to the INI data base file }
+	end;
 
 const
   {---- Option codes for protocols ----}
@@ -2199,16 +2199,16 @@ type
     procedure Next;
     procedure Prev;
 
-    procedure Append(const Text: ansistring);
+    procedure Append(const Text: AnsiString);
     procedure AppendTAdStr(TS: TAdStr);
     procedure AppendBuff(Buff: PansiChar);
     procedure Clear;
-    function Copy(Index, SegLen: Integer): ansistring;
+    function Copy(Index, SegLen: Integer): AnsiString;
     procedure Delete(Index, SegLen: Integer);
-    procedure Insert(const Text: ansistring; Index: Integer);
-    function Pos(const SubStr: ansistring): Cardinal;
-    function PosIdx(const SubStr: ansistring; Index: Integer): Cardinal;
-    procedure Prepend(const Text: ansistring);
+    procedure Insert(const Text: AnsiString; Index: Integer);
+    function Pos(const SubStr: AnsiString): Cardinal;
+    function PosIdx(const SubStr: AnsiString; Index: Integer): Cardinal;
+    procedure Prepend(const Text: AnsiString);
     procedure Resize(NewLen: Integer);
   end;
 
@@ -2736,7 +2736,19 @@ procedure ClearByteFlag(var Flags : Byte; FlagMask : Byte);
 
 function ByteFlagIsSet(Flags : Byte; FlagMask : Byte) : Bool;
 
-function PayloadLengthInBytes( const s: string): integer; { String length for all delphi}
+{$IF CompilerVersion <= 18.5}
+// define  CharInSet for Delphi 2007 or earlier
+function CharInSet(const C: Char; const testSet: TSysCharSet): boolean;
+{$IFEND}
+
+
+{$IFDEF UNICODE}
+//BSA - Added in overload version for UTF8 handling - is this best way??
+function PayloadLengthInBytes( const s: UnicodeString): integer;     overload { String length for all delphi}
+function PayloadLengthInBytes( const s: AnsiString): integer; overload { String length for all delphi}
+{$ELSE}
+function PayloadLengthInBytes( const s: AnsiString): integer; { String length for all delphi}
+{$ENDIF}
 
 function AddWordToPtr(P : Pointer; W : Cardinal) : Pointer;
 
@@ -2753,18 +2765,39 @@ function ElapsedTimeInSecs(ET : EventTimer) : LongInt;
 function RemainingTime(ET : EventTimer) : LongInt;
 function RemainingTimeInSecs(ET : EventTimer) : LongInt;
 function DelayTicks(Ticks: LongInt; Yield : Bool) : Longint;
+{$IFNDEF PrnDrv}
+function Long2StrZ(Dest : PChar; L : LongInt) : PChar; overload;
+function Str2LongZ(S : PChar; var I : LongInt) : Bool; overload;
+{$IFDEF UNICODE}
+function Long2StrZ(Dest : PAnsiChar; L : LongInt) : PAnsiChar; overload;
+function Str2LongZ(S : PAnsiChar; var I : LongInt) : Bool; overload;
+{$ENDIF}
+{$ENDIF}
 function JustPathnameZ(out Dest : string; PathName : string) : string; overload;
 function JustPathnameZ(Dest : PAnsiChar; PathName : PAnsiChar) : PAnsiChar; overload;
-function JustFilenameZ(Dest : PAnsiChar; PathName : PAnsiChar) : PAnsiChar;
+{$IFDEF UNICODE}
+function JustPathnameZ(Dest : PWideChar; PathName : PWideChar) : PWideChar; overload;
+{$ENDIF}
+function JustFilenameZ(out Dest : string; PathName : string) : string; overload;
+function JustFilenameZ(Dest : PAnsiChar; PathName : PAnsiChar) : PAnsiChar; overload;
+{$IFDEF UNICODE}
+function JustFilenameZ(Dest : PWideChar; PathName : PWideChar) : PWideChar; overload;
+{$ENDIF}
 {$IFNDEF PrnDrv}
 function JustExtensionZ(out Dest : string; Name : string) : string; overload;
 {$ENDIF}
 function StrStCopy(Dest : PWideChar; S : PWideChar; Pos, Count : Cardinal) : PWideChar; overload;
 function StrStCopy(Dest : PAnsiChar; S : PAnsiChar; Pos, Count : Cardinal) : PAnsiChar; overload;
+{$IFDEF UNICODE}
+	function AddBackSlashZ(Dest : PWideChar; DirName : PWideChar) : PWideChar; overload;
+{$ENDIF}
 function AddBackSlashZ(Dest : PAnsiChar; DirName : PAnsiChar) : PAnsiChar; overload;
 function AddBackSlashZ(out Dest : string; DirName : string) : string; overload;
 {$IFNDEF PrnDrv}
-function ExistFileZ(FName : string) : Bool; overload;
+	function ExistFileZ(FName : String) : Bool; overload;
+{$IFDEF UNICODE}
+	function ExistFileZ(FName : AnsiString) : Bool; overload;
+{$ENDIF}
 {$ENDIF}
 function ForceExtensionZ(out Dest : string; Name, Ext : string) : string; overload;
 function DefaultExtensionZ(out Dest : string; Name, Ext : string) : string; overload;
@@ -2949,7 +2982,7 @@ begin
   begin                                                                     // SWB
     { if we're at the end of the file, make sure it has the line term char }
     if (BytesRead<LineBufferSize) and                                      {!!.04}
-      not(Buffer[BytesRead-1] in [#13,#$1A]) then                          {!!.04}
+			not CharInSet(Buffer[BytesRead-1], [#13,#$1A]) then                          {!!.04}
       Buffer[BytesRead] := #13;                                            {!!.04}
     ReadPtr := @Buffer[0];
     if ReadPtr^ = #10 then inc(ReadPtr);
@@ -3122,7 +3155,7 @@ begin
   Inc(FCur, Index-1);
 end;
 
-procedure TAdStr.Insert(const Text: ansistring; Index: Integer);
+procedure TAdStr.Insert(const Text: AnsiString; Index: Integer);
 var
   Buff: PansiChar;
   NewLen: Integer;
@@ -3217,7 +3250,7 @@ begin
     Result := FCur - FString + 1;
 end;
 
-procedure TAdStr.Prepend(const Text: ansistring);
+procedure TAdStr.Prepend(const Text: AnsiString);
 begin
   Insert(Text,1);
 end;
@@ -3458,6 +3491,37 @@ const
     DelayTicks := Res;
   end;
 
+	{$IFNDEF PrnDrv}
+	{$IFDEF UNICODE}
+	function Long2StrZ(Dest : PChar; L : LongInt) : PChar; overload;
+		{-Convert a long/Cardinal/integer/byte/shortint to a string}
+	var
+		S : string;
+	begin
+		S := IntToStr(L);
+		Result := StrPCopy(Dest, S);
+	end;
+	function Long2StrZ(Dest : PAnsiChar; L : LongInt) : PAnsiChar; overload;
+		{-Convert a long/Cardinal/integer/byte/shortint to a string}
+	var
+		S : AnsiString;
+	begin
+		S := AnsiString(IntToStr(L));
+		Result := StrPCopy(Dest, S);
+	end;
+	{$ELSE}
+	function Long2StrZ(Dest : PAnsiChar; L : LongInt) : PAnsiChar;
+		{-Convert a long/Cardinal/integer/byte/shortint to a string}
+	var
+		S : AnsiString;
+	begin
+		S := AnsiString(IntToStr(L));
+		Result := StrPCopy(Dest, S);
+	end;
+	{$ENDIF}
+
+	{$ENDIF}
+
 const
   MaxLen  = 255;
   ExtLen = 3;
@@ -3465,18 +3529,38 @@ const
 type
   TSmallArray = Array[0..MaxLen-1] of Char;
 
-  {$IFNDEF PrnDrv}
-  function Str2LongZ(S : PChar; var I : LongInt) : Bool;
-    {-Convert a string to a longint, returning true if successful}
-  var
-    Err : Integer;
-  begin
-    Val(StrPas(S),I,Err);
-    Result := Err = 0;
-  end;
+	{$IFNDEF PrnDrv}
+	{$IFDEF UNICODE}
+	function Str2LongZ(S : PChar; var I : LongInt) : Bool; overload;
+		{-Convert a string to a longint, returning true if successful}
+	var
+		Err : Integer;
+	begin
+		Val(StrPas(S),I,Err);
+		Result := Err = 0;
+	end;
+
+	function Str2LongZ(S : PAnsiChar; var I : LongInt) : Bool; overload;
+		{-Convert a string to a longint, returning true if successful}
+	var
+		Err : Integer;
+	begin
+		Val(string(StrPas(S)),I,Err);
+		Result := Err = 0;
+	end;
+	{$ELSE}
+	function Str2LongZ(S : PChar; var I : LongInt) : Bool;
+		{-Convert a string to a longint, returning true if successful}
+	var
+		Err : Integer;
+	begin
+		Val(StrPas(S),I,Err);
+		Result := Err = 0;
+	end;
+	{$ENDIF}
   {$ENDIF}
 
-  function JustPathnameZ(out Dest : string; PathName : string) : string;
+	function JustPathnameZ(out Dest : string; PathName : string) : string; overload;
     {-Return just the drive:directory portion of a pathname}
   begin
     Result := ExtractFileDir(PathName);
@@ -3492,7 +3576,7 @@ type
     I := StrLen(PathName);
     repeat
       Dec(I);
-    until (I = -1) or (PathName[I] in DosDelimSet);
+    until (I = -1) or CharInSet(PathName[I], DosDelimSet);
 
     if I = -1 then
       {Had no drive or directory name}
@@ -3514,17 +3598,76 @@ type
     Result := Dest;
   end;
 
-  function JustFilenameZ(Dest : PAnsiChar; PathName : PAnsiChar) : PAnsiChar;
+	{$IFDEF UNICODE}
+	function JustPathnameZ(Dest : PWideChar; PathName : PWideChar) : PWideChar; overload;
+		{-Return just the drive:directory portion of a pathname}
+	var
+		I : Integer;
+
+	begin
+		I := StrLen(PathName);
+		repeat
+			Dec(I);
+		until (I = -1) or CharInSet(PathName[I], DosDelimSet);
+
+		if I = -1 then
+			{Had no drive or directory name}
+			Dest[0] := #0
+		else if I = 0 then begin
+			{Either the root directory of default drive or invalid pathname}
+			Dest[0] := PathName[0];
+			Dest[1] := #0;
+		end else if (PathName[I] = '\') then begin
+			if PathName[Pred(I)] = ':' then
+				{Root directory of a drive, leave trailing backslash}
+				Dest := StrStCopy(Dest, PathName, 0, Succ(I))
+			else
+				{Subdirectory, remove the trailing backslash}
+				Dest := StrStCopy(Dest, PathName, 0, I);
+		end else
+			{Either the default directory of a drive or invalid pathname}
+			Dest:= StrStCopy(Dest, PathName, 0, Succ(I));
+		Result := Dest;
+	end;
+	{$ENDIF}
+
+  function JustFilenameZ(out Dest : string; PathName : string) : string; overload;
+    {-Return just the filename of a pathname}
+  var
+    I : Cardinal;
+  begin
+    I := Length(PathName);
+    while (I > 0) and (not CharInSet(PathName[I-1], DosDelimSet)) do
+      Dec(I);
+    Dest := Copy(PathName, I, Length(PathName));
+    Result := Dest;
+  end;
+
+  function JustFilenameZ(Dest : PAnsiChar; PathName : PAnsiChar) : PAnsiChar; overload;
     {-Return just the filename of a pathname}
   var
     I : Cardinal;
   begin
     I := StrLen(PathName);
-    while (I > 0) and (not (PathName[I-1] in DosDelimSet)) do
+    while (I > 0) and (not CharInSet(PathName[I-1],  DosDelimSet)) do
       Dec(I);
     Dest := StrStCopy(Dest, PathName, I, MaxLen);
     Result := Dest;
   end;
+
+{$IFDEF UNICODE}
+	function JustFilenameZ(Dest : PWideChar; PathName : PWideChar) : PWideChar; overload;
+		{-Return just the filename of a pathname}
+	var
+		I : Cardinal;
+	begin
+		I := StrLen(PathName);
+		while (I > 0) and (not CharInSet(PathName[I-1], DosDelimSet)) do
+			Dec(I);
+		Dest := StrStCopy(Dest, PathName, I, MaxLen);
+		Result := Dest;
+	end;
+{$ENDIF}
 
   {$IFNDEF PrnDrv}
   function JustExtensionZ(out Dest : string; Name : string) : string;
@@ -3532,137 +3675,175 @@ type
     X : string;
   begin
     X := ExtractFileExt(Name);
-    if X = '' then
-      Dest := ''
-    else
-      Dest := Copy(X, 2, 255);
-    Result := Dest;
-  end;
-  {$ENDIF}
+		if X = '' then
+			Dest := ''
+		else
+			Dest := Copy(X, 2, 255);
+		Result := Dest;
+	end;
+	{$ENDIF}
 
-  function StrStCopy(Dest : PAnsiChar; S : PAnsiChar; Pos, Count : Cardinal) : PAnsiChar;
-  var
-    Len : Cardinal;
+	function StrStCopy(Dest : PAnsiChar; S : PAnsiChar; Pos, Count : Cardinal) : PAnsiChar; overload;
+	var
+		Len : Cardinal;
 
-  begin
-    Len := StrLen(S);
-    if Pos < Len then begin
-      if (Len-Pos) < Count then
-        Count := Len-Pos;
-      Move(S[Pos], Dest^, Count);
-      Dest[Count] := #0;
-    end else
-      Dest[0] := #0;
-    Result := Dest;
-  end;
+	begin
+		Len := StrLen(S);
+		if Pos < Len then begin
+			if (Len-Pos) < Count then
+				Count := Len-Pos;
+			Move(S[Pos], Dest^, Count);
+			Dest[Count] := #0;
+		end else
+			Dest[0] := #0;
+		Result := Dest;
+	end;
 
 {$IFNDEF UNICODE}
 function StrLenW( const Str: PWideChar): Cardinal;
 asm
-  {Check the first byte}
-  cmp word ptr [eax], 0
-  je @ZeroLength
-  {Get the negative of the string start in edx}
-  mov edx, eax
-  neg edx
+	{Check the first byte}
+	cmp word ptr [eax], 0
+	je @ZeroLength
+	{Get the negative of the string start in edx}
+	mov edx, eax
+	neg edx
 @ScanLoop:
-  mov cx, word ptr [eax]
-  add eax, 2
-  test cx, cx
-  jnz @ScanLoop
-  lea eax, [eax + edx - 2]
-  shr eax, 1
-  ret
+	mov cx, word ptr [eax]
+	add eax, 2
+	test cx, cx
+	jnz @ScanLoop
+	lea eax, [eax + edx - 2]
+	shr eax, 1
+	ret
 @ZeroLength:
-  xor eax, eax
+	xor eax, eax
 end;
 {$ENDIF}
 
 
-  function StrStCopy( Dest : PWideChar; S : PWideChar; Pos, Count : Cardinal) : PWideChar;
-  var
-    Len : Cardinal; // Length in code points.
-  begin
+	function StrStCopy( Dest : PWideChar; S : PWideChar; Pos, Count : Cardinal) : PWideChar; overload;
+	var
+		Len : Cardinal; // Length in code points.
+	begin
 {$IFDEF UNICODE}
-    Len := StrLen(S);
+		Len := StrLen(S);
 {$ELSE}
-    Len := StrLenW(S);
+		Len := StrLenW(S);
 {$ENDIF}
-  if Pos < Len then
-      begin
-      if (Len-Pos) < Count then
-        Count := Len-Pos;
-      Move(S[Pos], Dest^, Count * SizeOf(WideChar));
-      Dest[Count] := #0;
-      end
-    else
-      Dest[0] := #0;
-  StrStCopy := Dest
-  end;
+	if Pos < Len then
+			begin
+			if (Len-Pos) < Count then
+				Count := Len-Pos;
+			Move(S[Pos], Dest^, Count * SizeOf(WideChar));
+			Dest[Count] := #0;
+			end
+		else
+			Dest[0] := #0;
+	StrStCopy := Dest
+	end;
 
+	{$IFDEF UNICODE}
+	function AddBackSlashZ(Dest : PWideChar; DirName : PWideChar) : PWideChar;
+		{-Add a default backslash to a directory name}
+	var
+		L : Cardinal;
+	begin
+		Result := Dest;
+		StrCopy(Dest, DirName);
+		L := StrLen(DirName);
+		if (L > 0) and not CharInSet(DirName[L-1], DosDelimSet) then begin
+			Dest[L] := '\';
+			Dest[L+1] := #0;
+		end;
+	end;
+	{$ENDIF}
 
-  function AddBackSlashZ(out Dest : string; DirName : string) : string; overload;
-    {-Add a default backslash to a directory name}
-  begin
-    Result := IncludeTrailingPathDelimiter(DirName);
-    Dest := Result;
-  end;
+	function AddBackSlashZ(Dest : PAnsiChar; DirName : PAnsiChar) : PAnsiChar;
+		{-Add a default backslash to a directory name}
+	var
+		L : Cardinal;
+	begin
+		Result := Dest;
+		StrCopy(Dest, DirName);
+		L := StrLen(DirName);
+		if (L > 0) and not CharInSet(DirName[L-1], DosDelimSet) then begin
+			Dest[L] := '\';
+			Dest[L+1] := #0;
+		end;
+	end;
 
-  function AddBackSlashZ(Dest : PAnsiChar; DirName : PAnsiChar) : PAnsiChar;
-    {-Add a default backslash to a directory name}
-  var
-    L : Cardinal;
-  begin
-    Result := Dest;
-    StrCopy(Dest, DirName);
-    L := StrLen(DirName);
-    if (L > 0) and not(DirName[L-1] in DosDelimSet) then begin
-      Dest[L] := '\';
-      Dest[L+1] := #0;
-    end;
-  end;
+	function AddBackSlashZ(out Dest : string; DirName : string) : string; overload;
+		{-Add a default backslash to a directory name}
+	begin
+		Result := IncludeTrailingPathDelimiter(DirName);
+		Dest := Result;
+	end;
 
-  {$IFNDEF PrnDrv}
-  function ExistFileZ(FName : string) : Bool;
-  begin
-    Result := FileExists(FName);
-  end;
-  {$ENDIF}
+	{$IFNDEF PrnDrv}
+	function ExistFileZ(FName : string) : Bool; overload;
+	begin
+		Result := FileExists(FName);
+	end;
 
-  function ForceExtensionZ(out Dest : string; Name, Ext : string) : string; overload;
-  begin
-    Result := ChangeFileExt(Name,'.'+Ext);
-    Dest := Result;
-  end;
+	{$IFDEF UNICODE}
+	function ExistFileZ(FName : AnsiString) : Bool; overload;
+	begin
+		Result := FileExists(string(FName));
+	end;
+	{$ENDIF}
+	{$ENDIF}
 
-  function DefaultExtensionZ(out Dest : string; Name, Ext : string) : string;
-  var
-    S : string;
-  begin
-    S := Name;
-    if ExtractFileExt(S) = '' then
-      S := ChangeFileExt(S,'.'+Ext);
-    Dest := S;
-    Result := S;
-  end;
+	function ForceExtensionZ(out Dest : string; Name, Ext : string) : string; overload;
+	begin
+		Result := ChangeFileExt(Name,'.'+Ext);
+		Dest := Result;
+	end;
 
-  function GetPtr(P : Pointer; O : LongInt) : Pointer; assembler; register;
-  asm
-    add   eax,edx   {eax = P; edx = Offset}
-  end;
+	function DefaultExtensionZ(out Dest : string; Name, Ext : string) : string;
+	var
+		S : string;
+	begin
+		S := Name;
+		if ExtractFileExt(S) = '' then
+			S := ChangeFileExt(S,'.'+Ext);
+		Dest := S;
+		Result := S;
+	end;
+
+	function GetPtr(P : Pointer; O : LongInt) : Pointer; assembler; register;
+	asm
+		add   eax,edx   {eax = P; edx = Offset}
+	end;
+
+{$IF CompilerVersion <= 18.5}
+// define  CharInSet for Delphi 2007 or earlier
+function CharInSet(const C: Char; const testSet: TSysCharSet): boolean;
+begin
+	Result := C in testSet;
+end;
+{$IFEND}
+
 
 { length of the string for all delphi version }
 //SZ note: nice try, but doesn't work as expected
-function PayloadLengthInBytes( const s: string): integer;
-  begin
-  {$IFDEF CompilerVersion >= 210}
-    result := Length( s) * StringElementSize( s)
-  {$ELSE}
-    result := Length( s) * SizeOf( Char)
-  {$ENDIF}
+function PayloadLengthInBytes( const s: string): integer; overload
+	begin
+	{$IFDEF VER220}
+		result := Length( s) * StringElementSize( s)
+	{$ELSE}
+		result := Length( s) * SizeOf( Char)
+	{$ENDIF}
   end;
 
-  procedure NotBuffer(var Buf; Len : Cardinal); assembler; register;
+	{$IFDEF UNICODE}
+	function PayloadLengthInBytes( const s: AnsiString): integer; overload
+	begin
+		result := Length(s);
+	end;
+	{$ENDIF}
+
+procedure NotBuffer(var Buf; Len : Cardinal); assembler; register;
   asm
     {eax is the pointer to the buffer}
     {edx is the length of the buffer}
@@ -3743,9 +3924,9 @@ function PayloadLengthInBytes( const s: string): integer;
   if not CharInSet( result[L], DosDelimSet) then
 {$ELSE}
   {$IFDEF UNICODE}
-    if not (result[L] < #$0100) and (AnsiChar(result[L]) in DosDelimSet) then
+    if not (result[L] < #$0100) and CharInSet(result[L], DosDelimSet) then
   {$ELSE}
-    if not (result[L] in DosDelimSet) then
+    if not CharInSet(result[L], DosDelimSet) then
   {$ENDIF}
 {$IFEND}
     result := result + '\';

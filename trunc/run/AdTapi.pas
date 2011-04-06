@@ -26,7 +26,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                    ADTAPI.PAS 5.00                    *}
+{*                    ADTAPI.PAS 5.01                    *}
 {*********************************************************}
 {* TApdTapiDevice, status and log components             *}
 {*********************************************************}
@@ -250,7 +250,7 @@ type
     FCancelled      : Boolean;            {True if call was cancelled}
     FDialing        : Boolean;            {True when dialing, False not}
     FDialTime       : LongInt;            {Elapsed dial time}
-    FTapiDevices    : TStrings;           {List of tapi device names}
+    FTapiDevices    : TStringList;           {List of tapi device names}
     FSelectedDevice : string;             {Name of selected device}
     FApiVersion     : LongInt;            {Negotiated version}
     FDeviceCount    : DWORD;              {Number of supported TAPI devices}
@@ -349,15 +349,15 @@ type
     {Property access methods}
     function GetBPSRate : DWORD;
     function GetCalledID: string;
-    function GetCalledIDName: AnsiString;
-    function GetCallerID : Ansistring;
-    function GetCallerIDName : Ansistring;
+    function GetCalledIDName: string;
+    function GetCallerID : string;
+    function GetCallerIDName : string;
     function GetComNumber : Integer;
     function GetParentHWnd : HWnd;
     function GetTapiState : TTapiState;
     procedure SetStatusDisplay(const NewDisplay : TApdAbstractTapiStatus);
     procedure SetTapiLog(const NewLog : TApdTapiLog);
-    procedure SetTapiDevices(const Values : TStrings);
+		procedure SetTapiDevices(const Values : TStringList);
     procedure SetSelectedDevice(const NewDevice : string);
     procedure SetEnableVoice(Value: Boolean);
     procedure SetMonitorRecording(const Value : Boolean);
@@ -462,11 +462,11 @@ type
       read GetBPSRate;
     property CalledID : string                                           {!!.04}
       read GetCalledID;                                                  {!!.04}
-    property CalledIDName : Ansistring                                   {!!.04}
+    property CalledIDName : string                                   {!!.04}
       read GetCalledIDName;                                              {!!.04}
-    property CallerID : Ansistring
+    property CallerID : string
       read GetCallerID;
-    property CallerIDName : Ansistring
+    property CallerIDName : string
       read GetCallerIDName;
     property Cancelled : Boolean
       read FCancelled;
@@ -480,10 +480,10 @@ type
       read FWaitingForCall;                                              {!!.04}
 
   public
-    property TapiDevices : TStrings
-      read FTapiDevices write SetTapiDevices;
-    property SelectedDevice : string
-      read FSelectedDevice write SetSelectedDevice;
+		property TapiDevices : TStringList
+			read FTapiDevices write SetTapiDevices;
+		property SelectedDevice : string
+			read FSelectedDevice write SetSelectedDevice;
     property ComPort : TApdCustomComPort
       read FComPort write FComPort;
     property StatusDisplay : TApdAbstractTapiStatus
@@ -971,76 +971,82 @@ type
 
 {TApdCustomTapiDevice}
 
-  function SearchStatusDisplay(const C : TComponent) : TApdAbstractTapiStatus;
-    {-Search for a status display in the same form as TComponent}
+	function SearchStatusDisplay(const C : TComponent) : TApdAbstractTapiStatus;
+		{-Search for a status display in the same form as TComponent}
 
-    function FindStatusDisplay(const C : TComponent) : TApdAbstractTapiStatus;
-    var
-      I  : Integer;
-    begin
-      Result := nil;
-      if not Assigned(C) then
-        Exit;
+		function FindStatusDisplay(const C : TComponent) : TApdAbstractTapiStatus;
+		var
+			I  : Integer;
+		begin
+			Result := nil;
+			if not Assigned(C) then
+				Exit;
 
-      {Look through all of the owned components}
-      for I := 0 to C.ComponentCount-1 do begin
-        if C.Components[I] is TApdAbstractTapiStatus then begin
-          {...and it's not assigned}
-          if not Assigned(
-            TApdAbstractTapiStatus(C.Components[I]).FTapiDevice) then begin
-            Result := TApdAbstractTapiStatus(C.Components[I]);
-            Exit;
-          end;
-        end;
+			{Look through all of the owned components}
+			for I := 0 to C.ComponentCount-1 do
+			begin
+				if C.Components[I] is TApdAbstractTapiStatus then
+				begin
+					{...and it's not assigned}
+					if not Assigned(
+						TApdAbstractTapiStatus(C.Components[I]).FTapiDevice) then
+					begin
+						Result := TApdAbstractTapiStatus(C.Components[I]);
+						Exit;
+					end;
+				end;
 
-        {If this isn't one, see if it owns other components}
-        Result := FindStatusDisplay(C.Components[I]);
-      end;
-    end;
+				{If this isn't one, see if it owns other components}
+				Result := FindStatusDisplay(C.Components[I]);
+			end;
+		end;
 
-  begin
-    {Search the entire form}
-    Result := FindStatusDisplay(C);
-  end;
+	begin
+		{Search the entire form}
+		Result := FindStatusDisplay(C);
+	end;
 
-  function SearchTapiLog(const C : TComponent) : TApdTapiLog;
-    {-Search for a tapi log component on the same form as TComponent}
+	function SearchTapiLog(const C : TComponent) : TApdTapiLog;
+		{-Search for a tapi log component on the same form as TComponent}
 
-    function FindTapiLog(const C : TComponent) : TApdTapiLog;
-    var
-      I  : Integer;
-    begin
-      Result := nil;
-      if not Assigned(C) then
-        Exit;
+		function FindTapiLog(const C : TComponent) : TApdTapiLog;
+		var
+			I  : Integer;
+		begin
+			Result := nil;
+			if not Assigned(C) then
+				Exit;
 
-      {Look through all of the owned components}
-      for I := 0 to C.ComponentCount-1 do begin
-        if C.Components[I] is TApdTapiLog then begin
-          {...and it's not assigned}
-          if not Assigned(TApdTapiLog(C.Components[I]).FTapiDevice) then begin
-            Result := TApdTapiLog(C.Components[I]);
-            Exit;
-          end;
-        end;
+			{Look through all of the owned components}
+			for I := 0 to C.ComponentCount-1 do
+			begin
+				if C.Components[I] is TApdTapiLog then
+				begin
+					{...and it's not assigned}
+					if not Assigned(TApdTapiLog(C.Components[I]).FTapiDevice) then
+					begin
+						Result := TApdTapiLog(C.Components[I]);
+						Exit;
+					end;
+				end;
 
-        {If this isn't one, see if it owns other components}
-        Result := FindTapiLog(C.Components[I]);
-      end;
-    end;
+				{If this isn't one, see if it owns other components}
+				Result := FindTapiLog(C.Components[I]);
+			end;
+		end;
 
-  begin
-    {Search the entire form}
-    Result := FindTapiLog(C);
-  end;
+	begin
+		{Search the entire form}
+		Result := FindTapiLog(C);
+	end;
 
-  procedure TApdCustomTapiDevice.DoLineReply(Device, P1, P2, P3 : LongInt);
-  begin
-    if (RequestedId = P1) then begin
-      ReplyReceived := True;
-      AsyncReply := P2;
-    end;
-  end;
+	procedure TApdCustomTapiDevice.DoLineReply(Device, P1, P2, P3 : LongInt);
+	begin
+		if (RequestedId = P1) then begin
+			ReplyReceived := True;
+			AsyncReply := P2;
+		end;
+	end;
 
   procedure TApdCustomTapiDevice.DoLineCallInfo(Device, P1, P2, P3 : LongInt);
   begin
@@ -1696,562 +1702,576 @@ type
     except
       FEnableVoice := False;
       raise ETapiVoiceNotSupported.Create(ecTapiVoiceNotSupported, True);
-    end;
-     {Shutdown this line}
-    tuLineShutdown(LineApp);
-  end;
-
-  procedure TApdCustomTapiDevice.Notification(AComponent : TComponent;
-                                              Operation : TOperation);
-    {-Handle new/deleted components}
-  begin
-    inherited Notification(AComponent, Operation);
-
-    if Operation = opRemove then begin
-      {Owned components going away}
-      if AComponent = FComPort then
-        ComPort := nil;
-      if AComponent = FStatusDisplay then
-        StatusDisplay := nil;
-      if AComponent = FTapiLog then
-        TapiLog := nil;
-    end else if Operation = opInsert then begin
-      {Check for new comport}
-      if AComponent is TApdCustomComPort then begin
-        if not Assigned(FComPort) then
-          ComPort := TApdCustomComPort(AComponent);
-
-        {Force its TapiMode to True, AutoOpen and Open to False}
-        if ComPort.TapiMode = tmAuto then begin
-          ComPort.TapiMode := tmOn;
-          ComPort.AutoOpen := False;
-          ComPort.Open := False;
-        end;
-      end;
-
-      {Check for new status component}
-      if AComponent is TApdAbstractTapiStatus then begin
-        if not Assigned(FStatusDisplay) then
-          if not Assigned(TApdAbstractTapiStatus(AComponent).FTapiDevice) then
-            StatusDisplay := TApdAbstractTapiStatus(AComponent);
-      end;
-
-      {Check for new log component}
-      if AComponent is TApdTapiLog then begin
-        if not Assigned(FTapiLog) then
-          if not Assigned(TApdTapiLog(AComponent).FTapiDevice) then
-            TapiLog := TApdTapiLog(AComponent);
-      end;
-    end;
-  end;
-
-  procedure TApdCustomTapiDevice.Loaded;                                 {!!.02}
-  begin
-    inherited;
-    if not Assigned(FComPort) then begin
-      FComPort := SearchComPort(Owner);
-      if Assigned(FComPort) and (ComPort.TapiMode = tmAuto) then begin
-        ComPort.TapiMode := tmOn;
-        ComPort.AutoOpen := False;
-        ComPort.Open := False;
-      end;
-    end;
-  end;
-
-  constructor TApdCustomTapiDevice.Create(AOwner : TComponent);
-    {-Create the object instance}
-  begin
-    {This causes notification events for all other components}
-    inherited Create(AOwner);
-    {Create the TAPI name string list}
-    FTapiDevices := TStringList.Create;
-
-    FSilence.AppSpecific := 5;
-    FSilence.Duration := 5000;
-    FSilence.Frequency1 := 0;
-    FSilence.Frequency2 := 0;
-    FSilence.Frequency3 := 0;
-
-    {Private inits}
-    LineApp         := 0;
-    LineHandle      := 0;
-    CallHandle      := 0;
-    SelectedLine    := -1;
-    RetryPending    := False;
-    FillChar(LineExt, SizeOf(LineExt), 0);
-    FDialTime       := 0;
-    PassThruMode    := False;
-
-    {Property inits}
-    FDialing         := False;
-    FSelectedDevice  := '';
-    FDeviceCount     := 0;
-    FOpen            := False;
-    FCallInfo        := nil;
-    FAnsRings        := DefAnsRings;
-    FMaxAttempts     := DefMaxAttempts;
-    FAttempt         := 0;
-    FRetryWait       := DefRetryWait;
-    FShowTapiDevices := DefShowTapiDevices;
-    FShowPorts       := DefShowPorts;
-    FWaveState       := wsIdle;
-    FInterruptWave   := True;
-    FMaxMessageLength:= DefMaxMessageLength;
-    FWaveState       := DefWaveState;
-    FUseSoundCard    := DefUseSoundCard;
-    FTrimSeconds     := DefTrimSeconds;
-    FSilenceThreshold:= DefSilenceThreshold;
-    Channels         := DefChannels;
-    SamplesPerSecond := DefSamplesPerSecond;
-    BitsPerSample    := DefBitsPerSample;
-    FMonitorRecording:= DefMonitorRecording;
-    FFilterUnsupportedDevices := True;
-    FWaitingForCall  := False;                                           {!!.04}
-
-    {Search for a comport - do this in .Loaded }
-    {FComPort := SearchComPort(Owner);}                                  {!!.02}
-    {if Assigned(FComPort) and (ComPort.TapiMode = tmAuto) then begin}   {!!.02}
-      {ComPort.TapiMode := tmOn;}                                        {!!.02}
-      {ComPort.AutoOpen := False;}                                       {!!.02}
-      {ComPort.Open := False;}                                           {!!.02}
-    {end;}                                                               {!!.02}
-
-    {Search for a status display}
-    StatusDisplay := SearchStatusDisplay(Owner);
-
-    {Search for a tapi log}
-    TapiLog := SearchTapiLog(Owner);
-
-    if not (csDesigning in ComponentState) then begin
-      {Init TAPI}
-      StartTapi;
-
-      {Get the list of TAPI line devices}
-      EnumLineDevices;
-    end;
-    FHandle := AllocateHWnd(WndProc);
-  end;
-
-  destructor TApdCustomTapiDevice.Destroy;
-    {-Destroy the object instance}
-  begin
-    {Make sure the line is closed}
-    Open := False;
-
-    {Stop TAPI}
-    StopTapi;
-
-    {Get rid of the string list}
-    FTapiDevices.Free;
-
-    {Deallocate FCallInfo}
-    if Assigned(FCallInfo) then begin
-      FreeMem(FCallInfo, FCallInfo^.TotalSize);
-      FCallInfo := nil;
-    end;
-
-    { Might need to free the wave buffers. }
-    FreeWaveOutBuffer;
-
-    if FHandle <> 0 then DeallocateHWnd(FHandle);
-    inherited Destroy;
-  end;
-
-  procedure TApdCustomTapiDevice.Assign(Source: TPersistent);
-    {-Assign values of Source to self}
-  var
-    SourceTapi : TApdCustomTapiDevice absolute Source;
-  begin
-    if Source is TApdCustomTapiDevice then begin
-      {Get rid of existing names...}
-      FTapiDevices.Clear;
-
-      {Property inits}
-      FDialing         := SourceTapi.FDialing;
-      FSelectedDevice  := SourceTapi.FSelectedDevice;
-      FDeviceCount     := SourceTapi.FDeviceCount;
-      FOpen            := SourceTapi.FOpen;
-      FMaxAttempts     := SourceTapi.FMaxAttempts;
-      FAnsRings        := SourceTapi.FAnsRings;
-      FAttempt         := SourceTapi.FAttempt;
-      FRetryWait       := SourceTapi.FRetryWait;
-      FShowTapiDevices := SourceTapi.FShowTapiDevices;
-      FComPort         := SourceTapi.FComPort;
-      FStatusDisplay   := SourceTapi.FStatusDisplay;
-      FTapiLog         := SourceTapi.FTapiLog;
-
-      {Handle FCallInfo}
-      if Assigned(FCallInfo) then begin
-        FreeMem(FCallInfo, FCallInfo^.TotalSize);
-        FCallInfo := nil;
-      end;
-      SourceTapi.CopyCallInfo(FCallInfo);
-    end;
-  end;
-
-  procedure TApdCustomTapiDevice.SetOpen(NewOpen : Boolean);
-    {-Open or close the selected TAPI line device}
-  const
-    CallPrivilege : array[Boolean] of LongInt =
-      (LINECALLPRIVILEGE_OWNER, LINECALLPRIVILEGE_NONE);
-  var
-    InitMediaModes : LongInt;
-  begin
-    StartTapi;
-
-    if FEnableVoice then
-      InitMediaModes := LINEMEDIAMODE_AUTOMATEDVOICE
-    else
-      InitMediaModes := LINEMEDIAMODE_DATAMODEM;
-
-    {Refresh the device ID from the selected string}
-    if NewOpen then
-      SelectedLine := GetSelectedLine;
-
-    if NewOpen <> FOpen then begin
-      if NewOpen then begin
-        TapiFailFired := False;
-
-        TapiException(Self, tuLineOpen(LineApp, SelectedLine,
-          LineHandle, ApiVersion, 0, LongInt(Self),
-          CallPrivilege[Dialing], InitMediaModes, 0));
-
-        TapiInUse := True;
-        TapiHasOpened := True;
-
-        {Request all status messages for this line}
-        TapiException(Self, tuLineSetStatusMessages(LineHandle,
-          AllLineDeviceStates, AllAddressStates));
-
-        {Set the new state}
-        FOpen := True;
-
-        {Log the call as open}
-        if (Attempt = 1) or (not Dialing) then
-          TapiLogging(ltapiCallStart);
-
-      end else begin
-        HangupCall(False);
-      end;
-    end;
-  end;
-
-  procedure TApdCustomTapiDevice.EnumLineDevices;
-    {-Enumerate all line devices and save their names in TapiDevices}
-  var
-    I        : Integer;
-    LineCaps : PLineDevCaps;
-    S        : string;
-  begin
-    StartTapi;
-
-    {Get rid of old list}
-    FTapiDevices.Clear;
-
-    {Enumerate all line devices and build a list of names}
-    for I := 1 to FTrueDeviceCount do begin
-      {Negotiate the API version to use for this device}
-      if tuLineNegotiateApiVersion(LineApp, I-1, TapiLowVer,
-        TapiHighVer, FApiVersion, LineExt) = 0 then begin
-
-        {Get the device capabilities}
-        LineCaps := nil;
-        try
-          if tuLineGetDevCapsDyn(LineApp, I-1, ApiVersion,
-            0, LineCaps) <> 0 then Exit;
-
-          {Check for nil - bail if so}
-          if not Assigned(LineCaps) then Exit;
-
-          {Extract the device name}
-          with LineCaps^ do begin
-            {$IFOPT H+}
-            SetLength(S, LineNameSize);
-            Move(LineCaps^.Data[LineNameOffset], PChar(S)^, LineNameSize);
-            {$ELSE}
-            Move(LineCaps^.Data[LineNameOffset], S[1], LineNameSize);
-            S[0] := Char(LineNameSize);
-            {$ENDIF}
-          end;
-          {added this section}                                         
-          if FFilterUnsupportedDevices then begin
-            { check to see if it's capable of data }
-            if ((LineCaps^.MediaModes and LINEMEDIAMODE_DATAMODEM) = 0) then
-              { it can't make a data connection }
-              if ((LineCaps^.MediaModes and LINEMEDIAMODE_AUTOMATEDVOICE) = 0) then
-                { it can't make an automated voice call either}
-                S := ''
-              else begin
-                { it can make a data and Automated voice call, does it support wave? }
-                { see if it supports the Wave/in and wave/out device classes }
-                FillChar(VS, SizeOf(TVarString), 0);                   
-                if (tuLineGetID(LineApp, 0, 0, LINECALLSELECT_LINE, VS, 'wave/in') <> 0) and
-                   (tuLineGetID(LineApp, 0, 0, LINECALLSELECT_LINE, VS, 'wave/out') <> 0) then
-                  S := '';
-              end;
-            if ((LineCaps^.LineFeatures and LINEFEATURE_MAKECALL) = 0) then
-              { it can't make a call }
-              S := '';
-          end;
-          {end of added section}                                       
-
-
-        finally
-          {Free the buffer allocated by LineGetDevCapsDyn}
-          if Assigned(LineCaps) then
-            FreeMem(LineCaps, LineCaps^.TotalSize);
-        end;
-
-        {Add the name our list}
-        if S <> '' then
-          TapiDevices.Add(Copy(S, 1, Length(S)-1));
-      end;
-      FDeviceCount := TapiDevices.Count;                               
-    end;
-  end;
-
-  function TApdCustomTapiDevice.StartTapi : Boolean;
-    {-Initialize TAPI}
-  var
-    lResult : LongInt;
-    AppName : array[0..255] of AnsiChar;
-    TimeStart : DWORD;
-    TryReInit : Boolean;
-    TmpRegistry : TRegIniFile;
-    TapiProcesses : TStringList;
-    I : Integer;
-  begin
-    TryReInit := True;
-    Result := False;
-
-    if LineApp <> 0 then begin
-      Result := True;           { Already initialized }
-      Exit;
-    end;
-
-    if Initializing then begin
-      Exit;                     { Init in progress, not done yet }
-    end;
-
-    { Protect against reentry }
-    Initializing := True;
-    try
-      try
-        { Check for old processes }
-        TmpRegistry := TRegIniFile.Create('SOFTWARE\TurboPower\APRO\TAPI');
-        try
-          { Check all LineApp handles in Registry if previous crash }
-          TapiProcesses := TStringList.Create;
-          try
-            TmpRegistry.ReadSection('',TapiProcesses);
-            for I := 0 to TapiProcesses.Count-1 do begin
-              try
-                if OpenProcess(STANDARD_RIGHTS_REQUIRED, False,
-                  StrToInt(TapiProcesses[I])) = Null then begin
-                  { If process doesn't exist, shut down old LineApp }
-                  tuLineShutdown(TmpRegistry.ReadInteger('TAPI', TapiProcesses[I], 0));
-                end;
-              except
-                { Eat exception, delete key blindly since it }
-                { must not be an integer as expected }
-              end;
-              TmpRegistry.DeleteKey('', TapiProcesses[I]);
-            end;
-          finally
-            TapiProcesses.Free;
-          end;
-
-          StrPCopy(AppName, ChangeFileExt(Application.ExeName, ''));
-
-          { Start TAPI and get the number of line devices }
-          repeat
-            lResult := tuLineInitialize(LineApp, hInstance, GenCallBack,
-              AppName, FTrueDeviceCount);                              
-            if FDeviceCount = 0 then                                   
-              FDeviceCount := FTrueDeviceCount;                        
-            if lResult = LineErr_ReInit then begin
-              if TryReinit then begin
-                TimeStart := GetTickCount;
-                { Wait 5 seconds and try again }
-                while (GetTickCount - TimeStart) < 5000 do
-                  Application.ProcessMessages;
-                TryReinit := False;
-              end else TapiException(Self, LineErr_ReInit);
-            end else if (lResult = LineErr_LineMapperFailed) or
-              (lResult = LineErr_NoDevice) or (lResult = LineErr_NoDriver)
-              or (lResult = LineErr_NoMem) or (lResult = LineErr_NotOwner)
-              or (lResult = LineErr_OperationFailed) then
-                TapiException(Self, lResult);
-
-            if (lResult = LineErr_NoDevice) then
-              TapiException(Self, LineErr_NoDevice);
-          until lResult = Success;
-
-          { Save LineApp to Registry in case of crash }
-          TmpRegistry.WriteInteger('', '$' + IntToHex(GetCurrentProcessId, 8), LineApp);
-        finally
-          TmpRegistry.Free;
-        end;
-
-        LineHandle := 0;
-        CallHandle := 0;
-
-      {$IFDEF TapiDebug}
-      WriteLn(Dbg, 'Tapi Initialized. LineApp : ', IntToHex(LineApp, 8));
-      {$ENDIF}
-
-      finally
-        Initializing := False;
-      end;
-      Result := True;
-
-    except
-      on E: Exception do begin
-        {$IFDEF TapiDebug}
-        WriteLn(Dbg,
-                'Tapi Initialization Failure:' + E.ClassName + ': ' +
-                E.Message + ', LineApp : ', IntToHex(LineApp, 8));     
-        {$ENDIF}
-        Result := False;
-      end;
-    end;
-  end;
-
-  function TApdCustomTapiDevice.StopTapi : Boolean;
-    {-Shut down TAPI}
-  begin
-    Result := False;
-    if LineApp = 0 then begin
-      Result := True;             { Not initialized, no need to shut down }
-      Exit;
-    end;
-
-    if ShuttingDown then
-      Exit;                       { Shutdown in progress, not finished yet }
-
-    ShuttingDown := True;
-    HangupCall(True);
-
-    TapiException(Self, tuLineShutdown(LineApp));
-    {Remove LineApp from Registry for this process}
-    with TRegIniFile.Create('SOFTWARE\TurboPower\APRO\TAPI') do try
-      DeleteKey('', '$' + IntToHex(GetCurrentProcessId, 8));
-    finally
-      Free;
-    end;
-  end;
-
-  procedure TApdCustomTapiDevice.OpenTapiPort;
-    {-Open the comport associated with this TAPI device}
-  begin
-    if Assigned(FComPort) then with FComPort do begin
-      Open := False;
-      TapiCid := CidFromTapiDevice;
-      try                                                                {!!.04}
-        Open := True;
-
-        { purge the input buffer, TAPI occasionally leaves config replies }
-        FlushInBuffer;
-        FlushOutBuffer;
-
-        Dispatcher.DeviceName := FSelectedDevice;
-        FWaitingForCall := False;                                        {!!.04}           
-
-        {Generate the OnTapiPortOpen event}
-        PostMessage(FHandle, apw_TapiEventMessage, etTapiPortOpen, 0);
-      except                                                             {!!.04}
-        { an exception was raised }
-        PostMessage(FHandle, apw_TapiEventMessage, etTapiFail, 0);       {!!.04}
-      end;                                                               {!!.04}
-    end;
-  end;
-
-  function TApdCustomTapiDevice.CloseTapiPort : Boolean;
-    {-Close the comport associated with this TAPI device}
-  begin
-    if Assigned(FComPort) then with FComPort do begin
-      Result := Open;
-      {Close the port}
-      Open := False;
-      TapiCid := 0;
-    end else begin
-      Result := False;
-    end;
-  end;
-
-  function TApdCustomTapiDevice.DeviceIDFromName(const Name : string) : Integer;
-    {-Return a line ID from a device name}
-  var
-    I         : Integer;
-    LineCaps  : PLineDevCaps;
-    S         : AnsiString;
-  begin
-    StartTapi;
-    
-    if Name = '' then begin
-      Result := -1;
-      Exit;
-    end;
-
-    {Enumerate all line devices and build a list of names}
-    for I := 1 to FTrueDeviceCount do begin                            
-      try
-        LineCaps := nil;
-
-        {Negotiate the API version to use for this device}
-        if tuLineNegotiateApiVersion(LineApp, I-1, TapiLowVer,
-          TapiHighVer, FApiVersion, LineExt) = 0 then begin
-
-          {Get the device capabilities, really, the name is all we care about}
-          TapiException(Self, tuLineGetDevCapsDyn(LineApp, I-1,
-            ApiVersion, 0, LineCaps));
-
-          {Check for nil - bail if so}
-          if not Assigned(LineCaps) then begin
-            Result := -1;
-            Exit;
-          end;
-
-          {Extract the device name}
-          with LineCaps^ do begin
-            {$IFOPT H+}
-            SetLength(S, LineNameSize-1);
-            Move(LineCaps^.Data[LineNameOffset], PAnsiChar(S)^, LineNameSize);
-            {$ELSE}
-            Move(LineCaps^.Data[LineNameOffset], S[1], LineNameSize);
-            S[0] := Char(LineNameSize-1);
-            {$ENDIF}
-
-            {Compare to the selected device}
-            if Name = S then begin
-              Result := I-1;
-              Exit;
-            end;
-          end;
-        end;
-      finally
-        {Free the buffer allocated by LineGetDevCapsDyn}
-        if Assigned(LineCaps) then
-          FreeMem(LineCaps, LineCaps^.TotalSize);
-      end;
-    end;
-
-    {No match if we get here}
-    Result := -1;
-  end;
-
-  function TApdCustomTapiDevice.CidFromTapiDevice : LongInt;
-    {-Return the CID from the current TAPI session}
-  begin
-    {Get a handle to the comm port}
-    FillChar(VS, SizeOf(TVarString), 0);
-    VS.TotalSize := SizeOf(TVarString);
-    if tuLineGetID(LineHandle, 0, CallHandle, LINECALLSELECT_CALL,
-      VS, 'comm/datamodem') = 0 then with VS do
-      Move(StringData[StringOffset], Result, SizeOf(Result))
-    else
-      Result := -1;
-  end;
+		end;
+		 {Shutdown this line}
+		tuLineShutdown(LineApp);
+	end;
+
+	procedure TApdCustomTapiDevice.Notification(AComponent : TComponent;
+																							Operation : TOperation);
+		{-Handle new/deleted components}
+	begin
+		inherited Notification(AComponent, Operation);
+
+		if Operation = opRemove then begin
+			{Owned components going away}
+			if AComponent = FComPort then
+				ComPort := nil;
+			if AComponent = FStatusDisplay then
+				StatusDisplay := nil;
+			if AComponent = FTapiLog then
+				TapiLog := nil;
+		end else if Operation = opInsert then begin
+			{Check for new comport}
+			if AComponent is TApdCustomComPort then begin
+				if not Assigned(FComPort) then
+					ComPort := TApdCustomComPort(AComponent);
+
+				{Force its TapiMode to True, AutoOpen and Open to False}
+				if ComPort.TapiMode = tmAuto then begin
+					ComPort.TapiMode := tmOn;
+					ComPort.AutoOpen := False;
+					ComPort.Open := False;
+				end;
+			end;
+
+			{Check for new status component}
+			if AComponent is TApdAbstractTapiStatus then begin
+				if not Assigned(FStatusDisplay) then
+					if not Assigned(TApdAbstractTapiStatus(AComponent).FTapiDevice) then
+						StatusDisplay := TApdAbstractTapiStatus(AComponent);
+			end;
+
+			{Check for new log component}
+			if AComponent is TApdTapiLog then begin
+				if not Assigned(FTapiLog) then
+					if not Assigned(TApdTapiLog(AComponent).FTapiDevice) then
+						TapiLog := TApdTapiLog(AComponent);
+			end;
+		end;
+	end;
+
+	procedure TApdCustomTapiDevice.Loaded;                                 {!!.02}
+	begin
+		inherited;
+		if not Assigned(FComPort) then begin
+			FComPort := SearchComPort(Owner);
+			if Assigned(FComPort) and (ComPort.TapiMode = tmAuto) then begin
+				ComPort.TapiMode := tmOn;
+				ComPort.AutoOpen := False;
+				ComPort.Open := False;
+			end;
+		end;
+	end;
+
+	constructor TApdCustomTapiDevice.Create(AOwner : TComponent);
+		{-Create the object instance}
+	begin
+		{This causes notification events for all other components}
+		inherited Create(AOwner);
+		{Create the TAPI name string list}
+		FTapiDevices := TStringList.Create;
+
+		FSilence.AppSpecific := 5;
+		FSilence.Duration := 5000;
+		FSilence.Frequency1 := 0;
+		FSilence.Frequency2 := 0;
+		FSilence.Frequency3 := 0;
+
+		{Private inits}
+		LineApp         := 0;
+		LineHandle      := 0;
+		CallHandle      := 0;
+		SelectedLine    := -1;
+		RetryPending    := False;
+		FillChar(LineExt, SizeOf(LineExt), 0); 	//BSA - fill char OK here
+		FDialTime       := 0;
+		PassThruMode    := False;
+
+		{Property inits}
+		FDialing         := False;
+		FSelectedDevice  := '';
+		FDeviceCount     := 0;
+		FOpen            := False;
+		FCallInfo        := nil;
+		FAnsRings        := DefAnsRings;
+		FMaxAttempts     := DefMaxAttempts;
+		FAttempt         := 0;
+		FRetryWait       := DefRetryWait;
+		FShowTapiDevices := DefShowTapiDevices;
+		FShowPorts       := DefShowPorts;
+		FWaveState       := wsIdle;
+		FInterruptWave   := True;
+		FMaxMessageLength:= DefMaxMessageLength;
+		FWaveState       := DefWaveState;
+		FUseSoundCard    := DefUseSoundCard;
+		FTrimSeconds     := DefTrimSeconds;
+		FSilenceThreshold:= DefSilenceThreshold;
+		Channels         := DefChannels;
+		SamplesPerSecond := DefSamplesPerSecond;
+		BitsPerSample    := DefBitsPerSample;
+		FMonitorRecording:= DefMonitorRecording;
+		FFilterUnsupportedDevices := True;
+		FWaitingForCall  := False;                                           {!!.04}
+
+		{Search for a comport - do this in .Loaded }
+		{FComPort := SearchComPort(Owner);}                                  {!!.02}
+		{if Assigned(FComPort) and (ComPort.TapiMode = tmAuto) then begin}   {!!.02}
+			{ComPort.TapiMode := tmOn;}                                        {!!.02}
+			{ComPort.AutoOpen := False;}                                       {!!.02}
+			{ComPort.Open := False;}                                           {!!.02}
+		{end;}                                                               {!!.02}
+
+		{Search for a status display}
+		StatusDisplay := SearchStatusDisplay(Owner);
+
+		{Search for a tapi log}
+		TapiLog := SearchTapiLog(Owner);
+
+		if not (csDesigning in ComponentState) then begin
+			{Init TAPI}
+			StartTapi;
+
+			{Get the list of TAPI line devices}
+			EnumLineDevices;
+		end;
+		FHandle := AllocateHWnd(WndProc);
+	end;
+
+	destructor TApdCustomTapiDevice.Destroy;
+		{-Destroy the object instance}
+	begin
+		{Make sure the line is closed}
+		Open := False;
+
+		{Stop TAPI}
+		StopTapi;
+
+		{Get rid of the string list}
+		FTapiDevices.Free;
+
+		{Deallocate FCallInfo}
+		if Assigned(FCallInfo) then begin
+			FreeMem(FCallInfo, FCallInfo^.TotalSize);
+			FCallInfo := nil;
+		end;
+
+		{ Might need to free the wave buffers. }
+		FreeWaveOutBuffer;
+
+		if FHandle <> 0 then DeallocateHWnd(FHandle);
+		inherited Destroy;
+	end;
+
+	procedure TApdCustomTapiDevice.Assign(Source: TPersistent);
+		{-Assign values of Source to self}
+	var
+		SourceTapi : TApdCustomTapiDevice absolute Source;
+	begin
+		if Source is TApdCustomTapiDevice then
+		begin
+			{Get rid of existing names...}
+			FTapiDevices.Clear;
+
+			{Property inits}
+			FDialing         := SourceTapi.FDialing;
+			FSelectedDevice  := SourceTapi.FSelectedDevice;
+			FDeviceCount     := SourceTapi.FDeviceCount;
+			FOpen            := SourceTapi.FOpen;
+			FMaxAttempts     := SourceTapi.FMaxAttempts;
+			FAnsRings        := SourceTapi.FAnsRings;
+			FAttempt         := SourceTapi.FAttempt;
+			FRetryWait       := SourceTapi.FRetryWait;
+			FShowTapiDevices := SourceTapi.FShowTapiDevices;
+			FComPort         := SourceTapi.FComPort;
+			FStatusDisplay   := SourceTapi.FStatusDisplay;
+			FTapiLog         := SourceTapi.FTapiLog;
+
+			{Handle FCallInfo}
+			if Assigned(FCallInfo) then begin
+				FreeMem(FCallInfo, FCallInfo^.TotalSize);
+				FCallInfo := nil;
+			end;
+			SourceTapi.CopyCallInfo(FCallInfo);
+		end;
+	end;
+
+	procedure TApdCustomTapiDevice.SetOpen(NewOpen : Boolean);
+		{-Open or close the selected TAPI line device}
+	const
+		CallPrivilege : array[Boolean] of LongInt =
+			(LINECALLPRIVILEGE_OWNER, LINECALLPRIVILEGE_NONE);
+	var
+		InitMediaModes : LongInt;
+	begin
+		StartTapi;
+
+		if FEnableVoice then
+			InitMediaModes := LINEMEDIAMODE_AUTOMATEDVOICE
+		else
+			InitMediaModes := LINEMEDIAMODE_DATAMODEM;
+
+		{Refresh the device ID from the selected string}
+		if NewOpen then
+			SelectedLine := GetSelectedLine;
+
+		if NewOpen <> FOpen then begin
+			if NewOpen then begin
+				TapiFailFired := False;
+
+				TapiException(Self, tuLineOpen(LineApp, SelectedLine,
+					LineHandle, ApiVersion, 0, LongInt(Self),
+					CallPrivilege[Dialing], InitMediaModes, 0));
+
+				TapiInUse := True;
+				TapiHasOpened := True;
+
+				{Request all status messages for this line}
+				TapiException(Self, tuLineSetStatusMessages(LineHandle,
+					AllLineDeviceStates, AllAddressStates));
+
+				{Set the new state}
+				FOpen := True;
+
+				{Log the call as open}
+				if (Attempt = 1) or (not Dialing) then
+					TapiLogging(ltapiCallStart);
+
+			end else begin
+				HangupCall(False);
+			end;
+		end;
+	end;
+
+	procedure TApdCustomTapiDevice.EnumLineDevices;
+		{-Enumerate all line devices and save their names in TapiDevices}
+	var
+		I        : Integer;
+		LineCaps : PLineDevCaps;
+		S        : AnsiString;
+	begin
+		StartTapi;
+
+		{Get rid of old list}
+		FTapiDevices.Clear;
+
+		{Enumerate all line devices and build a list of names}
+		for I := 1 to FTrueDeviceCount do
+		begin
+			{Negotiate the API version to use for this device}
+			if tuLineNegotiateApiVersion(LineApp, I-1, TapiLowVer,
+				TapiHighVer, FApiVersion, LineExt) = 0 then
+			begin
+
+				{Get the device capabilities}
+				LineCaps := nil;
+				try
+					if tuLineGetDevCapsDyn(LineApp, I-1, ApiVersion,
+						0, LineCaps) <> 0 then Exit;
+
+					{Check for nil - bail if so}
+					if not Assigned(LineCaps) then Exit;
+
+					{Extract the device name}
+					with LineCaps^ do
+					begin
+						{$IFOPT H+}
+						SetLength(S, LineNameSize);
+						Move(LineCaps^.Data[LineNameOffset], PAnsiChar(S)^, LineNameSize);
+						{$ELSE}
+						Move(LineCaps^.Data[LineNameOffset], S[1], LineNameSize);
+						S[0] := AnsiChar(LineNameSize);
+						{$ENDIF}
+					end;
+					{added this section}
+					if FFilterUnsupportedDevices then
+					begin
+						{ check to see if it's capable of data }
+						if ((LineCaps^.MediaModes and LINEMEDIAMODE_DATAMODEM) = 0) then
+							{ it can't make a data connection }
+							if ((LineCaps^.MediaModes and LINEMEDIAMODE_AUTOMATEDVOICE) = 0) then
+								{ it can't make an automated voice call either}
+								S := ''
+							else
+							begin
+								{ it can make a data and Automated voice call, does it support wave? }
+								{ see if it supports the Wave/in and wave/out device classes }
+								FillChar(VS, SizeOf(TVarString), 0);
+								if (tuLineGetID(LineApp, 0, 0, LINECALLSELECT_LINE, VS, 'wave/in') <> 0) and
+									 (tuLineGetID(LineApp, 0, 0, LINECALLSELECT_LINE, VS, 'wave/out') <> 0) then
+									S := '';
+							end;
+						if ((LineCaps^.LineFeatures and LINEFEATURE_MAKECALL) = 0) then
+							{ it can't make a call }
+							S := '';
+					end;
+					{end of added section}
+
+
+				finally
+					{Free the buffer allocated by LineGetDevCapsDyn}
+					if Assigned(LineCaps) then
+						FreeMem(LineCaps, LineCaps^.TotalSize);
+				end;
+
+				{Add the name our list}
+				if S <> '' then
+					TapiDevices.Add(string(Copy(S, 1, Length(S)-1)));
+			end;
+			FDeviceCount := TapiDevices.Count;
+		end;
+	end;
+
+	function TApdCustomTapiDevice.StartTapi : Boolean;
+		{-Initialize TAPI}
+	var
+		lResult : LongInt;
+		AppName : array[0..255] of AnsiChar;
+		TimeStart : DWORD;
+		TryReInit : Boolean;
+		TmpRegistry : TRegIniFile;
+		TapiProcesses : TStringList;
+		I : Integer;
+	begin
+		TryReInit := True;
+		Result := False;
+
+		if LineApp <> 0 then begin
+			Result := True;           { Already initialized }
+			Exit;
+		end;
+
+		if Initializing then begin
+			Exit;                     { Init in progress, not done yet }
+		end;
+
+		{ Protect against reentry }
+		Initializing := True;
+		try
+			try
+				{ Check for old processes }
+				TmpRegistry := TRegIniFile.Create('SOFTWARE\TurboPower\APRO\TAPI');
+				try
+					{ Check all LineApp handles in Registry if previous crash }
+					TapiProcesses := TStringList.Create;
+					try
+						TmpRegistry.ReadSection('',TapiProcesses);
+						for I := 0 to TapiProcesses.Count-1 do begin
+							try
+								if OpenProcess(STANDARD_RIGHTS_REQUIRED, False,
+									StrToInt(TapiProcesses[I])) = Null then begin
+									{ If process doesn't exist, shut down old LineApp }
+									tuLineShutdown(TmpRegistry.ReadInteger('TAPI', TapiProcesses[I], 0));
+								end;
+							except
+								{ Eat exception, delete key blindly since it }
+								{ must not be an integer as expected }
+							end;
+							TmpRegistry.DeleteKey('', TapiProcesses[I]);
+						end;
+					finally
+						TapiProcesses.Free;
+					end;
+
+					StrPCopy(AppName, AnsiString(ChangeFileExt(Application.ExeName, '')));
+
+					{ Start TAPI and get the number of line devices }
+					repeat
+						lResult := tuLineInitialize(LineApp, hInstance, GenCallBack,
+							AppName, FTrueDeviceCount);
+						if FDeviceCount = 0 then
+							FDeviceCount := FTrueDeviceCount;
+						if lResult = LineErr_ReInit then
+						begin
+							if TryReinit then
+							begin
+								TimeStart := GetTickCount;
+								{ Wait 5 seconds and try again }
+								while (GetTickCount - TimeStart) < 5000 do
+									Application.ProcessMessages;
+								TryReinit := False;
+							end
+							else TapiException(Self, LineErr_ReInit);
+						end
+						else if (lResult = LineErr_LineMapperFailed) or
+							(lResult = LineErr_NoDevice) or (lResult = LineErr_NoDriver)
+							or (lResult = LineErr_NoMem) or (lResult = LineErr_NotOwner)
+							or (lResult = LineErr_OperationFailed) then
+								TapiException(Self, lResult);
+
+						if (lResult = LineErr_NoDevice) then
+							TapiException(Self, LineErr_NoDevice);
+					until lResult = Success;
+
+					{ Save LineApp to Registry in case of crash }
+					TmpRegistry.WriteInteger('', '$' + IntToHex(GetCurrentProcessId, 8), LineApp);
+				finally
+					TmpRegistry.Free;
+				end;
+
+				LineHandle := 0;
+				CallHandle := 0;
+
+			{$IFDEF TapiDebug}
+			WriteLn(Dbg, 'Tapi Initialized. LineApp : ', IntToHex(LineApp, 8));
+			{$ENDIF}
+
+			finally
+				Initializing := False;
+			end;
+			Result := True;
+
+		except
+			on E: Exception do begin
+				{$IFDEF TapiDebug}
+				WriteLn(Dbg,
+								'Tapi Initialization Failure:' + E.ClassName + ': ' +
+								E.Message + ', LineApp : ', IntToHex(LineApp, 8));
+				{$ENDIF}
+				Result := False;
+			end;
+		end;
+	end;
+
+	function TApdCustomTapiDevice.StopTapi : Boolean;
+		{-Shut down TAPI}
+	begin
+		Result := False;
+		if LineApp = 0 then begin
+			Result := True;             { Not initialized, no need to shut down }
+			Exit;
+		end;
+
+		if ShuttingDown then
+			Exit;                       { Shutdown in progress, not finished yet }
+
+		ShuttingDown := True;
+		HangupCall(True);
+
+		TapiException(Self, tuLineShutdown(LineApp));
+		{Remove LineApp from Registry for this process}
+		with TRegIniFile.Create('SOFTWARE\TurboPower\APRO\TAPI') do try
+			DeleteKey('', '$' + IntToHex(GetCurrentProcessId, 8));
+		finally
+			Free;
+		end;
+	end;
+
+	procedure TApdCustomTapiDevice.OpenTapiPort;
+		{-Open the comport associated with this TAPI device}
+	begin
+		if Assigned(FComPort) then with FComPort do begin
+			Open := False;
+			TapiCid := CidFromTapiDevice;
+			try                                                                {!!.04}
+				Open := True;
+
+				{ purge the input buffer, TAPI occasionally leaves config replies }
+				FlushInBuffer;
+				FlushOutBuffer;
+
+				Dispatcher.DeviceName := FSelectedDevice;
+				FWaitingForCall := False;                                        {!!.04}
+
+				{Generate the OnTapiPortOpen event}
+				PostMessage(FHandle, apw_TapiEventMessage, etTapiPortOpen, 0);
+			except                                                             {!!.04}
+				{ an exception was raised }
+				PostMessage(FHandle, apw_TapiEventMessage, etTapiFail, 0);       {!!.04}
+			end;                                                               {!!.04}
+		end;
+	end;
+
+	function TApdCustomTapiDevice.CloseTapiPort : Boolean;
+		{-Close the comport associated with this TAPI device}
+	begin
+		if Assigned(FComPort) then with FComPort do begin
+			Result := Open;
+			{Close the port}
+			Open := False;
+			TapiCid := 0;
+		end else begin
+			Result := False;
+		end;
+	end;
+
+	function TApdCustomTapiDevice.DeviceIDFromName(const Name : string) : Integer;
+		{-Return a line ID from a device name}
+	var
+		I         : Integer;
+		LineCaps  : PLineDevCaps;
+		S         : AnsiString;
+	begin
+		StartTapi;
+
+		if Name = '' then begin
+			Result := -1;
+			Exit;
+		end;
+
+		{Enumerate all line devices and build a list of names}
+		for I := 1 to FTrueDeviceCount do
+		begin
+			try
+				LineCaps := nil;
+
+				{Negotiate the API version to use for this device}
+				if tuLineNegotiateApiVersion(LineApp, I-1, TapiLowVer,
+					TapiHighVer, FApiVersion, LineExt) = 0 then
+				begin
+
+					{Get the device capabilities, really, the name is all we care about}
+					TapiException(Self, tuLineGetDevCapsDyn(LineApp, I-1, ApiVersion, 0, LineCaps));
+
+					{Check for nil - bail if so}
+					if not Assigned(LineCaps) then
+					begin
+						Result := -1;
+						Exit;
+					end;
+
+					{Extract the device name}
+					with LineCaps^ do
+					begin
+						{$IFOPT H+}
+						SetLength(S, LineNameSize-1);
+						Move(LineCaps^.Data[LineNameOffset], PAnsiChar(S)^, LineNameSize);
+						{$ELSE}
+						Move(LineCaps^.Data[LineNameOffset], S[1], LineNameSize);
+						S[0] := AnsiChar(LineNameSize-1);
+						{$ENDIF}
+
+						{Compare to the selected device}
+						if AnsiString(Name) = S then
+						begin
+							Result := I-1;
+							Exit;
+						end;
+					end;
+				end;
+			finally
+				{Free the buffer allocated by LineGetDevCapsDyn}
+				if Assigned(LineCaps) then
+					FreeMem(LineCaps, LineCaps^.TotalSize);
+			end;
+		end;
+
+		{No match if we get here}
+		Result := -1;
+	end;
+
+	function TApdCustomTapiDevice.CidFromTapiDevice : LongInt;
+		{-Return the CID from the current TAPI session}
+	begin
+		{Get a handle to the comm port}
+		FillChar(VS, SizeOf(TVarString), 0);
+		VS.TotalSize := SizeOf(TVarString);
+		if tuLineGetID(LineHandle, 0, CallHandle, LINECALLSELECT_CALL,
+			VS, 'comm/datamodem') = 0 then with VS do
+			Move(StringData[StringOffset], Result, SizeOf(Result))
+		else
+			Result := -1;
+	end;
 
   function TApdCustomTapiDevice.GetBPSRate : DWORD;
     {-Return the BPS rate of the current call}
@@ -2284,10 +2304,10 @@ type
     end;
   end;
 
-  procedure TApdCustomTapiDevice.SetTapiDevices(const Values : TStrings);
+  procedure TApdCustomTapiDevice.SetTapiDevices(const Values : TStringList);
     {-Set new strings}
   begin
-    FTapiDevices.Assign(Values);
+		FTapiDevices.Assign(Values);
   end;
 
   procedure TApdCustomTapiDevice.SetSelectedDevice(const NewDevice : string);
@@ -2332,7 +2352,7 @@ type
       Result := '';
   end;
 
-  function TApdCustomTapiDevice.GetCalledIDName: AnsiString;
+  function TApdCustomTapiDevice.GetCalledIDName: string;
   begin
     if Assigned(FCallInfo) then begin
       with FCallInfo^ do begin
@@ -2363,7 +2383,7 @@ type
 
   end;
 
-  function TApdCustomTapiDevice.GetCallerID : AnsiString;
+  function TApdCustomTapiDevice.GetCallerID : string;
     {-Return the caller ID of the current call}
   begin
     if Assigned(FCallInfo) then begin
@@ -2396,7 +2416,7 @@ type
       Result := '';
   end;
 
-  function TApdCustomTapiDevice.GetCallerIDName : Ansistring;
+  function TApdCustomTapiDevice.GetCallerIDName : string;
     {-Return the caller ID name of the current call}
   begin
     if Assigned(FCallInfo) then begin
@@ -2688,7 +2708,7 @@ type
     {Make the call}
     TapiFailFired := False;
     TapiLogging(ltapiDial);
-    sAnsiNumber := Number;
+    sAnsiNumber := AnsiString(Number);
     ReplyResult := WaitForReply(tuLineMakeCall(LineHandle, CallHandle,
       StrPCopy(NumZ, sAnsiNumber), 0, @CallParams));
     if ReplyResult < 0 then begin
@@ -2918,7 +2938,7 @@ type
   function TApdCustomTapiDevice.GetComNumber : Integer;
     {-Return the Com Number from the current TAPI device}
   var
-    S: ansistring;
+    S: string;
     X : Integer;
     SaveOpen: Boolean;
   begin

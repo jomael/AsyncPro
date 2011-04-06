@@ -26,7 +26,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADTSTAT.PAS 5.00                    *}
+{*                   ADTSTAT.PAS 5.01                    *}
 {*********************************************************}
 {* TApdTapiStatus dialog                                 *}
 {*********************************************************}
@@ -214,48 +214,53 @@ implementation
     Labels[LabCount].Caption := S;
   end;
 
-  procedure TApdStandardTapiDisplay.UpdateValues(TapiDevice : TApdCustomTapiDevice;
-    Device, Message, Param1, Param2, Param3 : DWORD);
-    {-Update the displayed values}
-  var
-    Update : Boolean;
+	procedure TApdStandardTapiDisplay.UpdateValues(TapiDevice : TApdCustomTapiDevice;
+		Device, Message, Param1, Param2, Param3 : DWORD);
+		{-Update the displayed values}
+	var
+		Update : Boolean;
 
-  begin
-    with TapiDevice do begin
-      dpUsing.Caption   := SelectedDevice;
-      if Dialing then begin
-        dpDialing.Caption := Number;
-        dpAttempt.Caption := IntToStr(Attempt);
-        dpTotalAttempts.Caption := IntToStr(MaxAttempts);
-      end else begin
-        dpDialing.Caption := 'Caller ID: ' + CallerID;
-        dpAttempt.Caption := '1';
-        dpTotalAttempts.Caption := '1';
-      end;
+	begin
+		with TapiDevice do
+		begin
+			dpUsing.Caption   := SelectedDevice;
+			if Dialing then
+			begin
+				dpDialing.Caption := Number;
+				dpAttempt.Caption := IntToStr(Attempt);
+				dpTotalAttempts.Caption := IntToStr(MaxAttempts);
+			end else
+			begin
+				dpDialing.Caption := 'Caller ID: ' + CallerID;
+				dpAttempt.Caption := '1';
+				dpTotalAttempts.Caption := '1';
+			end;
 
-      {Should we add/scroll a new status line or update the current one?}
-      Update := False;
-      if (Param1 = LineCallState_Proceeding) or
-         (Param1 = APDSpecific_RetryWait) then begin
-        {This logic will still cause an "add" for the first "proceeding"}
-        Update := Updating;
-        Updating := True;
-      end else begin
-        Updating := False;
-      end;
+			{Should we add/scroll a new status line or update the current one?}
+			Update := False;
+			if (Param1 = LineCallState_Proceeding) or
+				 (Param1 = APDSpecific_RetryWait) then
+			begin
+				{This logic will still cause an "add" for the first "proceeding"}
+				Update := Updating;
+				Updating := True;
+			end else
+			begin
+				Updating := False;
+			end;
 
-      {Add or update, as required}
-      if Update then
-        UpdateStatusLine(TapiStatusMsg(Message, Param1, Param2))
-      else
-        AddStatusLine(TapiStatusMsg(Message, Param1, Param2));
-    end;
-  end;
+			{Add or update, as required}
+			if Update then
+				UpdateStatusLine(TapiStatusMsg(Message, Param1, Param2))
+			else
+				AddStatusLine(TapiStatusMsg(Message, Param1, Param2));
+		end;
+	end;
 
-  procedure TApdStandardTapiDisplay.dpCancelClick(Sender: TObject);
-    {-Cancel the call in progress}
-  begin
-    TapiDevice.CancelCall;
-  end;
+	procedure TApdStandardTapiDisplay.dpCancelClick(Sender: TObject);
+		{-Cancel the call in progress}
+	begin
+		TapiDevice.CancelCall;
+	end;
 
 end.

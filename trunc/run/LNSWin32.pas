@@ -31,7 +31,7 @@
  *  Sebastian Zierer
  * ***** END LICENSE BLOCK ***** *)
 {*********************************************************}
-{*                   LNSWIN32.PAS 5.00                   *}
+{*                   LNSWIN32.PAS 5.01                   *}
 {*********************************************************}
 {* Win32 serial device layer and dispatcher              *}
 {*********************************************************}
@@ -560,8 +560,6 @@ end;
 //  Shutdown the dispatcher
 procedure TApdWin32Dispatcher.StopDispatcher;
 begin
-EnterCriticalSection( DataSection);
-try
     if DispActive then
         CloseCom;
 
@@ -600,10 +598,7 @@ try
         if CloseHandle(OutFlushEvent) then
             OutFlushEvent := INVALID_HANDLE_VALUE;
     end;
-finally
-  LeaveCriticalSection( DataSection)
-end end;
-
+end;
 
 //  This doesn't apply to WIN32 dispatcher any more
 function TApdWin32Dispatcher.WaitComEvent(var EvtMask : DWORD;

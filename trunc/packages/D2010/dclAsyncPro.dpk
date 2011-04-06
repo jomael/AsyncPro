@@ -22,7 +22,7 @@ package dclAsyncPro;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'TurboPower AsyncPro 5 design-time package'}
+{$DESCRIPTION 'TurboPower AsyncPro 5.01 design-time package'}
 {$LIBSUFFIX '_D2010'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
@@ -30,20 +30,17 @@ package dclAsyncPro;
 requires
   rtl,
   AsyncPro,
-  designide;
+  designide,
+  vclx;
 
 contains
   adabout in '..\..\design\adabout.pas' {ApdAboutForm},
   AdPropEd in '..\..\design\AdPropEd.pas',
   AproReg in '..\..\design\AproReg.pas',
-  Adpedit0 in '..\..\design\Adpedit0.pas' {AdPEdit};
+  Adpedit0 in '..\..\design\Adpedit0.pas' {AdPEdit},
+  AdStatEd in '..\..\design\AdStatEd.pas' {frmStateEdit},
+  adpacked in '..\..\design\adpacked.pas' {PacketEditor},
+  Adpeditt in '..\..\design\Adpeditt.pas',
+  AdStatE0 in '..\..\design\AdStatE0.pas' {frmConditionEdit};
 
-{ NOTE: Add the following units as their underlying runtime friends
-   get upgraded to unicode:
-
-  AdStatEd
-  AdStatE0
-  adpacked
-  Adpeditt
-}
 end.

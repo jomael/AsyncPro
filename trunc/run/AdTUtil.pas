@@ -26,7 +26,7 @@
  * ***** END LICENSE BLOCK ***** *)
 
 {*********************************************************}
-{*                   ADTUTIL.PAS 5.00                    *}
+{*                   ADTUTIL.PAS 5.01                    *}
 {*********************************************************}
 {* TAPI DLL interface and utility methods                *}
 {*********************************************************}
@@ -1730,160 +1730,160 @@ const
   TapiDLL = 'TAPI32';
 
 var
-  {Pointers and constants used to get/hold the fixed record sizes}
-  DevCapsFixed       : Integer;
-  CallInfoFixed      : Integer;
-  CallStatusFixed    : Integer;
-  LineTranslateFixed : Integer;
-  TranslateCapsFixed : Integer;
-  DevStatusFixed     : Integer;                                          {!!.02}
+	{Pointers and constants used to get/hold the fixed record sizes}
+	DevCapsFixed       : Integer;
+	CallInfoFixed      : Integer;
+	CallStatusFixed    : Integer;
+	LineTranslateFixed : Integer;
+	TranslateCapsFixed : Integer;
+	DevStatusFixed     : Integer;                                          {!!.02}
 
-  {Global vars holding entry points to TAPI}
-  tapiLineGenerateTones       : TLineGenerateTones;
-  tapiLineMonitorTones        : TLineMonitorTones;
-  tapiLineSetCallParams       : TLineSetCallParams;
-  tapiLineHandoff             : TLineHandoff;
-  tapiLineMonitorMedia        : TLineMonitorMedia;
-  tapiLineGenerateDigits      : TLineGenerateDigits;
-  tapiLineMonitorDigits       : TLineMonitorDigits;
-  tapiLineInitialize          : TLineInitialize;
-  tapiLineShutdown            : TLineShutdown;
-  tapiLineNegotiateApiVersion : TLineNegotiateApiVersion;
-  tapiLineGetDevCaps          : TLineGetDevCaps;
-  tapiLineOpen                : TLineOpen;
-  tapiLineMakeCall            : TLineMakeCall;
-  tapiLineAccept              : TLineAccept;
-  tapiLineAnswer              : TLineAnswer;
-  tapiLineDeallocateCall      : TLineDeallocateCall;
-  tapiLineDrop                : TLineDrop;
-  tapiLineClose               : TLineClose;
-  tapiLineGetCountry          : TLineGetCountry;
-  tapiLineConfigDialog        : TLineConfigDialog;
-  tapiLineConfigDialogEdit    : TLineConfigDialogEdit;
-  tapiLineGetID               : TLineGetID;
-  tapiLineSetStatusMessages   : TLineSetStatusMessages;
-  tapiLineGetStatusMessages   : TLineGetStatusMessages;
-  tapiLineGetAddressStatus    : TLineGetAddressStatus;
-  tapiLineGetLineDevStatus    : TLineGetLineDevStatus;
-  tapiLineGetDevConfig        : TLineGetDevConfig;
-  tapiLineSetDevConfig        : TLineSetDevConfig;
-  tapiLineGetCallInfo         : TLineGetCallInfo;
-  tapiLineGetCallStatus       : TLineGetCallStatus;
-  tapiLineSetMediaMode        : TLineSetMediaMode;
-  tapiLineTranslateAddress    : TLineTranslateAddress;
-  tapiLineTranslateDialog     : TLineTranslateDialog;
-  tapiLineSetCurrentLocation  : TLineSetCurrentLocation;
-  tapiLineSetTollList         : TLineSetTollList;
-  tapiLineGetTranslateCaps    : TLineGetTranslateCaps;
-  tapiLineGetAddressCaps      : TLineGetAddressCaps;                     {!!.06}
-  tapiLineHold                : TLineHold;                               {!!.06}
-  tapiLineUnHold              : TLineUnhold;                             {!!.06}
-  tapiLineTransfer            : TLineTransfer;                           {!!.06}
+	{Global vars holding entry points to TAPI}
+	tapiLineGenerateTones       : TLineGenerateTones;
+	tapiLineMonitorTones        : TLineMonitorTones;
+	tapiLineSetCallParams       : TLineSetCallParams;
+	tapiLineHandoff             : TLineHandoff;
+	tapiLineMonitorMedia        : TLineMonitorMedia;
+	tapiLineGenerateDigits      : TLineGenerateDigits;
+	tapiLineMonitorDigits       : TLineMonitorDigits;
+	tapiLineInitialize          : TLineInitialize;
+	tapiLineShutdown            : TLineShutdown;
+	tapiLineNegotiateApiVersion : TLineNegotiateApiVersion;
+	tapiLineGetDevCaps          : TLineGetDevCaps;
+	tapiLineOpen                : TLineOpen;
+	tapiLineMakeCall            : TLineMakeCall;
+	tapiLineAccept              : TLineAccept;
+	tapiLineAnswer              : TLineAnswer;
+	tapiLineDeallocateCall      : TLineDeallocateCall;
+	tapiLineDrop                : TLineDrop;
+	tapiLineClose               : TLineClose;
+	tapiLineGetCountry          : TLineGetCountry;
+	tapiLineConfigDialog        : TLineConfigDialog;
+	tapiLineConfigDialogEdit    : TLineConfigDialogEdit;
+	tapiLineGetID               : TLineGetID;
+	tapiLineSetStatusMessages   : TLineSetStatusMessages;
+	tapiLineGetStatusMessages   : TLineGetStatusMessages;
+	tapiLineGetAddressStatus    : TLineGetAddressStatus;
+	tapiLineGetLineDevStatus    : TLineGetLineDevStatus;
+	tapiLineGetDevConfig        : TLineGetDevConfig;
+	tapiLineSetDevConfig        : TLineSetDevConfig;
+	tapiLineGetCallInfo         : TLineGetCallInfo;
+	tapiLineGetCallStatus       : TLineGetCallStatus;
+	tapiLineSetMediaMode        : TLineSetMediaMode;
+	tapiLineTranslateAddress    : TLineTranslateAddress;
+	tapiLineTranslateDialog     : TLineTranslateDialog;
+	tapiLineSetCurrentLocation  : TLineSetCurrentLocation;
+	tapiLineSetTollList         : TLineSetTollList;
+	tapiLineGetTranslateCaps    : TLineGetTranslateCaps;
+	tapiLineGetAddressCaps      : TLineGetAddressCaps;                     {!!.06}
+	tapiLineHold                : TLineHold;                               {!!.06}
+	tapiLineUnHold              : TLineUnhold;                             {!!.06}
+	tapiLineTransfer            : TLineTransfer;                           {!!.06}
 
-  {Misc}
-  TapiModule    : THandle;
+	{Misc}
+	TapiModule    : THandle;
 
-  function TapiLoaded : Boolean;
-    {-Assure that TAPI is loaded and globals are set}
-  begin
-    if TapiModule <> 0 then begin
-      Result := True;
-      Exit;
-    end;
+	function TapiLoaded : Boolean;
+		{-Assure that TAPI is loaded and globals are set}
+	begin
+		if TapiModule <> 0 then begin
+			Result := True;
+			Exit;
+		end;
 
-    {Load TAPI}
-    TapiModule := LoadLibrary(TapiDLL);
+		{Load TAPI}
+		TapiModule := LoadLibrary(TapiDLL);
 
-    if TapiModule <> 0 then begin
-      {Say it's loaded...}
-      Result := True;
+		if TapiModule <> 0 then begin
+			{Say it's loaded...}
+			Result := True;
 
-      {...and load all globals}
-      @tapiLineGenerateTones     :=
-        GetProcAddress(TapiModule, 'lineGenerateTone');
-      @tapiLineMonitorTones      :=
-        GetProcAddress(TapiModule, 'lineMonitorTones');
-      @tapiLineSetCallParams     :=
-        GetProcAddress(TapiModule, 'lineSetCallParams');
-      @tapiLineHandoff           :=
-        GetProcAddress(TapiModule, 'lineHandoff');
-      @tapiLineMonitorMedia      :=
-        GetProcAddress(TapiModule, 'lineMonitorMedia');
-      @tapiLineGenerateDigits    :=
-        GetProcAddress(TapiModule, 'lineGenerateDigits' + TAPI_CallSuffix);
-      @tapiLineMonitorDigits     :=
-        GetProcAddress(TapiModule, 'lineMonitorDigits');
-      @tapiLineInitialize        :=
-        GetProcAddress(TapiModule, 'lineInitialize');
-      @tapiLineShutdown          :=
-        GetProcAddress(TapiModule, 'lineShutdown');
-      @tapiLineNegotiateApiVersion :=
-        GetProcAddress(TapiModule, 'lineNegotiateAPIVersion');
-      @tapiLineGetDevCaps        :=
-        GetProcAddress(TapiModule, 'lineGetDevCaps' + TAPI_CallSuffix);
-      @tapiLineOpen              :=
-        GetProcAddress(TapiModule, 'lineOpen' + TAPI_CallSuffix);
-      @tapiLineMakeCall          :=
-        GetProcAddress(TapiModule, 'lineMakeCall' + TAPI_CallSuffix);
-      @tapiLineAccept            :=
-        GetProcAddress(TapiModule, 'lineAccept');
-      @tapiLineAnswer            :=
-        GetProcAddress(TapiModule, 'lineAnswer');
-      @tapiLineDeallocateCall    :=
-        GetProcAddress(TapiModule, 'lineDeallocateCall');
-      @tapiLineDrop              :=
-        GetProcAddress(TapiModule, 'lineDrop');
-      @tapiLineClose             :=
-        GetProcAddress(TapiModule, 'lineClose');
-      @tapiLineGetCountry        :=
-        GetProcAddress(TapiModule, 'lineGetCountry' + TAPI_CallSuffix);
-      @tapiLineConfigDialog      :=
-        GetProcAddress(TapiModule, 'lineConfigDialog' + TAPI_CallSuffix);
-      @tapiLineConfigDialogEdit  :=
-        GetProcAddress(TapiModule, 'lineConfigDialogEdit' + TAPI_CallSuffix);
-      @tapiLineGetID             :=
-        GetProcAddress(TapiModule, 'lineGetID' + TAPI_CallSuffix);
-      @tapiLineSetStatusMessages :=
-        GetProcAddress(TapiModule, 'lineSetStatusMessages' + TAPI_CallSuffix);
-      @tapiLineGetStatusMessages :=
-        GetProcAddress(TapiModule, 'lineGetStatusMessages' + TAPI_CallSuffix);
-      @tapiLineGetAddressCaps    :=                                      {!!.06}
-        GetProcAddress(TapiModule, 'lineGetAddressCaps' + TAPI_CallSuffix);                {!!.06}
-      @tapiLineGetAddressStatus  :=
-        GetProcAddress(TapiModule, 'lineGetAddressStatus' + TAPI_CallSuffix);
-      @tapiLineGetLineDevStatus  :=                                      {!!.02}
-        GetProcAddress(TapiModule, 'lineGetLineDevStatus' + TAPI_CallSuffix);              {!!.02}
-      @tapiLineGetDevConfig      :=
-        GetProcAddress(TapiModule, 'lineGetDevConfig' + TAPI_CallSuffix);
-      @tapiLineSetDevConfig      :=
-        GetProcAddress(TapiModule, 'lineSetDevConfig' + TAPI_CallSuffix);
-      @tapiLineGetCallInfo       :=
-        GetProcAddress(TapiModule, 'lineGetCallInfo' + TAPI_CallSuffix);
-      @tapiLineGetCallStatus     :=
-        GetProcAddress(TapiModule, 'lineGetCallStatus');
-      @tapiLineSetMediaMode      :=
-        GetProcAddress(TapiModule, 'lineSetMediaMode');
-      @tapiLineTranslateAddress  :=
-        GetProcAddress(TapiModule, 'lineTranslateAddress' + TAPI_CallSuffix);
-      @tapiLineTranslateDialog :=
-        GetProcAddress(TapiModule, 'lineTranslateDialog' + TAPI_CallSuffix);
-      @tapiLineSetCurrentLocation:=
-        GetProcAddress(TapiModule, 'lineSetCurrentLocation');
-      @tapiLineSetTollList       :=
-        GetProcAddress(TapiModule, 'lineSetTollList' + TAPI_CallSuffix);
-      @tapiLineGetTranslateCaps  :=
-        GetProcAddress(TapiModule, 'lineGetTranslateCaps' + TAPI_CallSuffix);
+			{...and load all globals}
+			@tapiLineGenerateTones     :=
+				GetProcAddress(TapiModule, 'lineGenerateTone');
+			@tapiLineMonitorTones      :=
+				GetProcAddress(TapiModule, 'lineMonitorTones');
+			@tapiLineSetCallParams     :=
+				GetProcAddress(TapiModule, 'lineSetCallParams');
+			@tapiLineHandoff           :=
+				GetProcAddress(TapiModule, 'lineHandoff');
+			@tapiLineMonitorMedia      :=
+				GetProcAddress(TapiModule, 'lineMonitorMedia');
+			@tapiLineGenerateDigits    :=
+				GetProcAddress(TapiModule, 'lineGenerateDigits' + TAPI_CallSuffix);
+			@tapiLineMonitorDigits     :=
+				GetProcAddress(TapiModule, 'lineMonitorDigits');
+			@tapiLineInitialize        :=
+				GetProcAddress(TapiModule, 'lineInitialize');
+			@tapiLineShutdown          :=
+				GetProcAddress(TapiModule, 'lineShutdown');
+			@tapiLineNegotiateApiVersion :=
+				GetProcAddress(TapiModule, 'lineNegotiateAPIVersion');
+			@tapiLineGetDevCaps        :=
+				GetProcAddress(TapiModule, 'lineGetDevCaps' + TAPI_CallSuffix);
+			@tapiLineOpen              :=
+				GetProcAddress(TapiModule, 'lineOpen' + TAPI_CallSuffix);
+			@tapiLineMakeCall          :=
+				GetProcAddress(TapiModule, 'lineMakeCall' + TAPI_CallSuffix);
+			@tapiLineAccept            :=
+				GetProcAddress(TapiModule, 'lineAccept');
+			@tapiLineAnswer            :=
+				GetProcAddress(TapiModule, 'lineAnswer');
+			@tapiLineDeallocateCall    :=
+				GetProcAddress(TapiModule, 'lineDeallocateCall');
+			@tapiLineDrop              :=
+				GetProcAddress(TapiModule, 'lineDrop');
+			@tapiLineClose             :=
+				GetProcAddress(TapiModule, 'lineClose');
+			@tapiLineGetCountry        :=
+				GetProcAddress(TapiModule, 'lineGetCountry' + TAPI_CallSuffix);
+			@tapiLineConfigDialog      :=
+				GetProcAddress(TapiModule, 'lineConfigDialog' + TAPI_CallSuffix);
+			@tapiLineConfigDialogEdit  :=
+				GetProcAddress(TapiModule, 'lineConfigDialogEdit' + TAPI_CallSuffix);
+			@tapiLineGetID             :=
+				GetProcAddress(TapiModule, 'lineGetID' + TAPI_CallSuffix);
+			@tapiLineSetStatusMessages :=
+				GetProcAddress(TapiModule, 'lineSetStatusMessages');
+			@tapiLineGetStatusMessages :=
+				GetProcAddress(TapiModule, 'lineGetStatusMessages');
+			@tapiLineGetAddressCaps    :=                                      {!!.06}
+				GetProcAddress(TapiModule, 'lineGetAddressCaps' + TAPI_CallSuffix);                {!!.06}
+			@tapiLineGetAddressStatus  :=
+				GetProcAddress(TapiModule, 'lineGetAddressStatus' + TAPI_CallSuffix);
+			@tapiLineGetLineDevStatus  :=                                      {!!.02}
+				GetProcAddress(TapiModule, 'lineGetLineDevStatus' + TAPI_CallSuffix);              {!!.02}
+			@tapiLineGetDevConfig      :=
+				GetProcAddress(TapiModule, 'lineGetDevConfig' + TAPI_CallSuffix);
+			@tapiLineSetDevConfig      :=
+				GetProcAddress(TapiModule, 'lineSetDevConfig' + TAPI_CallSuffix);
+			@tapiLineGetCallInfo       :=
+				GetProcAddress(TapiModule, 'lineGetCallInfo' + TAPI_CallSuffix);
+			@tapiLineGetCallStatus     :=
+				GetProcAddress(TapiModule, 'lineGetCallStatus');
+			@tapiLineSetMediaMode      :=
+				GetProcAddress(TapiModule, 'lineSetMediaMode');
+			@tapiLineTranslateAddress  :=
+				GetProcAddress(TapiModule, 'lineTranslateAddress' + TAPI_CallSuffix);
+			@tapiLineTranslateDialog :=
+				GetProcAddress(TapiModule, 'lineTranslateDialog' + TAPI_CallSuffix);
+			@tapiLineSetCurrentLocation:=
+				GetProcAddress(TapiModule, 'lineSetCurrentLocation');
+			@tapiLineSetTollList       :=
+				GetProcAddress(TapiModule, 'lineSetTollList' + TAPI_CallSuffix);
+			@tapiLineGetTranslateCaps  :=
+				GetProcAddress(TapiModule, 'lineGetTranslateCaps' + TAPI_CallSuffix);
 
-    end else
-      Result := False;
-  end;
+		end else
+			Result := False;
+	end;
 
 {$IFDEF TapiDebug}
 procedure WriteResult(Res : LongInt);
 
-  function ResFunc : string;
-  begin
-    if Res = 0 then
+	function ResFunc : string;
+	begin
+		if Res = 0 then
       Result := 'OK'
     else if Res < 0 then begin
     case Res of
