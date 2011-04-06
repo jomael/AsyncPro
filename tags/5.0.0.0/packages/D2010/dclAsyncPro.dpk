@@ -1,0 +1,49 @@
+package dclAsyncPro;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'TurboPower AsyncPro 5 design-time package'}
+{$LIBSUFFIX '_D2010'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  AsyncPro,
+  designide;
+
+contains
+  adabout in '..\..\design\adabout.pas' {ApdAboutForm},
+  AdPropEd in '..\..\design\AdPropEd.pas',
+  AproReg in '..\..\design\AproReg.pas',
+  Adpedit0 in '..\..\design\Adpedit0.pas' {AdPEdit};
+
+{ NOTE: Add the following units as their underlying runtime friends
+   get upgraded to unicode:
+
+  AdStatEd
+  AdStatE0
+  adpacked
+  Adpeditt
+}
+end.

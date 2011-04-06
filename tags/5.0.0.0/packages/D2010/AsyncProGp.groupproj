@@ -1,0 +1,48 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{23B31902-1D19-46A4-83CF-BFD508CDAFF3}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="AsyncPro.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="dclAsyncPro.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="AsyncPro">
+			<MSBuild Projects="AsyncPro.dproj"/>
+		</Target>
+		<Target Name="AsyncPro:Clean">
+			<MSBuild Targets="Clean" Projects="AsyncPro.dproj"/>
+		</Target>
+		<Target Name="AsyncPro:Make">
+			<MSBuild Targets="Make" Projects="AsyncPro.dproj"/>
+		</Target>
+		<Target Name="dclAsyncPro">
+			<MSBuild Projects="dclAsyncPro.dproj"/>
+		</Target>
+		<Target Name="dclAsyncPro:Clean">
+			<MSBuild Targets="Clean" Projects="dclAsyncPro.dproj"/>
+		</Target>
+		<Target Name="dclAsyncPro:Make">
+			<MSBuild Targets="Make" Projects="dclAsyncPro.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="AsyncPro;dclAsyncPro"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="AsyncPro:Clean;dclAsyncPro:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="AsyncPro:Make;dclAsyncPro:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>

@@ -1,0 +1,72 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{23B31902-1D19-46A4-83CF-BFD508CDAFF3}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="dclAsyncPro.dproj">
+				<Dependencies>AsyncPro.dproj</Dependencies>
+			</Projects>
+			<Projects Include="AsyncPro.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="dclAsyncProDep.dproj">
+				<Dependencies>AsyncProDep.dproj</Dependencies>
+			</Projects>
+			<Projects Include="AsyncProDep.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="dclAsyncPro" DependsOnTargets="AsyncPro">
+			<MSBuild Projects="dclAsyncPro.dproj"/>
+		</Target>
+		<Target Name="dclAsyncPro:Clean" DependsOnTargets="AsyncPro:Clean">
+			<MSBuild Projects="dclAsyncPro.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclAsyncPro:Make" DependsOnTargets="AsyncPro:Make">
+			<MSBuild Projects="dclAsyncPro.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="AsyncPro">
+			<MSBuild Projects="AsyncPro.dproj"/>
+		</Target>
+		<Target Name="AsyncPro:Clean">
+			<MSBuild Projects="AsyncPro.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="AsyncPro:Make">
+			<MSBuild Projects="AsyncPro.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclAsyncProDep" DependsOnTargets="AsyncProDep">
+			<MSBuild Projects="dclAsyncProDep.dproj"/>
+		</Target>
+		<Target Name="dclAsyncProDep:Clean" DependsOnTargets="AsyncProDep:Clean">
+			<MSBuild Projects="dclAsyncProDep.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclAsyncProDep:Make" DependsOnTargets="AsyncProDep:Make">
+			<MSBuild Projects="dclAsyncProDep.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="AsyncProDep">
+			<MSBuild Projects="AsyncProDep.dproj"/>
+		</Target>
+		<Target Name="AsyncProDep:Clean">
+			<MSBuild Projects="AsyncProDep.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="AsyncProDep:Make">
+			<MSBuild Projects="AsyncProDep.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="dclAsyncPro;AsyncPro;dclAsyncProDep;AsyncProDep"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="dclAsyncPro:Clean;AsyncPro:Clean;dclAsyncProDep:Clean;AsyncProDep:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="dclAsyncPro:Make;AsyncPro:Make;dclAsyncProDep:Make;AsyncProDep:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>
